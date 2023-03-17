@@ -1,4 +1,4 @@
-package com.sdefaa.justmockdashboard.pojo;
+package com.sdefaa.justmockdashboard.pojo.vo;
 
 import lombok.Data;
 

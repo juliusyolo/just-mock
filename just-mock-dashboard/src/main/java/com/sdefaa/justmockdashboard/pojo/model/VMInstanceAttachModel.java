@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
  * @since 1.0.0
  */
 @Data
-public class VMInstanceModel {
+public class VMInstanceAttachModel {
+    private Long id;
     private String pid;
     private String name;
     private String platform;

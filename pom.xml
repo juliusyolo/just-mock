@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>just-mock-common</module>
+        <module>just-mock-agent</module>
     </modules>
 
     <properties>
@@ -17,5 +18,19 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
+    <dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+          <optional>true</optional>
+          <version>1.18.26</version>
+        </dependency>
+        <dependency>
+          <groupId>com.sdefaa</groupId>
+          <artifactId>just-mock-common</artifactId>
+          <version>1.0.0-RELEASE</version>
+        </dependency>
+      </dependencies>
+    </dependencyManagement>
 </project>

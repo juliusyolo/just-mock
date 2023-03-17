@@ -1,5 +1,11 @@
 package com.sdefaa.justmockdashboard.config;
 
+import com.sdefaa.justmockdashboard.enums.ResultStatus;
+import com.sdefaa.justmockdashboard.pojo.ResponseWrapper;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
@@ -11,12 +17,22 @@ import org.springframework.stereotype.Component;
  * <p>
  * @since 1.0.0
  */
-@Aspect
-@Component
+
 public class JustMockControllerAspect {
 
-    @Pointcut(value = "execution(com.sdefaa.justmockdashboard.controller.VMInstanceController)")
+    @Pointcut(value = "execution(public * com.sdefaa.justmockdashboard.controller..*.*(..))")
     public void pointcut(){}
+
+
+    @Around(value = "pointcut()")
+    public Object doResponseWrap(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+      Object proceed = proceedingJoinPoint.proceed();
+      ResponseWrapper<Object> responseWrapper = new ResponseWrapper<>();
+      responseWrapper.setData(proceed);
+      responseWrapper.setCode(ResultStatus.SUCCESS.getCode());
+      responseWrapper.setMessage(ResultStatus.SUCCESS.getMessage());
+      return responseWrapper;
+    }
 
 
 }

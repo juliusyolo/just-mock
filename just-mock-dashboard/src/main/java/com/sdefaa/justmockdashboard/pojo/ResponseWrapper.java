@@ -1,5 +1,6 @@
 package com.sdefaa.justmockdashboard.pojo;
 
+import com.sdefaa.justmockdashboard.enums.Status;
 import lombok.Data;
 
 /**
@@ -14,4 +15,16 @@ public class ResponseWrapper<T>{
     private String code;
     private String message;
     private T data;
+
+    public static <T> ResponseWrapper<T> wrap(Status status,T data){
+      ResponseWrapper<T> responseWrapper = new ResponseWrapper<>();
+      responseWrapper.setCode(status.getCode());
+      responseWrapper.setMessage(status.getMessage());
+      responseWrapper.setData(data);
+      return responseWrapper;
+    }
+
+  public static <T> ResponseWrapper<T> wrap(Status status){
+    return wrap(status,null);
+  }
 }

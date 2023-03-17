@@ -22,6 +22,11 @@ public class GlobalException extends RuntimeException {
         this(status.getCode(), status.getMessage(), cause);
     }
 
+    public GlobalException(Status status) {
+      super(status.getMessage());
+      this.code = status.getCode();
+    }
+
     public String getCode() {
         return code;
     }
