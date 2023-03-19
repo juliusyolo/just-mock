@@ -19,18 +19,38 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencyManagement>
-      <dependencies>
-        <dependency>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok</artifactId>
-          <optional>true</optional>
-          <version>1.18.26</version>
-        </dependency>
-        <dependency>
-          <groupId>com.sdefaa</groupId>
-          <artifactId>just-mock-common</artifactId>
-          <version>1.0.0-RELEASE</version>
-        </dependency>
-      </dependencies>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <optional>true</optional>
+                <version>1.18.26</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sdefaa</groupId>
+                <artifactId>just-mock-common</artifactId>
+                <version>1.0.0-RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>4.1.86.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>2.14.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.32</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.2.9</version>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
 </project>

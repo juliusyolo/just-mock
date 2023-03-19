@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Agent-Class: com.sdefaa.just.mock.agent.MockAgentMain
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
+Can-Set-Native-Method-Prefix: false
+Boot-Class-Path: just-mock-agent-1.0.0-RELEASE.jar
+Class-Path: just-mock-agent-1.0.0-RELEASE.jar just-mock-common-1.0.0-RELEASE.jar jackson-dataformat-yaml-2.14.2.jar jackson-databind-2.14.2.jar

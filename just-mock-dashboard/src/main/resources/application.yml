@@ -1,10 +1,12 @@
 spring:
   datasource:
     username: root
-    password: 527901748
+    password: flowable
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/just_mock?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-
+    url: jdbc:mysql://127.0.0.1:3306/flowable_snippet?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+  mvc:
+    servlet:
+      load-on-startup: 1
 mock:
   agent:
     path: mockAgent
