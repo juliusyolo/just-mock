@@ -15,20 +15,20 @@ import java.io.IOException;
  * @since 1.0.0
  */
 public class JustMockAgentConfigLoader {
-//    public static final JustMockAgentConfigLoader INSTANCE = new JustMockAgentConfigLoader();
-//
-//    private JustMockAgentConfigProperties justMockAgentConfigProperties;
-//
-//    private final  YAMLMapper yamlMapper = new YAMLMapper();
-//
-//    private JustMockAgentConfigLoader(){}
-//
-//    public JustMockAgentConfigLoader load(String filePath) throws IOException {
-//        justMockAgentConfigProperties = yamlMapper.readValue(new File(filePath), JustMockAgentConfigProperties.class);
-//        return this;
-//    }
-//
-//    public AgentConfigProperties agentConfigProperties(){
-//        return justMockAgentConfigProperties.getMock().getAgent();
-//    }
+    public static final JustMockAgentConfigLoader INSTANCE = new JustMockAgentConfigLoader();
+
+    private JustMockAgentConfigProperties justMockAgentConfigProperties;
+
+    private final  YAMLMapper yamlMapper = new YAMLMapper();
+
+    private JustMockAgentConfigLoader(){}
+
+    public JustMockAgentConfigLoader load(String filePath) throws IOException {
+        justMockAgentConfigProperties = yamlMapper.readValue(new File(filePath), JustMockAgentConfigProperties.class);
+        return this;
+    }
+
+    public AgentConfigProperties agentConfigProperties(){
+        return justMockAgentConfigProperties.getMock().getAgent();
+    }
 }

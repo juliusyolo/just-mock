@@ -1,5 +1,6 @@
 package com.sdefaa.justmockdashboard.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.justmockdashboard.bo.VMInstanceBO;
 import com.sdefaa.justmockdashboard.enums.ResultStatus;
 import com.sdefaa.justmockdashboard.exception.GlobalException;
@@ -28,7 +29,8 @@ public class VMInstanceServiceImpl implements VMInstanceService {
   private VMInstanceAttachMapper vmInstanceAttachMapper;
   @Autowired
   private VMInstanceMockInfoMapper vmInstanceMockInfoMapper;
-
+@Autowired
+  ObjectMapper objectMapper;
   @Autowired
   private VMInstanceBO vmInstanceBO;
 

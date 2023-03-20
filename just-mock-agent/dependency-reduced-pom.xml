@@ -18,45 +18,33 @@
             <goals>
               <goal>shade</goal>
             </goals>
-            <configuration>
-              <transformers>
-                <transformer>
-                  <mainClass>com.sdefaa.just.mock.agent.MockAgentMain</mainClass>
-                </transformer>
-              </transformers>
-              <artifactSet>
-                <includes>
-                  <include>com.sdefaa:just-mock-agent</include>
-                  <include>com.fasterxml.jackson.dataformat:jackson-dataformat-yaml</include>
-                  <include>com.sdefaa:just-mock-common</include>
-                  <include>io.netty:netty-all</include>
-                </includes>
-              </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>com.fasterxml.jackson</pattern>
-                  <shadedPattern>com.sdefaa.com.fasterxml.jackson</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>io.netty</pattern>
-                  <shadedPattern>com.sdefaa.io.netty</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <transformers>
+            <transformer>
+              <manifestEntries>
+                <Agent-Class>com.sdefaa.just.mock.agent.MockAgentMain</Agent-Class>
+                <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                <Can-Set-Native-Method-Prefix>false</Can-Set-Native-Method-Prefix>
+              </manifestEntries>
+            </transformer>
+          </transformers>
+          <relocations>
+            <relocation>
+              <pattern>com.fasterxml.jackson</pattern>
+              <shadedPattern>com.sdefaa.jackson</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>io.netty</pattern>
+              <shadedPattern>com.sdefaa.netty</shadedPattern>
+            </relocation>
+          </relocations>
+        </configuration>
       </plugin>
     </plugins>
   </build>
-  <dependencies>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.26</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-  </dependencies>
   <properties>
     <maven.compiler.target>17</maven.compiler.target>
     <maven.compiler.source>17</maven.compiler.source>
