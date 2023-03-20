@@ -15,27 +15,29 @@ import java.util.logging.Logger;
  * <p>
  * @since 1.0.0
  */
-public class EmbeddedHttpServer{
-  private static final Logger logger = Logger.getLogger(EmbeddedHttpServer.class.getName());
-  NioEventLoopGroup bossGroup = new NioEventLoopGroup();
-  NioEventLoopGroup workerGroup = new NioEventLoopGroup();
-    public void start() throws InterruptedException {
-        try {
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                    .childHandler(new EmbeddedServerInitializer());
-            ChannelFuture channelFuture = serverBootstrap.bind(8899).sync();
-            channelFuture.channel().closeFuture().sync();
-            logger.info("start embedded http server");
-        } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
+public class EmbeddedHttpServer {
+    private static final Logger logger = Logger.getLogger(EmbeddedHttpServer.class.getName());
+    private int port;
+    private NioEventLoopGroup bossGroup = new NioEventLoopGroup();
+    private NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
+    public EmbeddedHttpServer(int port) {
+        this.port = port;
     }
 
-    public void stop(){
-     bossGroup.shutdownGracefully();
-     workerGroup.shutdownGracefully();
+    public void start() throws InterruptedException {
+        logger.info("start embedded http server");
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
+        serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+                .childHandler(new EmbeddedServerInitializer());
+        ChannelFuture channelFuture = serverBootstrap.bind(this.port).sync();
+        channelFuture.channel().closeFuture().sync();
+    }
+
+    public void stop()  {
+        logger.info("stop embedded http server");
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
 
 }

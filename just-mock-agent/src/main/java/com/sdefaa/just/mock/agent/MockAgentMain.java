@@ -61,38 +61,19 @@ public class MockAgentMain {
             registry(agentConfigProperties.getRegistryUrl(),apiRegistryDTO);
 
             // 启动内嵌HttpServer，用于心跳检测和注册Mock拦截
-//            ExecutorService executorService = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue());
-//            executorService.submit(() -> {
-//
-//                EmbeddedHttpServer server = new EmbeddedHttpServer();
-//                try {
-//                    server.start();
-//                } catch (InterruptedException e) {
-//                    server.stop();
-//                    logger.info("EmbeddedHttpServer exit!");
-//                }
-//            });
-          EmbeddedHttpServer server = new EmbeddedHttpServer();
-           Thread thread = new Thread(()->{
-//              EmbeddedHttpServer server = new EmbeddedHttpServer();
-              try {
-                server.start();
-              } catch (InterruptedException e) {
-
-                logger.info("EmbeddedHttpServer exit!");
-              }
+            EmbeddedHttpServer server = new EmbeddedHttpServer(8899);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                try {
+                    server.start();
+                } catch (InterruptedException e) {
+                    logger.info("interrupted");
+                    server.stop();
+                }
             });
-            thread.start();
-
             // 添加虚拟机shutdownHook
             Runtime.getRuntime().addShutdownHook(new Thread(()-> {
-              thread.interrupt();
-              server.stop();
-              try {
-                thread.join();
-              } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-              }
+                future.cancel(true);
+                server.stop();
             }));
         }
 
