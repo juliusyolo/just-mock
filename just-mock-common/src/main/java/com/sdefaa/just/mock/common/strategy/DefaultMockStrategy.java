@@ -25,13 +25,8 @@ public class DefaultMockStrategy extends AbstractMockStrategy{
 
   @Override
   protected boolean canMock(Object... parameters) {
-    return false;
+    return true;
   }
 
-
-  public static void main(String[] args) {
-    Faker faker = new Faker(Locale.CHINA);
-    System.out.println(faker.address().city());
-  }
 
 }

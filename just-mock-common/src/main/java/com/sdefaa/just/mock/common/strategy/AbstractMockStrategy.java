@@ -1,5 +1,6 @@
 package com.sdefaa.just.mock.common.strategy;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -33,13 +34,26 @@ public abstract class AbstractMockStrategy implements MockStrategy{
       }
     }
     Faker faker = new Faker();
-    faker.address();
+    Map<String,Object> fakerMap = new HashMap<>();
+    Map<String,Object> address = new HashMap<>();
+    address.put("city",faker.address().city());
+    address.put("buildingNumber",faker.address().buildingNumber());
+    address.put("cityName",faker.address().cityName());
+    address.put("cityPrefix",faker.address().cityPrefix());
+    address.put("citySuffix",faker.address().citySuffix());
+    address.put("country",faker.address().country());
+    address.put("countryCode",faker.address().countryCode());
+    address.put("firstName",faker.address().firstName());
+    address.put("lastName",faker.address().lastName());
+    fakerMap.put("address",address);
+    modelMap.put("faker",fakerMap);
     StringWriter writer = new StringWriter();
     try {
       template.process(modelMap,writer);
+      ObjectMapper objectMapper = new ObjectMapper();
+      return objectMapper.readValue(writer.toString(), returnClass);
     } catch (TemplateException | IOException e) {
-
+      return null;
     }
-    return null;
   }
 }
