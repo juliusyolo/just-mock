@@ -37,6 +37,10 @@
               <shadedPattern>com.sdefaa.jackson</shadedPattern>
             </relocation>
             <relocation>
+              <pattern>org.javassist</pattern>
+              <shadedPattern>com.sdefaa.javassist</shadedPattern>
+            </relocation>
+            <relocation>
               <pattern>io.netty</pattern>
               <shadedPattern>com.sdefaa.netty</shadedPattern>
             </relocation>

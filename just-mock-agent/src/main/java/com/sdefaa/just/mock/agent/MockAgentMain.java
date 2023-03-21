@@ -5,18 +5,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.just.mock.agent.config.JustMockAgentConfigLoader;
 import com.sdefaa.just.mock.agent.pojo.AgentConfigProperties;
 import com.sdefaa.just.mock.agent.server.EmbeddedHttpServer;
+import com.sdefaa.just.mock.agent.transformer.MockClassFileTransformer;
+import com.sdefaa.just.mock.agent.utils.AgentUtils;
 import com.sdefaa.just.mock.common.constant.CommonConstant;
 import com.sdefaa.just.mock.common.pojo.ApiInfo;
 import com.sdefaa.just.mock.common.pojo.ApiRegistryDTO;
 import com.sdefaa.just.mock.common.utils.CommonUtils;
+import javassist.*;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.instrument.Instrumentation;
+import java.lang.instrument.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -75,6 +83,15 @@ public class MockAgentMain {
                 future.cancel(true);
                 server.stop();
             }));
+
+          LOADED_TARGET_CLASSES.forEach(aClass -> Arrays.stream(aClass.getDeclaredMethods()).filter(CommonUtils::hasTargetMethodAnnotation).forEach(method -> {
+            instrumentation.addTransformer(new MockClassFileTransformer(aClass.getName(),method.getName()),true);
+            try {
+              instrumentation.retransformClasses(aClass);
+            } catch (UnmodifiableClassException e) {
+              logger.info("unmodifiable class exception:" + aClass.getName());
+            }
+          }));
         }
 
     }

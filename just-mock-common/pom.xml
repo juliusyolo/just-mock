@@ -23,9 +23,21 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+      <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>javax.el</artifactId>
+      </dependency>
+        <dependency>
+          <groupId>com.github.javafaker</groupId>
+          <artifactId>javafaker</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
+      <dependency>
+        <groupId>org.freemarker</groupId>
+        <artifactId>freemarker</artifactId>
+      </dependency>
     </dependencies>
 </project>

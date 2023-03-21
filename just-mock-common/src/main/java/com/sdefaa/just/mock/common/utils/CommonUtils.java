@@ -9,7 +9,6 @@ import com.sdefaa.just.mock.common.pojo.ApiMethodArgInfo;
 import com.sdefaa.just.mock.common.pojo.ApiMethodInfo;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,15 +27,15 @@ public class CommonUtils {
     private final static String FEIGN_TARGET_CLASS = "@org.springframework.cloud.openfeign.FeignClient";
     private final static List<String> TARGET_CLASSES = Arrays.asList("@org.springframework.stereotype.Controller", "@org.springframework.web.bind.annotation.RestController", FEIGN_TARGET_CLASS);
     private final static String REQUEST_MAPPING_TARGET_METHOD = "@org.springframework.web.bind.annotation.RequestMapping";
-    private final static List<String> TARGET_METHODS = Arrays.asList("@org.springframework.web.bind.annotation.PostMapping", "@org.springframework.web.bind.annotation.GetMapping", "@org.springframework.web.bind.annotation.PutMapping", "@org.springframework.web.bind.annotation.PatchMapping", "@org.springframework.web.bind.annotation.DeleteMapping", REQUEST_MAPPING_TARGET_METHOD);
+    public final static List<String> TARGET_METHODS = Arrays.asList("@org.springframework.web.bind.annotation.PostMapping", "@org.springframework.web.bind.annotation.GetMapping", "@org.springframework.web.bind.annotation.PutMapping", "@org.springframework.web.bind.annotation.PatchMapping", "@org.springframework.web.bind.annotation.DeleteMapping", REQUEST_MAPPING_TARGET_METHOD);
 
     public static Stream<Class> generateTargetClass(Class[] classes) {
-        return Arrays.stream(classes).filter(aClass -> Arrays.stream(aClass.getAnnotations()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains));
+        return Arrays.stream(classes).filter(CommonUtils::hasTargetClassAnnotation);
     }
 
     public static Stream<ApiInfo> generateApiInfoFromTargetClass(Class clazz) {
         String apiType = generateApiType(clazz);
-        return Arrays.stream(clazz.getDeclaredMethods()).filter(method -> Arrays.stream(method.getAnnotations()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_METHODS::contains)).map(method -> {
+        return Arrays.stream(clazz.getDeclaredMethods()).filter(CommonUtils::hasTargetMethodAnnotation).map(method -> {
             ApiInfo apiInfo = new ApiInfo();
             apiInfo.setApiType(apiType);
             apiInfo.setApiUrl(generateApiUrl(method));
@@ -62,6 +61,13 @@ public class CommonUtils {
         });
     }
 
+  public static boolean hasTargetClassAnnotation(Class clazz){
+    return Arrays.stream(clazz.getAnnotations()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains);
+  }
+
+    public static boolean hasTargetMethodAnnotation(Method method){
+      return Arrays.stream(method.getAnnotations()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(CommonUtils.TARGET_METHODS::contains);
+    }
 
     private static String generateClassStruct(Class clazz) {
         if (clazz.isPrimitive() || clazz.isEnum() || clazz == String.class) {

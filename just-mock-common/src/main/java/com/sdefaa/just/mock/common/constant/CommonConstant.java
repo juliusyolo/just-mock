@@ -36,8 +36,8 @@ public class CommonConstant {
     VirtualMachineDescriptor virtualMachineDescriptor = vmDescriptor.get();
     try {
       VirtualMachine vm = VirtualMachine.attach(virtualMachineDescriptor);
-      vm.loadAgent("E:\\Workspace\\IdeaProjects\\creative-explorer-all\\just-mock\\just-mock-agent\\target\\just-mock-agent-1.0.0-RELEASE.jar", "E:\\Workspace\\IdeaProjects\\creative-explorer-all\\just-mock\\just-mock-agent\\src\\main\\resources\\agent.yml " + virtualMachineDescriptor.id());
-     // vm.loadAgent("/Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/target/just-mock-agent-1.0.0-RELEASE.jar", "/Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/src/main/resources/agent.yml " + virtualMachineDescriptor.id());
+     // vm.loadAgent("E:\\Workspace\\IdeaProjects\\creative-explorer-all\\just-mock\\just-mock-agent\\target\\just-mock-agent-1.0.0-RELEASE.jar", "E:\\Workspace\\IdeaProjects\\creative-explorer-all\\just-mock\\just-mock-agent\\src\\main\\resources\\agent.yml " + virtualMachineDescriptor.id());
+      vm.loadAgent("/Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/target/just-mock-agent-1.0.0-RELEASE.jar", "/Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/src/main/resources/agent.yml " + virtualMachineDescriptor.id());
       vm.detach();
     } catch (AttachNotSupportedException e) {
       throw new RuntimeException(e);
