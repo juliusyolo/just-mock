@@ -3,6 +3,7 @@ package com.sdefaa.just.mock.common.strategy;
 import freemarker.template.Template;
 
 import javax.el.*;
+import java.util.Objects;
 
 /**
  * @author Julius Wong
@@ -19,6 +20,9 @@ public class ConditionalMockStrategy extends AbstractMockStrategy{
 
   @Override
   protected boolean canMock(Object... parameters) {
+    if (Objects.isNull(parameters)){
+      return true;
+    }
     ExpressionFactory factory = ExpressionFactory.newInstance();
     ELContext elContext = new StandardELContext(factory);
     VariableMapper variableMapper = elContext.getVariableMapper();
