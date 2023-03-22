@@ -56,6 +56,7 @@ public class VMInstanceController {
     @PostMapping("/v1/api/vm/instance/api/register")
     public ResponseWrapper<Void> registerApiList(@RequestBody ApiRegistryDTO apiRegistryDTO) {
         log.info("register api:{}",apiRegistryDTO.toString());
+        vmInstanceService.registerApiList(apiRegistryDTO);
         return ResponseWrapper.wrap(ResultStatus.SUCCESS);
     }
 

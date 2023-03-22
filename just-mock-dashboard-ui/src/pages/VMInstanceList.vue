@@ -35,7 +35,15 @@ export default defineComponent({
         loading.value = false
       }).catch(error => {
         loading.value = false
-        Message.error({content: error.msg ? error.msg : '系统异常！', duration: 5 * 1000})
+        Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
+      })
+    }
+
+    const queryAllVMInstancesWithoutState = () => {
+      getAllVMInstances().then((d) => {
+        data.value = d;
+      }).catch(error => {
+        Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
       })
     }
 
@@ -46,12 +54,15 @@ export default defineComponent({
         Message.success({content: '连接成功！', duration: 1000, onClose: () => queryAllVMInstances()})
       }).catch(error => {
         attachLoading.value = false
-        Message.error({content: error.msg ? error.msg : '系统异常！', duration: 5 * 1000})
+        Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
       })
     }
 
     onMounted(() => {
       queryAllVMInstances()
+      setInterval(()=>{
+        queryAllVMInstancesWithoutState()
+      },5000)
     })
     const columns = [{
       title: '进程号',

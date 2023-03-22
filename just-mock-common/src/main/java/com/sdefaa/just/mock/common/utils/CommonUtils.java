@@ -8,8 +8,12 @@ import com.sdefaa.just.mock.common.pojo.ApiInfo;
 import com.sdefaa.just.mock.common.pojo.ApiMethodArgInfo;
 import com.sdefaa.just.mock.common.pojo.ApiMethodInfo;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.ServerSocket;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -104,5 +108,11 @@ public class CommonUtils {
             return ApiTypeEnum.FEIGN_API.name();
         }
         return ApiTypeEnum.CONTROLLER_API.name();
+    }
+
+    public static int getAvailablePort() throws IOException {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        }
     }
 }

@@ -25,6 +25,10 @@ export const router = createRouter({
           name: 'template',
           component: TemplateConfiguration,
         },
+        {
+          path: '/',
+          redirect:'/vmInstances'
+        },
       ]
     },
     {
@@ -32,5 +36,9 @@ export const router = createRouter({
       name: 'mockInfo',
       component: MockInfo,
     },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect:'/vmInstances'
+    }
   ],
 });

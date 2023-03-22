@@ -10,7 +10,7 @@ axios.interceptors.response.use((response: AxiosResponse) => {
   if (resp !== undefined && resp.code === SUCCESS_CODE) {
     return resp.data;
   }else {
-    throw new Error(resp !== undefined ? resp.messge : '响应数据为空~');
+    throw new Error(resp !== undefined ? resp.message : '响应数据为空~');
   }
 })
 

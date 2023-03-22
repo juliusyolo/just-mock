@@ -68,7 +68,7 @@ public class MockAgentMain {
             registry(agentConfigProperties.getRegistryUrl(),apiRegistryDTO);
 
             // 启动内嵌HttpServer，用于心跳检测和注册Mock拦截
-            EmbeddedHttpServer server = new EmbeddedHttpServer(8899);
+            EmbeddedHttpServer server = new EmbeddedHttpServer(Integer.parseInt(argvs[2]));
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 try {
                     server.start();
