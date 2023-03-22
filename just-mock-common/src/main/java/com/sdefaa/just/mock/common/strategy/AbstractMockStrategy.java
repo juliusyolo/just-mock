@@ -23,6 +23,11 @@ public abstract class AbstractMockStrategy implements MockStrategy{
     this.template = template;
   }
 
+  /**
+   * 是否开启mock
+   * @param parameters mock方法的请求参数
+   * @return true开启，false不开启
+   */
   protected abstract boolean canMock(Object... parameters);
 
   @Override

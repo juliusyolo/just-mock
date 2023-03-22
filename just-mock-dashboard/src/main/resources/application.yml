@@ -7,7 +7,9 @@ spring:
 
 mock:
   agent:
-    path: mockAgent
+    path: /Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/target/just-mock-agent-1.0.0-RELEASE.jar
+  config:
+    path: /Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/src/main/resources/agent.yml
 management:
   endpoint:
     shutdown:

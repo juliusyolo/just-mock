@@ -26,35 +26,35 @@ public class MockStrategyManager {
         configuration.setTemplateLoader(stringTemplateLoader);
     }
 
-    public boolean shouldMock(String clazzName, String method, Object[] parameters) {
-        return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + method) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + method).canMock(parameters);
+    public boolean shouldMock(String clazzName, String methodName, Object[] parameters) {
+        return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(parameters);
     }
 
 
-    public synchronized void addMock(String clazzName, String method, String templateContent, String el) throws IOException {
-        stringTemplateLoader.putTemplate(clazzName + SPLIT + method, templateContent);
+    public synchronized void addMock(String clazzName, String methodName, String templateContent, String el) throws IOException {
+        stringTemplateLoader.putTemplate(clazzName + SPLIT + methodName, templateContent);
         configuration.clearTemplateCache();
-        Template template = configuration.getTemplate(clazzName + SPLIT + method);
+        Template template = configuration.getTemplate(clazzName + SPLIT + methodName);
         AbstractMockStrategy abstractMockStrategy;
         if (Objects.nonNull(el)) {
             abstractMockStrategy = new ConditionalMockStrategy(template, el);
         } else {
             abstractMockStrategy = new DefaultMockStrategy(template);
         }
-        this.MOCK_STRATEGY_MAP.put(clazzName + SPLIT + method, abstractMockStrategy);
+        this.MOCK_STRATEGY_MAP.put(clazzName + SPLIT + methodName, abstractMockStrategy);
     }
 
-    public void modifyMock(String clazzName, String method, String templateContent, String el) throws IOException {
-        this.addMock(clazzName, method, templateContent, el);
+    public void modifyMock(String clazzName, String methodName, String templateContent, String el) throws IOException {
+        this.addMock(clazzName, methodName, templateContent, el);
     }
 
-    public void removeMock(String clazzName, String method) {
-        stringTemplateLoader.removeTemplate(clazzName + SPLIT + method);
+    public void removeMock(String clazzName, String methodName) {
+        stringTemplateLoader.removeTemplate(clazzName + SPLIT + methodName);
         configuration.clearTemplateCache();
-        this.MOCK_STRATEGY_MAP.remove(clazzName + SPLIT + method);
+        this.MOCK_STRATEGY_MAP.remove(clazzName + SPLIT + methodName);
     }
 
-    public Object doMock(String clazzName, String method, Class<?> returnClazz, Object[] parameter) {
-        return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + method).mock(returnClazz, parameter);
+    public Object doMock(String clazzName, String methodName, Class<?> returnClazz, Object[] parameter) {
+        return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz, parameter);
     }
 }

@@ -41,8 +41,16 @@
               <shadedPattern>com.sdefaa.javassist</shadedPattern>
             </relocation>
             <relocation>
+              <pattern>org.freemarker</pattern>
+              <shadedPattern>com.sdefaa.freemarker</shadedPattern>
+            </relocation>
+            <relocation>
               <pattern>io.netty</pattern>
               <shadedPattern>com.sdefaa.netty</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>com.github.javafaker</pattern>
+              <shadedPattern>com.sdefaa.javafaker</shadedPattern>
             </relocation>
           </relocations>
         </configuration>

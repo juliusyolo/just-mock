@@ -2,6 +2,7 @@ package com.sdefaa.justmockdashboard.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.justmockdashboard.bo.VMInstanceBO;
+import com.sdefaa.justmockdashboard.converter.ToVMInstanceAttachModelConverter;
 import com.sdefaa.justmockdashboard.enums.ResultStatus;
 import com.sdefaa.justmockdashboard.exception.GlobalException;
 import com.sdefaa.justmockdashboard.mapper.VMInstanceAttachMapper;
@@ -29,7 +30,7 @@ public class VMInstanceServiceImpl implements VMInstanceService {
   private VMInstanceAttachMapper vmInstanceAttachMapper;
   @Autowired
   private VMInstanceMockInfoMapper vmInstanceMockInfoMapper;
-@Autowired
+  @Autowired
   ObjectMapper objectMapper;
   @Autowired
   private VMInstanceBO vmInstanceBO;
@@ -42,18 +43,29 @@ public class VMInstanceServiceImpl implements VMInstanceService {
 
   @Override
   public VMInstanceDTO attachVMInstance(String pid) {
-    return vmInstanceBO.attachVMInstance(pid);
+    VMInstanceDTO vmInstanceDTO = vmInstanceBO.attachVMInstance(pid);
+    VMInstanceAttachModel vmInstanceAttachModel = ToVMInstanceAttachModelConverter.INSTANCE.covert(vmInstanceDTO);
+    int effectRows;
+    try {
+      effectRows = vmInstanceAttachMapper.insertVMInstanceAttachModel(vmInstanceAttachModel);
+    } catch (Exception e) {
+      throw new GlobalException(ResultStatus.VM_INSERT_EXCEPTION, e);
+    }
+    if (effectRows != 1) {
+      throw new GlobalException(ResultStatus.VM_INSERT_FAILED);
+    }
+    return vmInstanceDTO;
   }
 
   @Override
   @Transactional(rollbackFor = GlobalException.class)
   public void detachVMInstance(String pid) {
-      try {
-        vmInstanceAttachMapper.deleteVMInstanceAttachModelByPid(pid);
-        vmInstanceMockInfoMapper.deleteVMInstanceMockInfoModelByPid(pid);
-      }catch (Exception e){
-        throw new GlobalException(ResultStatus.VM_DETACH_EXCEPTION);
-      }
+    try {
+      vmInstanceAttachMapper.deleteVMInstanceAttachModelByPid(pid);
+      vmInstanceMockInfoMapper.deleteVMInstanceMockInfoModelByPid(pid);
+    } catch (Exception e) {
+      throw new GlobalException(ResultStatus.VM_DETACH_EXCEPTION);
+    }
   }
 
 }

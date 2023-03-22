@@ -13,6 +13,12 @@ import java.time.LocalDateTime;
 public class VMInstanceMockInfoModel {
   private Long id;
   private String pid;
+  private String className;
+  private String methodName;
+  private String methodArgDesc;
+  private String methodReturnDesc;
+  private String apiUrl;
+  private String apiType;
   private LocalDateTime createTime;
   private LocalDateTime updateTime;
 }

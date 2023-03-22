@@ -48,7 +48,6 @@ public class MockAgentMain {
 
     private static final List<Class> LOADED_TARGET_CLASSES = new ArrayList<>();
 
-    public static final Map<String, Object> map = new ConcurrentHashMap<>();
 
     public static void agentmain(String args, Instrumentation instrumentation) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         if (LOADED.compareAndSet(false, true)) {

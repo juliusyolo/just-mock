@@ -35,26 +35,30 @@ public class MockClassFileTransformer implements ClassFileTransformer {
         pool.insertClassPath(new LoaderClassPath(loader));
         CtClass ctClass = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
         CtMethod ctMethod = ctClass.getDeclaredMethod(this.methodName);
-        StringBuilder sb = new StringBuilder();
-        sb.append("if(com.sdefaa.just.mock.common.strategy.MockStrategyManager.INSTANCE.shouldMock(\""+this.className+"\",\""+this.methodName+"\")){");
-        sb.append("return ($r)com.sdefaa.just.mock.common.strategy.MockStrategyManager.INSTANCE.doMock(\""+this.className+"\",\""+this.methodName+"\",$type");
         CtClass[] parameterTypes = ctMethod.getParameterTypes();
-        if (parameterTypes.length>0){
-          sb.append(",new Object[]{");
+        StringBuilder parameters = new StringBuilder();
+        if (parameterTypes.length > 0) {
+          parameters.append(",new Object[]{");
           for (int i = 1; i < parameterTypes.length; i++) {
-            sb.append("(Object)$"+i+",");
+            parameters.append("(Object)$" + i + ",");
           }
-          sb.append("(Object)$"+parameterTypes.length);
-          sb.append("}");
-        }else {
-          sb.append(",null");
+          parameters.append("(Object)$" + parameterTypes.length);
+          parameters.append("}");
+        } else {
+          parameters.append(",null");
         }
+        StringBuilder sb = new StringBuilder();
+        sb.append("if(com.sdefaa.just.mock.common.strategy.MockStrategyManager.INSTANCE.shouldMock(\"" + this.className + "\",\"" + this.methodName + "\"");
+        sb.append(parameters);
+        sb.append(")){");
+        sb.append("return ($r)com.sdefaa.just.mock.common.strategy.MockStrategyManager.INSTANCE.doMock(\"" + this.className + "\",\"" + this.methodName + "\",$type");
+        sb.append(parameters);
         sb.append(");");
         sb.append("}");
         ctMethod.insertBefore(sb.toString());
         byte[] byteCode = ctClass.toBytecode();
         ctClass.detach();
-        Path byteCodePath = Paths.get(this.className+ ".class");
+        Path byteCodePath = Paths.get(this.className + ".class");
         Files.write(byteCodePath, byteCode);
         return byteCode;
       } catch (Throwable e) {

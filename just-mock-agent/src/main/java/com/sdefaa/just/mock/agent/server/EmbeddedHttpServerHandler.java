@@ -1,7 +1,11 @@
 package com.sdefaa.just.mock.agent.server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.just.mock.agent.MockAgentMain;
 import com.sdefaa.just.mock.common.constant.CommonConstant;
+import com.sdefaa.just.mock.common.pojo.ApiMockCommandDTO;
+import com.sdefaa.just.mock.common.strategy.MockStrategyManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,6 +16,7 @@ import io.netty.util.CharsetUtil;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -50,11 +55,24 @@ public class EmbeddedHttpServerHandler extends SimpleChannelInboundHandler<FullH
         RequestHandler ACTIVE = request -> {
             // 获取请求正文
             String body = request.content().toString(CharsetUtil.UTF_8);
-            System.out.println(body);
-            System.out.println("请求方法名：" + request.method().name());
-            System.out.println(request.uri());
-            MockAgentMain.map.put("","");
-            ByteBuf content = Unpooled.copiedBuffer(body, CharsetUtil.UTF_8);
+            ObjectMapper objectMapper = new ObjectMapper();
+            String responseBody = "{\"code\":\"000000\",\"message\":\"成功\"}";
+            try {
+              ApiMockCommandDTO  apiMockCommandDTO = objectMapper.readValue(body, ApiMockCommandDTO.class);
+              String commandType = apiMockCommandDTO.getCommandType();
+              if (Objects.equals(commandType,ApiMockCommandDTO.CommandType.ADD.name())){
+                MockStrategyManager.INSTANCE.addMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName(),apiMockCommandDTO.getTemplateContent(),apiMockCommandDTO.getEl());
+              }else if (Objects.equals(commandType,ApiMockCommandDTO.CommandType.MODIFY.name())){
+                MockStrategyManager.INSTANCE.modifyMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName(),apiMockCommandDTO.getTemplateContent(),apiMockCommandDTO.getEl());
+              }else if (Objects.equals(commandType,ApiMockCommandDTO.CommandType.REMOVE.name())){
+                MockStrategyManager.INSTANCE.removeMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName());
+              }else {
+                responseBody = "{\"code\":\"999999\",\"message\":\"命令未匹配\"}";
+              }
+            } catch (Exception e) {
+              responseBody = "{\"code\":\"999999\",\"message\":\""+e.getMessage()+"\"}";
+            }
+            ByteBuf content = Unpooled.copiedBuffer(responseBody, CharsetUtil.UTF_8);
             DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, CommonConstant.APPLICATION_JSON);
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());

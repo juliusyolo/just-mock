@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Julius Wong
@@ -26,14 +23,19 @@ public class VMInstanceBOImpl implements VMInstanceBO {
   private final static String VM_SELF = "com.sdefaa.justmockdashboard.JustMockDashboardApplication";
   @Value("${mock.agent.path}")
   private String mockAgentPath;
-
+  @Value("${mock.config.path}")
+  private String mockConfigPath;
   @Override
   public List<VMInstanceDTO> vmInstanceWrap(List<VMInstanceAttachModel> vmInstanceAttachModelList) {
     List<VirtualMachineDescriptor> virtualMachineDescriptors = VirtualMachine.list();
     // 所有的本地虚拟机实例
     List<VMInstanceDTO> allVMInstanceDTOs = virtualMachineDescriptors.stream().filter(virtualMachineDescriptor -> !Objects.equals(virtualMachineDescriptor.displayName(),VM_SELF)).map(virtualMachineDescriptor -> {
       VMInstanceDTO vmInstanceDTO = new VMInstanceDTO();
-      vmInstanceDTO.setName(virtualMachineDescriptor.displayName());
+      if (virtualMachineDescriptor.displayName().isEmpty()){
+        vmInstanceDTO.setName("无");
+      }else {
+        vmInstanceDTO.setName(virtualMachineDescriptor.displayName().split(" ")[0]);
+      }
       vmInstanceDTO.setPid(virtualMachineDescriptor.id());
       vmInstanceDTO.setVendor(virtualMachineDescriptor.provider().name());
       vmInstanceDTO.setPlatform(virtualMachineDescriptor.provider().type());
@@ -44,16 +46,17 @@ public class VMInstanceBOImpl implements VMInstanceBO {
     List<VMInstanceDTO> attachedVMInstanceDTOs = vmInstanceAttachModelList.stream().map(ToVMInstanceDTOConverter.INSTANCE::covert).toList();
     // 未被连接的虚拟机实例
     List<VMInstanceDTO> unattachedVMInstanceDTOs = allVMInstanceDTOs.stream()
-      .filter(vmInstanceDTO -> attachedVMInstanceDTOs.stream().noneMatch(attachedVMInstanceDTO -> Objects.equals(vmInstanceDTO.getName(), attachedVMInstanceDTO.getName())))
+      .filter(vmInstanceDTO -> attachedVMInstanceDTOs.stream().noneMatch(attachedVMInstanceDTO -> Objects.equals(vmInstanceDTO.getPid(), attachedVMInstanceDTO.getPid())))
       .toList();
     // 过滤后的已连接的虚拟机实例
     List<VMInstanceDTO> filteredAttachedVMInstanceDTOs = allVMInstanceDTOs.stream()
-      .filter(vmInstanceDTO -> attachedVMInstanceDTOs.stream().anyMatch(attachedVMInstanceDTO -> Objects.equals(vmInstanceDTO.getName(), attachedVMInstanceDTO.getName())))
+      .filter(vmInstanceDTO -> attachedVMInstanceDTOs.stream().anyMatch(attachedVMInstanceDTO -> Objects.equals(vmInstanceDTO.getPid(), attachedVMInstanceDTO.getPid())))
       .peek(vmInstanceDTO -> vmInstanceDTO.setAttached(true))
       .toList();
     List<VMInstanceDTO> vmInstanceDTOList = new ArrayList<>();
     vmInstanceDTOList.addAll(unattachedVMInstanceDTOs);
     vmInstanceDTOList.addAll(filteredAttachedVMInstanceDTOs);
+    vmInstanceDTOList.sort(Comparator.comparing(VMInstanceDTO::getPid));
     return vmInstanceDTOList;
   }
 
@@ -67,7 +70,7 @@ public class VMInstanceBOImpl implements VMInstanceBO {
     VirtualMachineDescriptor virtualMachineDescriptor = vmDescriptor.get();
     try {
       VirtualMachine vm = VirtualMachine.attach(virtualMachineDescriptor);
-      vm.loadAgent(mockAgentPath);
+      vm.loadAgent(mockAgentPath,mockConfigPath.concat(" ").concat(pid));
       vm.detach();
     } catch (AttachNotSupportedException e) {
       throw new GlobalException(ResultStatus.ATTACH_NOT_SUPPORTED_EXCEPTION, e);
