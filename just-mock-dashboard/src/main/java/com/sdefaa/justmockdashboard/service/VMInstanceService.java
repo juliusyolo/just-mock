@@ -2,7 +2,6 @@ package com.sdefaa.justmockdashboard.service;
 
 import com.sdefaa.just.mock.common.pojo.ApiRegistryDTO;
 import com.sdefaa.justmockdashboard.pojo.dto.VMInstanceDTO;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 

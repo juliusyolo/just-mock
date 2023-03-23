@@ -15,5 +15,6 @@ import java.util.List;
 @Data
 public class ApiRegistryDTO implements Serializable {
     private String pid;
+    private Integer port;
     private List<ApiInfo> apiInfos;
 }

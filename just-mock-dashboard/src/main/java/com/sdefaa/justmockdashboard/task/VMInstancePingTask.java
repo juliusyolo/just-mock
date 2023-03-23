@@ -1,11 +1,9 @@
 package com.sdefaa.justmockdashboard.task;
 
 import com.sdefaa.just.mock.common.constant.CommonConstant;
+import com.sdefaa.justmockdashboard.service.VMInstanceService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
@@ -22,14 +20,19 @@ public class VMInstancePingTask implements Runnable {
 
     private final RestTemplate restTemplate;
 
+    private final VMInstanceService vmInstanceService;
+
+    private final String pid;
     private final int port;
 
-    public VMInstancePingTask(RestTemplate restTemplate, int port) {
-        this.restTemplate = restTemplate;
-        this.port = port;
-    }
+  public VMInstancePingTask(RestTemplate restTemplate, VMInstanceService vmInstanceService, String pid, int port) {
+    this.restTemplate = restTemplate;
+    this.vmInstanceService = vmInstanceService;
+    this.pid = pid;
+    this.port = port;
+  }
 
-    private volatile boolean continued = true;
+  private volatile boolean continued = true;
 
     private volatile int maxPingCount = 3;
 
@@ -37,16 +40,18 @@ public class VMInstancePingTask implements Runnable {
     public void run() {
         while (continued) {
             try {
-                ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://127.0.0.1:" + port + "/mock/agent/ping", String.class);
+                ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://127.0.0.1:" + this.port + "/mock/agent/ping", String.class);
                 if (!Objects.equals(responseEntity.getBody(), CommonConstant.PONG)) {
                     maxPingCount--;
                 }
-                Thread.sleep(3000);
+                Thread.sleep(5000);
             } catch (Exception e) {
                 maxPingCount--;
-                if (maxPingCount == 0) {
-                    continued = false;
-                }
+            }
+            if (maxPingCount == 0) {
+              continued = false;
+              log.info("retry 3 times for ping {},should detached!",this.pid);
+              vmInstanceService.detachVMInstance(this.pid);
             }
         }
     }

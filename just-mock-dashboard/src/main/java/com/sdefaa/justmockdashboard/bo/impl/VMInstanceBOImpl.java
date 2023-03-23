@@ -61,7 +61,7 @@ public class VMInstanceBOImpl implements VMInstanceBO {
   }
 
   @Override
-  public VMInstanceDTO attachVMInstance(String pid,Integer port) {
+  public VMInstanceDTO attachVMInstance(String pid) {
     List<VirtualMachineDescriptor> virtualMachineDescriptors = VirtualMachine.list();
     Optional<VirtualMachineDescriptor> vmDescriptor = virtualMachineDescriptors.stream().filter(virtualMachineDescriptor -> Objects.equals(virtualMachineDescriptor.id(), pid)).findFirst();
     if (vmDescriptor.isEmpty()) {
@@ -70,7 +70,7 @@ public class VMInstanceBOImpl implements VMInstanceBO {
     VirtualMachineDescriptor virtualMachineDescriptor = vmDescriptor.get();
     try {
       VirtualMachine vm = VirtualMachine.attach(virtualMachineDescriptor);
-      vm.loadAgent(mockAgentPath,mockConfigPath.concat(" ").concat(pid).concat(" ").concat(String.valueOf(port)));
+      vm.loadAgent(mockAgentPath,mockConfigPath.concat(" ").concat(pid));
       vm.detach();
     } catch (AttachNotSupportedException e) {
       throw new GlobalException(ResultStatus.ATTACH_NOT_SUPPORTED_EXCEPTION, e);

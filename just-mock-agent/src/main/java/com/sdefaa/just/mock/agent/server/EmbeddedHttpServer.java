@@ -1,6 +1,5 @@
 package com.sdefaa.just.mock.agent.server;
 
-import com.sdefaa.just.mock.agent.MockAgentMain;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.nio.NioEventLoopGroup;

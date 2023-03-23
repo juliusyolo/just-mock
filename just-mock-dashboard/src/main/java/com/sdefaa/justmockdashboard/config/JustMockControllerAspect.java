@@ -2,13 +2,9 @@ package com.sdefaa.justmockdashboard.config;
 
 import com.sdefaa.justmockdashboard.enums.ResultStatus;
 import com.sdefaa.justmockdashboard.pojo.ResponseWrapper;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Julius Wong

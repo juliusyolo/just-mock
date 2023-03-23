@@ -6,28 +6,23 @@ import com.sdefaa.just.mock.agent.config.JustMockAgentConfigLoader;
 import com.sdefaa.just.mock.agent.pojo.AgentConfigProperties;
 import com.sdefaa.just.mock.agent.server.EmbeddedHttpServer;
 import com.sdefaa.just.mock.agent.transformer.MockClassFileTransformer;
-import com.sdefaa.just.mock.agent.utils.AgentUtils;
 import com.sdefaa.just.mock.common.constant.CommonConstant;
 import com.sdefaa.just.mock.common.pojo.ApiInfo;
 import com.sdefaa.just.mock.common.pojo.ApiRegistryDTO;
 import com.sdefaa.just.mock.common.utils.CommonUtils;
-import javassist.*;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.instrument.*;
+import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -52,6 +47,22 @@ public class MockAgentMain {
     public static void agentmain(String args, Instrumentation instrumentation) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         if (LOADED.compareAndSet(false, true)) {
             String[] argvs = args.split(WHITE_SPACE);
+            int availablePort = CommonUtils.getAvailablePort();
+            // 启动内嵌HttpServer，用于心跳检测和注册Mock拦截
+            EmbeddedHttpServer server = new EmbeddedHttpServer(availablePort);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+              try {
+                server.start();
+              } catch (InterruptedException e) {
+                logger.info("interrupted");
+                server.stop();
+              }
+            });
+            // 添加虚拟机shutdownHook
+            Runtime.getRuntime().addShutdownHook(new Thread(()-> {
+              future.cancel(true);
+              server.stop();
+            }));
             System.out.println(args);
             AgentConfigProperties agentConfigProperties = JustMockAgentConfigLoader.INSTANCE.load(argvs[0]).agentConfigProperties();
             Class[] allLoadedClasses = instrumentation.getAllLoadedClasses();
@@ -64,24 +75,9 @@ public class MockAgentMain {
             ApiRegistryDTO apiRegistryDTO = new ApiRegistryDTO();
             apiRegistryDTO.setApiInfos(apiInfoList);
             apiRegistryDTO.setPid(argvs[1]);
+            apiRegistryDTO.setPort(availablePort);
             //  Upload apiInfoList
             registry(agentConfigProperties.getRegistryUrl(),apiRegistryDTO);
-
-            // 启动内嵌HttpServer，用于心跳检测和注册Mock拦截
-            EmbeddedHttpServer server = new EmbeddedHttpServer(Integer.parseInt(argvs[2]));
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                try {
-                    server.start();
-                } catch (InterruptedException e) {
-                    logger.info("interrupted");
-                    server.stop();
-                }
-            });
-            // 添加虚拟机shutdownHook
-            Runtime.getRuntime().addShutdownHook(new Thread(()-> {
-                future.cancel(true);
-                server.stop();
-            }));
 
           LOADED_TARGET_CLASSES.forEach(aClass -> Arrays.stream(aClass.getDeclaredMethods()).filter(CommonUtils::hasTargetMethodAnnotation).forEach(method -> {
             instrumentation.addTransformer(new MockClassFileTransformer(aClass.getName(),method.getName()),true);

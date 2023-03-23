@@ -1,8 +1,6 @@
 package com.sdefaa.just.mock.agent.server;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sdefaa.just.mock.agent.MockAgentMain;
 import com.sdefaa.just.mock.common.constant.CommonConstant;
 import com.sdefaa.just.mock.common.pojo.ApiMockCommandDTO;
 import com.sdefaa.just.mock.common.strategy.MockStrategyManager;
@@ -13,7 +11,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;

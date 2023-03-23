@@ -2,7 +2,6 @@ package com.sdefaa.justmockdashboard.converter;
 
 import com.sdefaa.justmockdashboard.pojo.dto.VMInstanceDTO;
 import com.sdefaa.justmockdashboard.pojo.model.VMInstanceAttachModel;
-import com.sun.tools.attach.VirtualMachineDescriptor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

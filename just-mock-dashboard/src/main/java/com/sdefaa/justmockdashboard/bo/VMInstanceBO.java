@@ -15,5 +15,5 @@ import java.util.List;
 public interface VMInstanceBO {
   List<VMInstanceDTO> vmInstanceWrap(List<VMInstanceAttachModel> vmInstanceAttachModelList);
 
-  VMInstanceDTO attachVMInstance(String pid,Integer port);
+  VMInstanceDTO attachVMInstance(String pid);
 }

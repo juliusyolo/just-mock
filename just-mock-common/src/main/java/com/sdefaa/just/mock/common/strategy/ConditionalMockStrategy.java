@@ -1,9 +1,6 @@
 package com.sdefaa.just.mock.common.strategy;
 
 import freemarker.template.Template;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.el.*;
 import java.util.Objects;
