@@ -1,27 +1,36 @@
 <script lang="ts">
+import BasicLayout from "../components/BasicLayout.vue";
+
 export default {
-  name: 'Main'
+  name: 'Main',
+  components: {BasicLayout}
 }
 </script>
 
 <template>
-  <div class="main-layout">
-    <a-layout style="height: 100%;">
-      <a-layout-header>
-        <span>
-          <router-link to="/vmInstances">虚拟机实例</router-link>
-          <a-divider direction="vertical" />
-          <router-link to="/template">模板配置</router-link>
-        </span>
-      </a-layout-header>
-      <a-layout-content>
-       <router-view/>
-      </a-layout-content>
-      <a-layout-footer>非侵入式API Mock @Author sdefaa</a-layout-footer>
-    </a-layout>
-  </div>
+  <BasicLayout>
+    <template #header>
+      <a-link @click="linkClick('/vmInstances')">
+        虚拟机实例
+      </a-link>
+      <a-link @click="linkClick('/template')">
+        模板配置
+      </a-link>
+    </template>
+    <template #content>
+      <router-view/>
+    </template>
+  </BasicLayout>
 </template>
+<script setup lang="ts">
 
+import {defineComponent} from "vue";
+import {useRouter} from "vue-router";
+const router = useRouter();
+const linkClick = (href: string) => {
+  router.push(href)
+}
+</script>
 <style lang="less" scoped>
 .main-layout {
   margin: 0 50px 0 50px;

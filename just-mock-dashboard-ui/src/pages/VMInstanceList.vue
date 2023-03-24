@@ -1,4 +1,7 @@
 <template>
+  <a-breadcrumb style="margin: 0 0 10px 0">
+    <a-breadcrumb-item>虚拟机实例列表</a-breadcrumb-item>
+  </a-breadcrumb>
   <a-table :columns="columns" :data="data" :loading="loading" :pagination="false">
     <template #attached="{ record }">
       <a-tag v-if="record.attached" color="green">是</a-tag>

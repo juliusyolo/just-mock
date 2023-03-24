@@ -1,5 +1,5 @@
 import axios, {AxiosResponse} from "axios";
-import {VmInstanceArray} from "./types";
+import {RegisteredApiInfoArray, VmInstanceArray} from "./types";
 
 const SUCCESS_CODE = '000000';
 
@@ -20,4 +20,8 @@ export async function getAllVMInstances(): Promise<VmInstanceArray> {
 
 export async function attachVMInstance(pid:string):Promise<void>{
   return await axios.get('/v1/api/vm/instance/'+pid+'/attach') as void;
+}
+
+export async function getRegisteredApiList(pid:string):Promise<RegisteredApiInfoArray>{
+  return await axios.get('/v1/api/vm/instance/'+pid+'/api/list') as RegisteredApiInfoArray;
 }

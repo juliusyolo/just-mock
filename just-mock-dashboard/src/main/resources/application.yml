@@ -25,5 +25,6 @@ management:
       exposure:
         include: health,shutdown
     enabled-by-default: true
-
-
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
