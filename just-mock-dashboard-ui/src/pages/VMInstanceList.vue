@@ -19,11 +19,12 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, ref} from 'vue'
+import {defineComponent, onMounted, onUnmounted, ref} from 'vue'
 import {VmInstanceArray} from "../api/vm/types";
 import {attachVMInstance, getAllVMInstances} from "../api/vm";
 import {Message} from "@arco-design/web-vue";
 import {useRouter} from "vue-router";
+import {NodeJS} from "timers";
 
 export default defineComponent({
   setup() {
@@ -31,6 +32,7 @@ export default defineComponent({
     const data = ref<VmInstanceArray>([])
     const attachLoading = ref(false)
     const router = useRouter()
+    let intervalId: string | number | NodeJS.Timeout | null | undefined = null;
     const queryAllVMInstances = () => {
       loading.value = true
       getAllVMInstances().then((d) => {
@@ -63,10 +65,11 @@ export default defineComponent({
 
     onMounted(() => {
       queryAllVMInstances()
-      setInterval(()=>{
+      intervalId = setInterval(()=>{
         queryAllVMInstancesWithoutState()
       },5000)
     })
+    onUnmounted(()=> clearInterval(intervalId))
     const columns = [{
       title: '进程号',
       dataIndex: 'pid',

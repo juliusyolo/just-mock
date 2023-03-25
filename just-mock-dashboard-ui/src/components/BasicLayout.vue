@@ -11,7 +11,7 @@
         <div class="header-title">
           <div class="header-logo">
             <a href="/">
-              <svg width="150" height="32">
+              <svg width="155" height="32">
                 <defs>
                   <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" style="stop-color: red; stop-opacity: 1" />
@@ -34,9 +34,8 @@
       <a-divider style="margin: 0"/>
       <a-layout-footer>
         <div class="footer-remark">
-
           <span>
-            <svg width="253" height="32">
+            <svg width="267" height="32">
             <defs>
               <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" style="stop-color: red; stop-opacity: 1" />

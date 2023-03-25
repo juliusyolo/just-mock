@@ -106,9 +106,11 @@ public class VMInstanceServiceImpl implements VMInstanceService {
       }
       return vmInstanceMockInfoModel;
     }).collect(Collectors.toList());
-    int effectRows = vmInstanceMockInfoMapper.bulkInsertVMInstanceMockInfoModelList(vmInstanceMockInfoModelList);
-    if (effectRows != apiRegistryDTO.getApiInfos().size()) {
-      throw new GlobalException(ResultStatus.REGISTER_API_FAILED);
+    if (!vmInstanceMockInfoModelList.isEmpty()){
+      int effectRows = vmInstanceMockInfoMapper.bulkInsertVMInstanceMockInfoModelList(vmInstanceMockInfoModelList);
+      if (effectRows != apiRegistryDTO.getApiInfos().size()) {
+        throw new GlobalException(ResultStatus.REGISTER_API_FAILED);
+      }
     }
     threadPoolTaskExecutor.submit(new VMInstancePingTask(restTemplate, this, apiRegistryDTO.getPid(), apiRegistryDTO.getPort()));
   }

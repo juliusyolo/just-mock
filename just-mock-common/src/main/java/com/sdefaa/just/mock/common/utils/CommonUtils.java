@@ -72,8 +72,8 @@ public class CommonUtils {
     }
 
     private static String generateClassStruct(Class clazz) {
-        if (clazz.isPrimitive() || clazz.isEnum() || clazz == String.class) {
-            return "primitive";
+        if (clazz.isPrimitive()||Character.class.isAssignableFrom(clazz) ||Boolean.class.isAssignableFrom(clazz)||Number.class.isAssignableFrom(clazz)|| clazz.isEnum() || clazz == String.class) {
+            return clazz.getName();
         }
         Map<String, String> map = new HashMap<>();
         Arrays.stream(clazz.getDeclaredFields()).forEach(field -> map.put(field.getName(), generateClassStruct(field.getType())));

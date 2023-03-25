@@ -46,6 +46,7 @@ public class VMInstancePingTask implements Runnable {
                 }
                 Thread.sleep(5000);
             } catch (Exception e) {
+                e.printStackTrace();
                 maxPingCount--;
             }
             if (maxPingCount == 0) {
