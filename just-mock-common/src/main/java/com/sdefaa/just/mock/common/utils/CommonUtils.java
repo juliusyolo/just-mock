@@ -64,7 +64,7 @@ public class CommonUtils {
     }
 
   public static boolean hasTargetClassAnnotation(Class clazz){
-    return Arrays.stream(clazz.getAnnotations()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains);
+    return !clazz.isInterface()&&Arrays.stream(clazz.getAnnotations()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains);
   }
 
     public static boolean hasTargetMethodAnnotation(Method method){
