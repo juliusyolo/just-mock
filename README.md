@@ -17,5 +17,5 @@
   }
 </style>
 <div class="header-logo">
-  <img src="logo.svg"/>
+  <img src="https://github.com/4defaa/just-mock/blob/5948f1a341d96f565c5fc812f96f3c38f104eacf/logo.svg"/>
 </div>
