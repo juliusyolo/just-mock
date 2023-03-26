@@ -8,6 +8,7 @@
 *.ctxt
 
 .idea
+.DS_Store
 
 **/target/**
 
