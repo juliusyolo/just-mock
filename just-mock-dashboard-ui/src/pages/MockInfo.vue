@@ -87,7 +87,13 @@ export default defineComponent({
         </template>
         <template #expand-row="{record}">
           <h3>类名:</h3><b>{{ record.className }}</b>
+          <h3>类注解:</h3>
+          <a-textarea disabled v-model="record.classAnnotationsDesc"
+                      :auto-size="true"/>
           <h3>方法名:</h3><b>{{ record.methodName }}</b>
+          <h3>方法注解:</h3>
+          <a-textarea disabled v-model="record.methodAnnotationsDesc"
+                      :auto-size="true"/>
           <h3>方法参数描述:</h3>
           <template v-if="parseToArgInfoList(record.methodArgsDesc).length===0">无</template>
           <template v-else v-for="(argInfo,index) in parseToArgInfoList(record.methodArgsDesc)">

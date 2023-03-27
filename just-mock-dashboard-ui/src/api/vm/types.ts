@@ -11,9 +11,11 @@ export type VmInstanceArray = Array<VmInstance>;
 export type RegisteredApiInfo = {
   pid: string;
   className: string;
+  classAnnotationsDesc:string;
   methodName: string;
   methodArgsDesc: string;
   methodReturnDesc: string;
+  methodAnnotationsDesc:string;
   apiUrl: string;
   apiType: string;
   apiMethod: string;
