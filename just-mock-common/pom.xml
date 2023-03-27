@@ -8,9 +8,8 @@
         <artifactId>just-mock</artifactId>
         <version>1.0.0-RELEASE</version>
     </parent>
-
     <artifactId>just-mock-common</artifactId>
-
+    <version>${just.mock.common.version}</version>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>

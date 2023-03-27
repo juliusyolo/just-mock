@@ -20,6 +20,8 @@ public class VMInstanceMockInfoModel {
   private String apiUrl;
   private String apiType;
   private String apiMethod;
+  private String methodAnnotationsDesc;
+  private String classAnnotationsDesc;
   private LocalDateTime createTime;
   private LocalDateTime updateTime;
 }

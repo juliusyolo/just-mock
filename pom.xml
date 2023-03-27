@@ -3,7 +3,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.sdefaa</groupId>
     <artifactId>just-mock</artifactId>
     <version>1.0.0-RELEASE</version>
@@ -11,25 +10,47 @@
     <modules>
         <module>just-mock-common</module>
         <module>just-mock-agent</module>
+        <module>just-mock-dashboard</module>
+        <module>just-mock-test</module>
     </modules>
-
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <just.mock.common.version>1.0.0-RELEASE</just.mock.common.version>
+        <just.mock.agent.version>1.0.0-RELEASE</just.mock.agent.version>
+        <just.mock.dashboard.version>1.0.0-RELEASE</just.mock.dashboard.version>
+        <just.mock.test.version>1.0.0-RELEASE</just.mock.test.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-boot.version>3.0.4</spring-boot.version>
+        <spring-cloud.version>2022.0.1</spring-cloud.version>
+        <lombok.version>1.18.26</lombok.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-dependencies</artifactId>
+              <version>${spring-boot.version}</version>
+              <type>pom</type>
+              <scope>import</scope>
+            </dependency>
+            <dependency>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-dependencies</artifactId>
+              <version>${spring-cloud.version}</version>
+              <type>pom</type>
+              <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <optional>true</optional>
-                <version>1.18.26</version>
+                <version>${lombok.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.sdefaa</groupId>
                 <artifactId>just-mock-common</artifactId>
-                <version>1.0.0-RELEASE</version>
+                <version>${just.mock.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -73,4 +94,31 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+  <repositories>
+    <repository>
+      <id>nexus-163</id>
+      <name>Nexus 163</name>
+      <url>http://mirrors.163.com/maven/repository/maven-public/</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>nexus-163</id>
+      <name>Nexus 163</name>
+      <url>http://mirrors.163.com/maven/repository/maven-public/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
 </project>

@@ -101,6 +101,8 @@ public class VMInstanceServiceImpl implements VMInstanceService {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         vmInstanceMockInfoModel.setMethodArgsDesc(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiInfo.getApiMethodInfo().getInputs()));
         vmInstanceMockInfoModel.setMethodReturnDesc(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiInfo.getApiMethodInfo().getOutput()));
+        vmInstanceMockInfoModel.setClassAnnotationsDesc(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiInfo.getApiClassInfo().getAnnotations()));
+        vmInstanceMockInfoModel.setMethodAnnotationsDesc(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiInfo.getApiMethodInfo().getAnnotations()));
       } catch (JsonProcessingException e) {
         throw new GlobalException(ResultStatus.JSON_PROCESS_EXCEPTION, e);
       }

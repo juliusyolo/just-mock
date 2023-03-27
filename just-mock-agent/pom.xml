@@ -8,9 +8,8 @@
     <artifactId>just-mock</artifactId>
     <version>1.0.0-RELEASE</version>
   </parent>
-
   <artifactId>just-mock-agent</artifactId>
-
+  <version>${just.mock.agent.version}</version>
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
@@ -56,6 +55,7 @@
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.4.1</version>
         <configuration>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
               <manifestEntries>

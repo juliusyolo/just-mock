@@ -3,6 +3,8 @@ package com.sdefaa.just.mock.test.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 /**
  * @author Julius Wong
  * <p>
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class RestControllerTest  {
     @Autowired
     FeignTest feignTest;
-    public String test(){
+    public String hello(){
        return feignTest.hello();
     }
 }

@@ -1,11 +1,7 @@
 package com.sdefaa.just.mock.test.controller;
 
-import feign.Feign;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;

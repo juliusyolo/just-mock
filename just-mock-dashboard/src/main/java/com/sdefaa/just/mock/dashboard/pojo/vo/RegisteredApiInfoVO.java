@@ -13,6 +13,8 @@ public class RegisteredApiInfoVO {
   private String methodName;
   private String methodArgsDesc;
   private String methodReturnDesc;
+  private String methodAnnotationsDesc;
+  private String classAnnotationsDesc;
   private String apiUrl;
   private String apiType;
   private String apiMethod;

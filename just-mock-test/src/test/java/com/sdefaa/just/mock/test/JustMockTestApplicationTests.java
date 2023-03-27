@@ -1,8 +1,6 @@
 package com.sdefaa.just.mock.test;
 
 import com.sdefaa.just.mock.test.controller.FeignTest;
-import com.sdefaa.just.mock.test.controller.RestControllerTest;
-import feign.Feign;
 import org.junit.jupiter.api.Test;
 import org.springframework.asm.ClassReader;
 import org.springframework.asm.ClassVisitor;
@@ -10,12 +8,8 @@ import org.springframework.asm.ClassWriter;
 import org.springframework.asm.Opcodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 

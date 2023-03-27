@@ -9,6 +9,7 @@ import com.sdefaa.just.mock.agent.transformer.MockClassFileTransformer;
 import com.sdefaa.just.mock.common.constant.CommonConstant;
 import com.sdefaa.just.mock.common.pojo.ApiInfo;
 import com.sdefaa.just.mock.common.pojo.ApiRegistryDTO;
+import com.sdefaa.just.mock.common.pojo.TargetClass;
 import com.sdefaa.just.mock.common.utils.CommonUtils;
 
 import java.io.DataOutputStream;
@@ -18,10 +19,7 @@ import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
@@ -40,9 +38,6 @@ public class MockAgentMain {
     private static final AtomicBoolean LOADED = new AtomicBoolean(false);
 
     private static final String WHITE_SPACE = " ";
-
-    private static final List<Class> LOADED_TARGET_CLASSES = new ArrayList<>();
-
 
     public static void agentmain(String args, Instrumentation instrumentation) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         if (LOADED.compareAndSet(false, true)) {
@@ -63,12 +58,12 @@ public class MockAgentMain {
               future.cancel(true);
               server.stop();
             }));
-            System.out.println(args);
             AgentConfigProperties agentConfigProperties = JustMockAgentConfigLoader.INSTANCE.load(argvs[0]).agentConfigProperties();
             Class[] allLoadedClasses = instrumentation.getAllLoadedClasses();
-            List<Class> loadedTargetClasses = CommonUtils.generateTargetClass(allLoadedClasses).collect(Collectors.toList());
-            LOADED_TARGET_CLASSES.addAll(loadedTargetClasses);
-            System.out.println(loadedTargetClasses.toString());
+            List<TargetClass> loadedTargetClasses = Arrays.stream(allLoadedClasses)
+              .map(CommonUtils::generateTargetClass)
+              .filter(Objects::nonNull)
+              .collect(Collectors.toList());
             List<ApiInfo> apiInfoList = loadedTargetClasses.stream()
                     .flatMap(CommonUtils::generateApiInfoFromTargetClass)
                     .toList();
@@ -78,13 +73,12 @@ public class MockAgentMain {
             apiRegistryDTO.setPort(availablePort);
             //  Upload apiInfoList
             registry(agentConfigProperties.getRegistryUrl(),apiRegistryDTO);
-
-          LOADED_TARGET_CLASSES.forEach(aClass -> Arrays.stream(aClass.getDeclaredMethods()).filter(CommonUtils::hasTargetMethodAnnotation).forEach(method -> {
-            instrumentation.addTransformer(new MockClassFileTransformer(aClass.getName(),method.getName()),true);
+            loadedTargetClasses.forEach(targetClass -> targetClass.getTargetMethods().forEach(targetMethod -> {
+            instrumentation.addTransformer(new MockClassFileTransformer(targetClass.getClazz().getName(),targetMethod.getMethod().getName()),true);
             try {
-              instrumentation.retransformClasses(aClass);
+              instrumentation.retransformClasses(targetClass.getClazz());
             } catch (UnmodifiableClassException e) {
-              logger.info("unmodifiable class exception:" + aClass.getName());
+              logger.info("unmodifiable class exception:" + targetClass.getClazz().getName());
             }
           }));
         }

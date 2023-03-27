@@ -2,6 +2,8 @@ package com.sdefaa.just.mock.common.pojo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author Julius Wong
  * <p>
@@ -12,4 +14,5 @@ import lombok.Data;
 @Data
 public class ApiClassInfo {
   private String className;
+  private List<String> annotations;
 }
