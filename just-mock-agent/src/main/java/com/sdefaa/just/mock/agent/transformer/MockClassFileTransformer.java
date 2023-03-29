@@ -1,7 +1,7 @@
 package com.sdefaa.just.mock.agent.transformer;
 
 import com.sdefaa.just.mock.agent.config.JustMockAgentConfigLoader;
-import com.sdefaa.just.mock.common.pojo.CustomVariable;
+import com.sdefaa.just.mock.common.pojo.RandomVariable;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -25,14 +25,15 @@ public class MockClassFileTransformer implements ClassFileTransformer {
   private static final Logger logger = Logger.getLogger(MockClassFileTransformer.class.getName());
   private final String className;
   private final String methodName;
-  private final List<CustomVariable> customVariableList;
-
+  private final List<RandomVariable> randomVariableList;
+  private final List<String> environmentVariableList;
   private final List<String> taskDefinitionList;
 
-  public MockClassFileTransformer(String className, String methodName, List<CustomVariable> customVariableList, List<String> taskDefinitionList) {
+  public MockClassFileTransformer(String className, String methodName, List<RandomVariable> randomVariableList, List<String> environmentVariableList, List<String> taskDefinitionList) {
     this.className = className;
     this.methodName = methodName;
-    this.customVariableList = customVariableList;
+    this.randomVariableList = randomVariableList;
+    this.environmentVariableList = environmentVariableList;
     this.taskDefinitionList = taskDefinitionList;
   }
 
@@ -48,21 +49,31 @@ public class MockClassFileTransformer implements ClassFileTransformer {
         StringBuilder parameters = new StringBuilder();
         if (parameterTypes.length > 0) {
           parameters.append(",new Object[]{");
-          for (int i = 1; i < parameterTypes.length; i++) {
-            parameters.append("(Object)$" + i + ",");
+          if (environmentVariableList.isEmpty()){
+            for (int i = 1; i < parameterTypes.length; i++) {
+              parameters.append("(Object)$" + i + ",");
+            }
+            parameters.append("(Object)$" + parameterTypes.length);
+          }else {
+            for (int i = 1; i < parameterTypes.length+1; i++) {
+              parameters.append("(Object)$" + i + ",");
+            }
+            for (int i = 0; i < environmentVariableList.size()-1; i++) {
+              parameters.append("(Object)" + environmentVariableList.get(i) + ",");
+            }
+            parameters.append("(Object)" + environmentVariableList.get(environmentVariableList.size()-1));
           }
-          parameters.append("(Object)$" + parameterTypes.length);
           parameters.append("}");
         } else {
           parameters.append(",null");
         }
         StringBuilder customVariables = new StringBuilder();
-        if (Objects.nonNull(customVariableList) && customVariableList.size() > 0) {
-          customVariables.append(",new com.sdefaa.just.mock.common.pojo.CustomVariable[]{");
-          for (int i = 0; i < customVariableList.size() - 1; i++) {
-            customVariables.append("new com.sdefaa.just.mock.common.pojo.CustomVariable(" + customVariableList.get(i).getType() + "," + customVariableList.get(i).getContent() + "),");
+        if (Objects.nonNull(randomVariableList) && randomVariableList.size() > 0) {
+          customVariables.append(",new com.sdefaa.just.mock.common.pojo.RandomVariable[]{");
+          for (int i = 0; i < randomVariableList.size() - 1; i++) {
+            customVariables.append("new com.sdefaa.just.mock.common.pojo.RandomVariable(" + randomVariableList.get(i).getName() + "," + randomVariableList.get(i).getSequence() + "),");
           }
-          customVariables.append("new com.sdefaa.just.mock.common.pojo.CustomVariable(" + customVariableList.get(customVariableList.size() - 1).getType() + "," + customVariableList.get(customVariableList.size() - 1).getContent() + "),");
+          customVariables.append("new com.sdefaa.just.mock.common.pojo.RandomVariable(" + randomVariableList.get(randomVariableList.size() - 1).getName() + "," + randomVariableList.get(randomVariableList.size() - 1).getSequence() + ")");
           customVariables.append("}");
         } else {
           customVariables.append(",null");
@@ -101,7 +112,7 @@ public class MockClassFileTransformer implements ClassFileTransformer {
         }
         return byteCode;
       } catch (Throwable e) {
-        logger.info("目标类的方法修改失败,"+e);
+        logger.info("目标类的方法修改异常,"+e);
         throw new RuntimeException(e);
       }
     }

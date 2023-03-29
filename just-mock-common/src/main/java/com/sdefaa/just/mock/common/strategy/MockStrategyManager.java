@@ -1,6 +1,6 @@
 package com.sdefaa.just.mock.common.strategy;
 
-import com.sdefaa.just.mock.common.pojo.CustomVariable;
+import com.sdefaa.just.mock.common.pojo.RandomVariable;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -27,8 +27,8 @@ public class MockStrategyManager {
         configuration.setTemplateLoader(stringTemplateLoader);
     }
 
-    public boolean shouldMock(String clazzName, String methodName,CustomVariable[] customVariables, Object[] parameters) {
-        return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(customVariables,parameters);
+    public boolean shouldMock(String clazzName, String methodName, RandomVariable[] randomVariables, Object[] parameters) {
+        return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(randomVariables,parameters);
     }
 
     public synchronized void putMock(String clazzName, String methodName, String templateContent, String el) throws IOException {
@@ -50,7 +50,7 @@ public class MockStrategyManager {
         this.MOCK_STRATEGY_MAP.remove(clazzName + SPLIT + methodName);
     }
 
-    public Object doMock(String clazzName, String methodName, Class<?> returnClazz, CustomVariable[] customVariables,String[] taskDefinition, Object[] parameters) {
-        return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz,customVariables, parameters);
+    public Object doMock(String clazzName, String methodName, Class<?> returnClazz, RandomVariable[] randomVariables, String[] taskDefinition, Object[] parameters) {
+        return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz, randomVariables, parameters);
     }
 }

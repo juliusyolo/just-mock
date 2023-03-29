@@ -42,10 +42,6 @@
       <artifactId>lombok</artifactId>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>com.github.javafaker</groupId>
-      <artifactId>javafaker</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
@@ -82,10 +78,6 @@
             <relocation>
               <pattern>io.netty</pattern>
               <shadedPattern>com.sdefaa.netty</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>com.github.javafaker</pattern>
-              <shadedPattern>com.sdefaa.javafaker</shadedPattern>
             </relocation>
           </relocations>
         </configuration>

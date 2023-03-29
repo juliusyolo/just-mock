@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomVariable {
-  private String type;
-  private String content;
+public class RandomVariable {
+  private String name;
+  private String sequence;
 
 }

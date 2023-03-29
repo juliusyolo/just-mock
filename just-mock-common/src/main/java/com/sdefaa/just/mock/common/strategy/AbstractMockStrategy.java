@@ -2,8 +2,7 @@ package com.sdefaa.just.mock.common.strategy;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.javafaker.Faker;
-import com.sdefaa.just.mock.common.pojo.CustomVariable;
+import com.sdefaa.just.mock.common.pojo.RandomVariable;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -12,6 +11,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.logging.Logger;
 
 /**
@@ -31,30 +31,23 @@ public abstract class AbstractMockStrategy implements MockStrategy{
    * @param parameters mock方法的请求参数
    * @return true开启，false不开启
    */
-  protected abstract boolean canMock(CustomVariable[] customVariables, Object[] parameters);
+  protected abstract boolean canMock(RandomVariable[] randomVariables, Object[] parameters);
 
   @Override
-  public Object mock(Class<?> returnClass,CustomVariable[] customVariables, Object[] parameters) {
+  public Object mock(Class<?> returnClass, RandomVariable[] randomVariables, Object[] parameters) {
     Map<String,Object> modelMap = new HashMap<>();
     if (Objects.nonNull(parameters)){
       for (int i = 0; i < parameters.length; i++) {
         modelMap.put("p"+i,parameters[i]);
       }
     }
-    Faker faker = new Faker();
-    Map<String,Object> fakerMap = new HashMap<>();
-    Map<String,Object> address = new HashMap<>();
-    address.put("city",faker.address().city());
-    address.put("buildingNumber",faker.address().buildingNumber());
-    address.put("cityName",faker.address().cityName());
-    address.put("cityPrefix",faker.address().cityPrefix());
-    address.put("citySuffix",faker.address().citySuffix());
-    address.put("country",faker.address().country());
-    address.put("countryCode",faker.address().countryCode());
-    address.put("firstName",faker.address().firstName());
-    address.put("lastName",faker.address().lastName());
-    fakerMap.put("address",address);
-    modelMap.put("faker",fakerMap);
+    if (Objects.nonNull(randomVariables)){
+      for (RandomVariable randomVariable : randomVariables) {
+        String[] seq = randomVariable.getSequence().split(",");
+        int random = new Random().nextInt(seq.length);
+        modelMap.put(randomVariable.getName(),seq[random]);
+      }
+    }
     StringWriter writer = new StringWriter();
     try {
       template.process(modelMap,writer);
