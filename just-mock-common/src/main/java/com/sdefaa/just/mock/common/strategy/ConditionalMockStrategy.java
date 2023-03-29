@@ -1,5 +1,6 @@
 package com.sdefaa.just.mock.common.strategy;
 
+import com.sdefaa.just.mock.common.pojo.CustomVariable;
 import freemarker.template.Template;
 
 import javax.el.*;
@@ -19,18 +20,23 @@ public class ConditionalMockStrategy extends AbstractMockStrategy {
   }
 
   @Override
-  protected boolean canMock(Object... parameters) {
-    if (Objects.isNull(parameters)) {
+  protected boolean canMock(CustomVariable[] customVariables, Object[] parameters) {
+    if (Objects.isNull(customVariables) && Objects.isNull(parameters)) {
       return true;
     }
-    ExpressionFactory factory = ExpressionFactory.newInstance();
-    ELContext elContext = new StandardELContext(factory);
-    VariableMapper variableMapper = elContext.getVariableMapper();
-    for (int i = 0; i < parameters.length; i++) {
-      variableMapper.setVariable("p" + i, factory.createValueExpression(parameters[i], Object.class));
+    try {
+      ExpressionFactory factory = ExpressionFactory.newInstance();
+      ELContext elContext = new StandardELContext(factory);
+      VariableMapper variableMapper = elContext.getVariableMapper();
+      for (int i = 0; i < parameters.length; i++) {
+        variableMapper.setVariable("p" + i, factory.createValueExpression(parameters[i], Object.class));
+      }
+      ValueExpression valueExpression = factory.createValueExpression(elContext, el, Boolean.class);
+      return (boolean) valueExpression.getValue(elContext);
+    } catch (Exception e) {
+      return false;
     }
-    ValueExpression valueExpression = factory.createValueExpression(elContext, el, Boolean.class);
-    return (boolean) valueExpression.getValue(elContext);
+
   }
 
 }

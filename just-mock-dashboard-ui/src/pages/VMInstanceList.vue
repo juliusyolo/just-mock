@@ -1,7 +1,9 @@
 <template>
-  <a-breadcrumb style="margin: 0 0 10px 0">
-    <a-breadcrumb-item>虚拟机实例列表</a-breadcrumb-item>
-  </a-breadcrumb>
+  <div class="header-group">
+    <a-breadcrumb>
+      <a-breadcrumb-item>虚拟机实例列表</a-breadcrumb-item>
+    </a-breadcrumb>
+  </div>
   <a-table :columns="columns" :data="data" :loading="loading" :pagination="false">
     <template #attached="{ record }">
       <a-tag v-if="record.attached" color="green">是</a-tag>
@@ -12,7 +14,7 @@
       </a-button>
       <a-button v-else @click="doAttachVMInstance(record.pid)" :loading="attachLoading">连接</a-button>
       <a-divider direction="vertical"/>
-      <a-button :disabled="!record.attached" @click="mockClick(record.pid)">开始Mock
+      <a-button :disabled="!record.attached" @click="mockClick(record.pid,record.name)">开始Mock
       </a-button>
     </template>
   </a-table>
@@ -24,7 +26,6 @@ import {VmInstanceArray} from "../api/vm/types";
 import {attachVMInstance, getAllVMInstances} from "../api/vm";
 import {Message} from "@arco-design/web-vue";
 import {useRouter} from "vue-router";
-import {NodeJS} from "timers";
 
 export default defineComponent({
   setup() {
@@ -32,7 +33,7 @@ export default defineComponent({
     const data = ref<VmInstanceArray>([])
     const attachLoading = ref(false)
     const router = useRouter()
-    let intervalId: string | number | NodeJS.Timeout | null | undefined = null;
+    let intervalId: any = null;
     const queryAllVMInstances = () => {
       loading.value = true
       getAllVMInstances().then((d) => {
@@ -65,11 +66,11 @@ export default defineComponent({
 
     onMounted(() => {
       queryAllVMInstances()
-      intervalId = setInterval(()=>{
+      intervalId = setInterval(() => {
         queryAllVMInstancesWithoutState()
-      },5000)
+      }, 5000)
     })
-    onUnmounted(()=> clearInterval(intervalId))
+    onUnmounted(() => clearInterval(intervalId))
     const columns = [{
       title: '进程号',
       dataIndex: 'pid',
@@ -89,8 +90,8 @@ export default defineComponent({
       title: '操作',
       slotName: 'optional',
     }];
-    const mockClick = (pid: string) => {
-      router.push('/mock/info/'+pid)
+    const mockClick = (pid: string,name:string) => {
+      router.push({path:'/mock/info/' + pid,query:{name}})
     }
     return {
       columns,
@@ -105,6 +106,13 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-
+<style lang="less" scoped>
+.header-group{
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 2px 0;
+  padding:2px;
+  border: 1px solid #E5E6EB;
+  border-radius: 4px;
+}
 </style>

@@ -1,5 +1,6 @@
 package com.sdefaa.just.mock.common.strategy;
 
+import com.sdefaa.just.mock.common.pojo.CustomVariable;
 import freemarker.template.Template;
 
 /**
@@ -14,9 +15,10 @@ public class DefaultMockStrategy extends AbstractMockStrategy{
   }
 
   @Override
-  protected boolean canMock(Object... parameters) {
+  protected boolean canMock(CustomVariable[] customVariables, Object[] parameters) {
     return true;
   }
+
 
 
 }

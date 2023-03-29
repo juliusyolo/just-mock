@@ -1,5 +1,12 @@
 import axios, {AxiosResponse} from "axios";
-import {RegisteredApiInfoArray, VmInstanceArray} from "./types";
+import {
+  MockTemplateInfo,
+  MockTemplateInfoArray,
+  PutMockInfo,
+  RegisteredApiInfo,
+  RegisteredApiInfoArray,
+  VmInstanceArray
+} from "./types";
 
 const SUCCESS_CODE = '000000';
 
@@ -24,4 +31,24 @@ export async function attachVMInstance(pid:string):Promise<void>{
 
 export async function getRegisteredApiList(pid:string):Promise<RegisteredApiInfoArray>{
   return await axios.get('/v1/api/vm/instance/'+pid+'/api/list') as RegisteredApiInfoArray;
+}
+
+export async function removeMock(record:RegisteredApiInfo):Promise<void>{
+  return await axios.post('/v1/api/vm/instance/mock/remove',record) as void;
+}
+
+export async function putMock(record:PutMockInfo):Promise<void>{
+  return await axios.post('/v1/api/vm/instance/mock/put',record) as void;
+}
+
+export async function getMockTemplateInfoList():Promise<MockTemplateInfoArray>{
+  return await axios.get('/v1/api/mock/template/list') as MockTemplateInfoArray;
+}
+
+export async function putMockTemplateInfo(record:MockTemplateInfo):Promise<void>{
+  return await axios.post('/v1/api/mock/template/put',record) as void;
+}
+
+export async function removeMockTemplateInfo(id:number):Promise<void>{
+  return await axios.get('/v1/api/mock/template/{id}/remove') as void;
 }

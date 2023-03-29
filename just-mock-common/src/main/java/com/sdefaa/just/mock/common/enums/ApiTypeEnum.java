@@ -11,9 +11,9 @@ public enum ApiTypeEnum {
     /**
      * Feign调用API
      */
-    FEIGN_API,
+    FEIGN,
     /**
      * 普通API
      */
-    CONTROLLER_API
+    CONTROLLER
 }

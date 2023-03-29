@@ -1,39 +1,78 @@
 <template>
-  <a-breadcrumb style="margin: 0 0 10px 0">
-    <a-breadcrumb-item>模板配置</a-breadcrumb-item>
-  </a-breadcrumb>
+  <div class="header-group">
+    <a-breadcrumb>
+      <a-breadcrumb-item>模板列表</a-breadcrumb-item>
+    </a-breadcrumb>
+    <a-button-group>
+      <a-button @click="dealAddTemplate">新增</a-button>
+    </a-button-group>
+  </div>
   <a-table :columns="columns" :data="data" :loading="loading" :pagination="false">
-    <template #attached="{ record }">
-      <a-tag v-if="record.attached" color="green">是</a-tag>
+    <template #tag="{ record }">
+      <a-space>
+        <template v-for="e in record.tag.split(';')">
+          <a-tag color="green">{{ e }}</a-tag>
+        </template>
+      </a-space>
+    </template>
+    <template #conditionalMock="{ record }">
+      <a-tooltip v-if="record.el" :content="record.el">
+        <a-tag color="green">是</a-tag>
+      </a-tooltip>
       <a-tag v-else color="red">否</a-tag>
     </template>
     <template #optional="{ record }">
-      <a-button v-if="record.attached" @click="doAttachVMInstance(record.pid)" :loading="attachLoading">已连接
-      </a-button>
-      <a-button v-else @click="doAttachVMInstance(record.pid)" :loading="attachLoading">连接</a-button>
+      <a-button  @click="dealEditTemplate(record)">编辑</a-button>
       <a-divider direction="vertical"/>
-      <a-button :disabled="!record.attached" @click="mockClick(record.pid)">开始Mock
-      </a-button>
+      <a-popconfirm content="确定移除该Mock模板?" @ok="dealRemoveTemplate(record)">
+        <a-button >删除</a-button>
+      </a-popconfirm>
     </template>
   </a-table>
+  <a-modal width="50%" v-model:visible="modalVisible" @cancel="handleCancel" :on-before-ok="handleBeforeOk"
+           unmountOnClose>
+    <template #title>
+      <template v-if="isEditable">编辑模板</template>
+      <template v-else>新增模板</template>
+    </template>
+    <div>
+      <h3>模板标签:</h3>
+      <a-input-tag v-model="inputTags" placeholder="请输入标签..." @change="tagInputChange" allow-clear/>
+      <h3>模板内容:</h3>
+      <a-textarea v-model="mockTemplateInfoModel.templateContent" :auto-size="true"/>
+      <h3>模板EL表达式:</h3>
+      <a-textarea v-model="mockTemplateInfoModel.el" :auto-size="true"/>
+      <h3>备注:</h3>
+      <a-textarea disabled default-value="使用freemarker作为模板引擎，EL表达式支持JSR245规范，环境变量现有请求方法参数，以p0,p1,p2,p3以此类推。" :auto-size="true"/>
+    </div>
+  </a-modal>
 </template>
 
 <script lang="ts">
 import {defineComponent, onMounted, ref} from 'vue'
-import {VmInstanceArray} from "../api/vm/types";
-import {attachVMInstance, getAllVMInstances} from "../api/vm";
+import {MockTemplateInfo, MockTemplateInfoArray, PutMockInfo, VmInstanceArray} from "../api/vm/types";
+import {
+  attachVMInstance,
+  getAllVMInstances,
+  getMockTemplateInfoList,
+  putMock, putMockTemplateInfo,
+  removeMock,
+  removeMockTemplateInfo
+} from "../api/vm";
 import {Message} from "@arco-design/web-vue";
 import {useRouter} from "vue-router";
 
 export default defineComponent({
   setup() {
     const loading = ref(false)
-    const data = ref<VmInstanceArray>([])
-    const attachLoading = ref(false)
-    const router = useRouter()
-    const queryAllVMInstances = () => {
+    const data = ref<MockTemplateInfoArray>([])
+    const modalVisible = ref<boolean>(false)
+    const isEditable = ref<boolean>(false)
+    const mockTemplateInfoModel = ref<MockTemplateInfo>()
+    const inputTags = ref<Array<string>>([])
+    const queryAllMockTemplateInfos = () => {
       loading.value = true
-      getAllVMInstances().then((d) => {
+      getMockTemplateInfoList().then((d) => {
         data.value = d;
         loading.value = false
       }).catch(error => {
@@ -41,67 +80,101 @@ export default defineComponent({
         Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
       })
     }
-
-    const queryAllVMInstancesWithoutState = () => {
-      getAllVMInstances().then((d) => {
+    const queryAllMockTemplateInfosWithoutState = () => {
+      getMockTemplateInfoList().then((d) => {
         data.value = d;
       }).catch(error => {
         Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
       })
     }
-
-    const doAttachVMInstance = (pid: string) => {
-      attachLoading.value = true
-      attachVMInstance(pid).then(() => {
-        attachLoading.value = false
-        Message.success({content: '连接成功！', duration: 1000, onClose: () => queryAllVMInstances()})
+    const dealAddTemplate = () => {
+      mockTemplateInfoModel.value = {} as MockTemplateInfo;
+      inputTags.value = []
+      modalVisible.value = true;
+      isEditable.value = false;
+    }
+    const dealEditTemplate = (record: MockTemplateInfo) => {
+        mockTemplateInfoModel.value = record;
+        inputTags.value = record.tag.split(';')
+        modalVisible.value = true;
+        isEditable.value = true;
+    }
+    const dealRemoveTemplate = (record:MockTemplateInfo) =>{
+      removeMockTemplateInfo(record.id).then(() => {
+        Message.success({content: '删除Mock模板成功！', duration: 1000, onClose: () => queryAllMockTemplateInfos()})
       }).catch(error => {
-        attachLoading.value = false
         Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
       })
     }
 
+    const handleBeforeOk = async () => {
+      if (!mockTemplateInfoModel.value||!mockTemplateInfoModel.value?.tag||!mockTemplateInfoModel.value?.templateContent){
+        Message.error({content: '模板标签和内容必填！', duration: 2 * 1000})
+        return false;
+      }
+      if (mockTemplateInfoModel.value){
+        putMockTemplateInfo(mockTemplateInfoModel.value).then(()=>{
+          Message.success({content: '配置模板成功！', duration: 1000, onClose: () => queryAllMockTemplateInfos()})
+        }).catch(error=>{
+          Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
+        })
+      }
+      return true;
+    };
+    const handleCancel = () => {
+      modalVisible.value = false;
+    }
+    const tagInputChange = (tags:Array<string>) =>{
+      mockTemplateInfoModel.value = {...mockTemplateInfoModel.value,tag: tags.join(";")} as MockTemplateInfo
+      console.log(mockTemplateInfoModel.value)
+    }
     onMounted(() => {
-      queryAllVMInstances()
+      queryAllMockTemplateInfos()
       setInterval(()=>{
-        queryAllVMInstancesWithoutState()
+        queryAllMockTemplateInfosWithoutState()
       },5000)
     })
     const columns = [{
-      title: '进程号',
-      dataIndex: 'pid',
+      title: '模板标签',
+      slotName: 'tag',
     }, {
-      title: '进程名称',
-      dataIndex: 'name',
-    }, {
-      title: '平台',
-      dataIndex: 'platform',
-    }, {
-      title: '厂商',
-      dataIndex: 'vendor',
-    }, {
-      title: '是否已连接',
-      slotName: 'attached'
-    }, {
+      title: '是否el条件mock',
+      slotName: 'conditionalMock',
+    },{
+      title: '模板内容',
+      dataIndex: 'templateContent',
+      ellipsis: true,
+      tooltip: true
+    },{
       title: '操作',
       slotName: 'optional',
     }];
-    const mockClick = (pid: string) => {
-      router.push('/mock/info/'+pid)
-    }
     return {
       columns,
       loading,
       data,
-      attachLoading,
-      queryAllVMInstances,
-      doAttachVMInstance,
-      mockClick
+      modalVisible,
+      mockTemplateInfoModel,
+      inputTags,
+      isEditable,
+      tagInputChange,
+      dealAddTemplate,
+      dealEditTemplate,
+      dealRemoveTemplate,
+      handleBeforeOk,
+      handleCancel
     }
   }
 })
 </script>
 
-<style scoped>
-
+<style lang="less" scoped>
+.header-group{
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 2px 0;
+  padding:2px;
+  border: 1px solid #E5E6EB;
+  border-radius: 4px;
+}
 </style>

@@ -26,7 +26,7 @@ public class EmbeddedHttpServerHandler extends SimpleChannelInboundHandler<FullH
 
     static {
         REQUEST_HANDLER_MAPPING.put("GET ".concat(CommonConstant.PING_URL), RequestHandler.PING);
-        REQUEST_HANDLER_MAPPING.put("POST ".concat(CommonConstant.ACTIVE_URL), RequestHandler.ACTIVE);
+        REQUEST_HANDLER_MAPPING.put("POST ".concat(CommonConstant.COMMAND_URL), RequestHandler.ACTIVE);
     }
 
     @Override
@@ -57,10 +57,8 @@ public class EmbeddedHttpServerHandler extends SimpleChannelInboundHandler<FullH
             try {
               ApiMockCommandDTO  apiMockCommandDTO = objectMapper.readValue(body, ApiMockCommandDTO.class);
               String commandType = apiMockCommandDTO.getCommandType();
-              if (Objects.equals(commandType,ApiMockCommandDTO.CommandType.ADD.name())){
-                MockStrategyManager.INSTANCE.addMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName(),apiMockCommandDTO.getTemplateContent(),apiMockCommandDTO.getEl());
-              }else if (Objects.equals(commandType,ApiMockCommandDTO.CommandType.MODIFY.name())){
-                MockStrategyManager.INSTANCE.modifyMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName(),apiMockCommandDTO.getTemplateContent(),apiMockCommandDTO.getEl());
+              if (Objects.equals(commandType,ApiMockCommandDTO.CommandType.PUT.name())){
+                MockStrategyManager.INSTANCE.putMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName(),apiMockCommandDTO.getTemplateContent(),apiMockCommandDTO.getEl());
               }else if (Objects.equals(commandType,ApiMockCommandDTO.CommandType.REMOVE.name())){
                 MockStrategyManager.INSTANCE.removeMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName());
               }else {

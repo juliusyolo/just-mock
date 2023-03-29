@@ -2,6 +2,8 @@ package com.sdefaa.just.mock.test.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Julius Wong
@@ -10,10 +12,37 @@ import org.springframework.web.bind.annotation.GetMapping;
  * <p>
  * @since 1.0.0
  */
-@Controller
+@RestController
 public class ControllerTest {
-  @GetMapping("/hello")
-  public String say(){
-    return null;
+  @GetMapping("/hello1")
+  public Integer say(){
+    return 1;
   }
+
+  @GetMapping("/hello2/test")
+  public Test say1(@RequestBody Test test){
+    return test;
+  }
+
+  public static class Test{
+    private String name;
+    private String age;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public String getAge() {
+      return age;
+    }
+
+    public void setAge(String age) {
+      this.age = age;
+    }
+  }
+
 }

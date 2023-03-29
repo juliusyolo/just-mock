@@ -2,7 +2,9 @@ package com.sdefaa.just.mock.dashboard.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.sdefaa.just.mock.common.constant.CommonConstant;
+import com.sdefaa.just.mock.common.pojo.ApiMockCommandDTO;
+import com.sdefaa.just.mock.common.pojo.ApiMockCommandResponseDTO;
 import com.sdefaa.just.mock.dashboard.bo.VMInstanceBO;
 import com.sdefaa.just.mock.dashboard.converter.ToRegisteredApiInfoDTOConverter;
 import com.sdefaa.just.mock.dashboard.converter.ToVMInstanceAttachModelConverter;
@@ -11,20 +13,25 @@ import com.sdefaa.just.mock.dashboard.enums.ResultStatus;
 import com.sdefaa.just.mock.dashboard.exception.GlobalException;
 import com.sdefaa.just.mock.dashboard.mapper.VMInstanceAttachMapper;
 import com.sdefaa.just.mock.dashboard.mapper.VMInstanceMockInfoMapper;
+import com.sdefaa.just.mock.dashboard.pojo.dto.PutMockDTO;
 import com.sdefaa.just.mock.dashboard.pojo.dto.RegisteredApiInfoDTO;
+import com.sdefaa.just.mock.dashboard.pojo.dto.RemoveMockDTO;
 import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
 import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachModel;
 import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceMockInfoModel;
 import com.sdefaa.just.mock.dashboard.task.VMInstancePingTask;
 import com.sdefaa.just.mock.common.pojo.ApiRegistryDTO;
 import com.sdefaa.just.mock.dashboard.service.VMInstanceService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +42,7 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 @Service
+@Slf4j
 public class VMInstanceServiceImpl implements VMInstanceService {
   @Autowired
   private VMInstanceAttachMapper vmInstanceAttachMapper;
@@ -65,15 +73,26 @@ public class VMInstanceServiceImpl implements VMInstanceService {
 
   @Override
   public VMInstanceDTO attachVMInstance(String pid) {
-    VMInstanceDTO vmInstanceDTO = vmInstanceBO.attachVMInstance(pid);
-    VMInstanceAttachModel vmInstanceAttachModel = ToVMInstanceAttachModelConverter.INSTANCE.covert(vmInstanceDTO);
     int effectRows;
+    VMInstanceAttachModel vmInstanceAttachModel = new VMInstanceAttachModel();
+    vmInstanceAttachModel.setPid(pid);
     try {
       effectRows = vmInstanceAttachMapper.insertVMInstanceAttachModel(vmInstanceAttachModel);
     } catch (Exception e) {
       throw new GlobalException(ResultStatus.VM_INSERT_EXCEPTION, e);
     }
     if (effectRows != 1) {
+      throw new GlobalException(ResultStatus.VM_INSERT_FAILED);
+    }
+    VMInstanceDTO vmInstanceDTO = vmInstanceBO.attachVMInstance(pid);
+    vmInstanceAttachModel = ToVMInstanceAttachModelConverter.INSTANCE.covert(vmInstanceDTO);
+    int updateEffectRows;
+    try {
+      updateEffectRows = vmInstanceAttachMapper.updateVMInstanceAttachModel(vmInstanceAttachModel);
+    } catch (Exception e) {
+      throw new GlobalException(ResultStatus.VM_INSERT_EXCEPTION, e);
+    }
+    if (updateEffectRows != 1) {
       throw new GlobalException(ResultStatus.VM_INSERT_FAILED);
     }
     return vmInstanceDTO;
@@ -91,30 +110,111 @@ public class VMInstanceServiceImpl implements VMInstanceService {
   }
 
   @Override
+  @Transactional(rollbackFor = GlobalException.class)
   public void registerApiList(ApiRegistryDTO apiRegistryDTO) {
     List<VMInstanceMockInfoModel> vmInstanceMockInfoModelList = apiRegistryDTO.getApiInfos().stream().map(apiInfo -> {
       VMInstanceMockInfoModel vmInstanceMockInfoModel = ToVMInstanceMockInfoModelConverter.INSTANCE.covert(apiInfo);
       vmInstanceMockInfoModel.setPid(apiRegistryDTO.getPid());
       vmInstanceMockInfoModel.setClassName(apiInfo.getApiClassInfo().getClassName());
       vmInstanceMockInfoModel.setMethodName(apiInfo.getApiMethodInfo().getMethodName());
+      vmInstanceMockInfoModel.setMockEnable(false);
       try {
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        vmInstanceMockInfoModel.setMethodArgsDesc(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiInfo.getApiMethodInfo().getInputs()));
-        vmInstanceMockInfoModel.setMethodReturnDesc(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiInfo.getApiMethodInfo().getOutput()));
-        vmInstanceMockInfoModel.setClassAnnotationsDesc(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiInfo.getApiClassInfo().getAnnotations()));
-        vmInstanceMockInfoModel.setMethodAnnotationsDesc(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiInfo.getApiMethodInfo().getAnnotations()));
+        vmInstanceMockInfoModel.setMethodArgsDesc(objectMapper.writeValueAsString(apiInfo.getApiMethodInfo().getInputs()));
+        vmInstanceMockInfoModel.setMethodReturnDesc(objectMapper.writeValueAsString(apiInfo.getApiMethodInfo().getOutput()));
+        vmInstanceMockInfoModel.setClassAnnotationsDesc(objectMapper.writeValueAsString(apiInfo.getApiClassInfo().getAnnotations()));
+        vmInstanceMockInfoModel.setMethodAnnotationsDesc(objectMapper.writeValueAsString(apiInfo.getApiMethodInfo().getAnnotations()));
       } catch (JsonProcessingException e) {
         throw new GlobalException(ResultStatus.JSON_PROCESS_EXCEPTION, e);
       }
       return vmInstanceMockInfoModel;
     }).collect(Collectors.toList());
-    if (!vmInstanceMockInfoModelList.isEmpty()){
+    if (!vmInstanceMockInfoModelList.isEmpty()) {
       int effectRows = vmInstanceMockInfoMapper.bulkInsertVMInstanceMockInfoModelList(vmInstanceMockInfoModelList);
       if (effectRows != apiRegistryDTO.getApiInfos().size()) {
         throw new GlobalException(ResultStatus.REGISTER_API_FAILED);
       }
     }
+    VMInstanceAttachModel vmInstanceAttachModel = new VMInstanceAttachModel();
+    vmInstanceAttachModel.setPid(apiRegistryDTO.getPid());
+    vmInstanceAttachModel.setPort(apiRegistryDTO.getPort());
+    int effectRows = vmInstanceAttachMapper.updateVMInstanceAttachModel(vmInstanceAttachModel);
+    if (effectRows != 1) {
+      throw new GlobalException(ResultStatus.REGISTER_API_FAILED);
+    }
     threadPoolTaskExecutor.submit(new VMInstancePingTask(restTemplate, this, apiRegistryDTO.getPid(), apiRegistryDTO.getPort()));
+  }
+
+  @Override
+  @Transactional(rollbackFor = GlobalException.class)
+  public void removeMock(RemoveMockDTO removeMockDTO) {
+    VMInstanceMockInfoModel vmInstanceMockInfoModel = ToVMInstanceMockInfoModelConverter.INSTANCE.covert(removeMockDTO);
+    vmInstanceMockInfoModel.setMockEnable(false);
+    int updateEffectRows;
+    try {
+      updateEffectRows = vmInstanceMockInfoMapper.updateVMInstanceMockInfoModel(vmInstanceMockInfoModel);
+    } catch (Exception e) {
+      throw new GlobalException(ResultStatus.UPDATE_MOCK_ENABLE_FLAG_EXCEPTION, e);
+    }
+    if (updateEffectRows != 1) {
+      throw new GlobalException(ResultStatus.UPDATE_MOCK_ENABLE_FLAG_FAILED);
+    }
+    VMInstanceAttachModel vmInstanceAttachModel;
+    try {
+      vmInstanceAttachModel = vmInstanceAttachMapper.selectVMInstanceAttachModelByPid(removeMockDTO.getPid());
+    } catch (Exception e) {
+      throw new GlobalException(ResultStatus.QUERY_MOCK_COMMAND_PORT_EXCEPTION, e);
+    }
+    ApiMockCommandDTO apiMockCommandDTO = new ApiMockCommandDTO();
+    apiMockCommandDTO.setCommandType(ApiMockCommandDTO.CommandType.REMOVE.name());
+    apiMockCommandDTO.setClazzName(removeMockDTO.getClassName());
+    apiMockCommandDTO.setMethodName(removeMockDTO.getMethodName());
+    ApiMockCommandResponseDTO apiMockCommandResponseDTO;
+    try {
+      apiMockCommandResponseDTO = restTemplate.postForObject("http://127.0.0.1:" + vmInstanceAttachModel.getPort() + CommonConstant.COMMAND_URL, apiMockCommandDTO, ApiMockCommandResponseDTO.class);
+      log.info("MockCommand Response: {}", apiMockCommandResponseDTO);
+    } catch (RestClientException e) {
+      throw new GlobalException(ResultStatus.CALL_MOCK_COMMAND_EXCEPTION, e);
+    }
+    if (!Objects.equals(apiMockCommandResponseDTO.getCode(), CommonConstant.SUCCESS_CODE)) {
+      throw new GlobalException(ResultStatus.CALL_MOCK_COMMAND_FAILED);
+    }
+  }
+
+  @Override
+  public void putMock(PutMockDTO putMockDTO) {
+    VMInstanceMockInfoModel vmInstanceMockInfoModel = ToVMInstanceMockInfoModelConverter.INSTANCE.covert(putMockDTO);
+    vmInstanceMockInfoModel.setMockEnable(true);
+    int updateEffectRows;
+    try {
+      updateEffectRows = vmInstanceMockInfoMapper.updateVMInstanceMockInfoModel(vmInstanceMockInfoModel);
+    } catch (Exception e) {
+      throw new GlobalException(ResultStatus.UPDATE_MOCK_ENABLE_FLAG_EXCEPTION, e);
+    }
+    if (updateEffectRows != 1) {
+      throw new GlobalException(ResultStatus.UPDATE_MOCK_ENABLE_FLAG_FAILED);
+    }
+    VMInstanceAttachModel vmInstanceAttachModel;
+    try {
+      vmInstanceAttachModel = vmInstanceAttachMapper.selectVMInstanceAttachModelByPid(putMockDTO.getPid());
+    } catch (Exception e) {
+      throw new GlobalException(ResultStatus.QUERY_MOCK_COMMAND_PORT_EXCEPTION, e);
+    }
+    ApiMockCommandDTO apiMockCommandDTO = new ApiMockCommandDTO();
+    apiMockCommandDTO.setCommandType(ApiMockCommandDTO.CommandType.PUT.name());
+    apiMockCommandDTO.setClazzName(putMockDTO.getClassName());
+    apiMockCommandDTO.setMethodName(putMockDTO.getMethodName());
+    apiMockCommandDTO.setEl(putMockDTO.getEl());
+    apiMockCommandDTO.setTemplateContent(putMockDTO.getTemplateContent());
+    ApiMockCommandResponseDTO apiMockCommandResponseDTO;
+    try {
+      apiMockCommandResponseDTO = restTemplate.postForObject("http://127.0.0.1:" + vmInstanceAttachModel.getPort() + CommonConstant.COMMAND_URL, apiMockCommandDTO, ApiMockCommandResponseDTO.class);
+      log.info("MockCommand Response: {}", apiMockCommandResponseDTO);
+    } catch (RestClientException e) {
+      throw new GlobalException(ResultStatus.CALL_MOCK_COMMAND_EXCEPTION, e);
+    }
+    if (!Objects.equals(apiMockCommandResponseDTO.getCode(), CommonConstant.SUCCESS_CODE)) {
+      throw new GlobalException(ResultStatus.CALL_MOCK_COMMAND_FAILED);
+    }
   }
 
 }

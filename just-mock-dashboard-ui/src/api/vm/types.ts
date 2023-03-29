@@ -11,18 +11,40 @@ export type VmInstanceArray = Array<VmInstance>;
 export type RegisteredApiInfo = {
   pid: string;
   className: string;
-  classAnnotationsDesc:string;
+  classAnnotationsDesc: string;
   methodName: string;
   methodArgsDesc: string;
   methodReturnDesc: string;
-  methodAnnotationsDesc:string;
+  methodAnnotationsDesc: string;
   apiUrl: string;
   apiType: string;
   apiMethod: string;
+  mockEnable: boolean;
+  mockTemplateId: number;
 }
 export type RegisteredApiInfoArray = Array<RegisteredApiInfo>;
 
 export type ArgInfo = {
   type: string;
   jsonStruct: object;
+}
+
+
+export type MockTemplateInfo = {
+  id: number;
+  templateContent: string;
+  el: string;
+  tag: string;
+}
+
+export type MockTemplateInfoArray = Array<MockTemplateInfo>;
+
+
+export type PutMockInfo = {
+  pid: string;
+  className: string;
+  methodName:string;
+  mockTemplateId: number;
+  templateContent: string;
+  el: string;
 }

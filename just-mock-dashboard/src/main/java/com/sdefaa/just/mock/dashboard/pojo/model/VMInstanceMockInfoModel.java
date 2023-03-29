@@ -22,6 +22,10 @@ public class VMInstanceMockInfoModel {
   private String apiMethod;
   private String methodAnnotationsDesc;
   private String classAnnotationsDesc;
+
+  private Boolean mockEnable;
+
+  private Long mockTemplateId;
   private LocalDateTime createTime;
   private LocalDateTime updateTime;
 }

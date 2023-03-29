@@ -7,7 +7,6 @@ import com.sdefaa.just.mock.common.pojo.*;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.ServerSocket;
@@ -31,6 +30,10 @@ public class CommonUtils {
   public final static List<String> TARGET_METHODS = Arrays.asList("@org.springframework.web.bind.annotation.PostMapping", "@org.springframework.web.bind.annotation.GetMapping", "@org.springframework.web.bind.annotation.PutMapping", "@org.springframework.web.bind.annotation.PatchMapping", "@org.springframework.web.bind.annotation.DeleteMapping", REQUEST_MAPPING_TARGET_METHOD);
 
   public final static List<String> FILTERED_CONTROLLERS = Arrays.asList("org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController");
+
+  private final static String PATH_REGEX = ".*(path=\\{(\"[^\"]*\")\\}).*";
+  private final static String VALUE_REGEX = ".*(value=\\{(\"[^\"]*\")\\}).*";
+
   public static Stream<ApiInfo> generateApiInfoFromTargetClass(TargetClass targetClass) {
     String apiType = generateApiType(targetClass.getAnnotations());
     return targetClass.getTargetMethods().stream().map(targetMethod -> {
@@ -62,7 +65,7 @@ public class CommonUtils {
   }
 
   public static TargetClass generateTargetClass(Class clazz) {
-    if (!hasTargetClassAnnotation(clazz)||FILTERED_CONTROLLERS.contains(clazz.getName())){
+    if (!hasTargetClassAnnotation(clazz) || FILTERED_CONTROLLERS.contains(clazz.getName())) {
       return null;
     }
     TargetClass targetClass = null;
@@ -113,7 +116,7 @@ public class CommonUtils {
           distinctMethodsInClass.addAll(value);
         } else {
           List<String> distinctAnnotationInMethod = value.stream().flatMap(targetMethod -> targetMethod.getAnnotations().stream()).distinct().collect(Collectors.toList());
-          distinctMethodsInClass.add(new TargetMethod(value.get(0).getMethod(),value.get(0).getSignature(),distinctAnnotationInMethod));
+          distinctMethodsInClass.add(new TargetMethod(value.get(0).getMethod(), value.get(0).getSignature(), distinctAnnotationInMethod));
         }
       });
       targetClass.setTargetMethods(distinctMethodsInClass);
@@ -162,7 +165,7 @@ public class CommonUtils {
   }
 
   private static String generateApiUrl(List<String> annotations) {
-    return annotations.stream().collect(Collectors.joining(";"));
+    return annotations.stream().map(s -> s.replaceAll(PATH_REGEX, "$1").replaceAll(VALUE_REGEX, "$1").replaceAll("path=\\{", "").replaceAll("value=\\{", "").replaceAll("}$", "").replaceAll("\"", "").replaceAll(" ", "").trim()).collect(Collectors.joining(";"));
   }
 
   private static String generateApiMethod(List<String> annotations) {
@@ -180,9 +183,9 @@ public class CommonUtils {
   private static String generateApiType(List<String> annotations) {
     boolean match = annotations.stream().map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(s -> Objects.equals(s, FEIGN_TARGET_CLASS));
     if (match) {
-      return ApiTypeEnum.FEIGN_API.name();
+      return ApiTypeEnum.FEIGN.name();
     }
-    return ApiTypeEnum.CONTROLLER_API.name();
+    return ApiTypeEnum.CONTROLLER.name();
   }
 
   public static int getAvailablePort() throws IOException {

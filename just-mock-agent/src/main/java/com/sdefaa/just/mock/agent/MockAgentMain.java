@@ -74,7 +74,7 @@ public class MockAgentMain {
             //  Upload apiInfoList
             registry(agentConfigProperties.getRegistryUrl(),apiRegistryDTO);
             loadedTargetClasses.forEach(targetClass -> targetClass.getTargetMethods().forEach(targetMethod -> {
-            instrumentation.addTransformer(new MockClassFileTransformer(targetClass.getClazz().getName(),targetMethod.getMethod().getName()),true);
+            instrumentation.addTransformer(new MockClassFileTransformer(targetClass.getClazz().getName(),targetMethod.getMethod().getName(),null,null),true);
             try {
               instrumentation.retransformClasses(targetClass.getClazz());
             } catch (UnmodifiableClassException e) {

@@ -19,4 +19,8 @@ public class RegisteredApiInfoDTO {
   private String apiUrl;
   private String apiType;
   private String apiMethod;
+
+  private Boolean mockEnable;
+
+  private Long mockTemplateId;
 }

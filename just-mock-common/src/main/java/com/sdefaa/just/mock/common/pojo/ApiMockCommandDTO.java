@@ -15,8 +15,7 @@ public class ApiMockCommandDTO {
   private String el;
 
   public enum CommandType{
-    ADD,
-    MODIFY,
+    PUT,
     REMOVE
   }
 }

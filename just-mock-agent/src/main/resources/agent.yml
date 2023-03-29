@@ -1,3 +1,4 @@
 mock:
   agent:
     registryUrl: http://localhost:8080/v1/api/vm/instance/api/register
+    debug: true

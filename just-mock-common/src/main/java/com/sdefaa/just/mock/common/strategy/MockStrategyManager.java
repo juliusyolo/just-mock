@@ -1,5 +1,6 @@
 package com.sdefaa.just.mock.common.strategy;
 
+import com.sdefaa.just.mock.common.pojo.CustomVariable;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -26,26 +27,21 @@ public class MockStrategyManager {
         configuration.setTemplateLoader(stringTemplateLoader);
     }
 
-    public boolean shouldMock(String clazzName, String methodName, Object[] parameters) {
-        return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(parameters);
+    public boolean shouldMock(String clazzName, String methodName,CustomVariable[] customVariables, Object[] parameters) {
+        return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(customVariables,parameters);
     }
 
-
-    public synchronized void addMock(String clazzName, String methodName, String templateContent, String el) throws IOException {
-        stringTemplateLoader.putTemplate(clazzName + SPLIT + methodName, templateContent);
-        configuration.clearTemplateCache();
-        Template template = configuration.getTemplate(clazzName + SPLIT + methodName);
-        AbstractMockStrategy abstractMockStrategy;
-        if (Objects.nonNull(el)) {
-            abstractMockStrategy = new ConditionalMockStrategy(template, el);
-        } else {
-            abstractMockStrategy = new DefaultMockStrategy(template);
-        }
-        this.MOCK_STRATEGY_MAP.put(clazzName + SPLIT + methodName, abstractMockStrategy);
-    }
-
-    public void modifyMock(String clazzName, String methodName, String templateContent, String el) throws IOException {
-        this.addMock(clazzName, methodName, templateContent, el);
+    public synchronized void putMock(String clazzName, String methodName, String templateContent, String el) throws IOException {
+      stringTemplateLoader.putTemplate(clazzName + SPLIT + methodName, templateContent);
+      configuration.clearTemplateCache();
+      Template template = configuration.getTemplate(clazzName + SPLIT + methodName);
+      AbstractMockStrategy abstractMockStrategy;
+      if (Objects.nonNull(el)) {
+        abstractMockStrategy = new ConditionalMockStrategy(template, el);
+      } else {
+        abstractMockStrategy = new DefaultMockStrategy(template);
+      }
+      this.MOCK_STRATEGY_MAP.put(clazzName + SPLIT + methodName, abstractMockStrategy);
     }
 
     public void removeMock(String clazzName, String methodName) {
@@ -54,7 +50,7 @@ public class MockStrategyManager {
         this.MOCK_STRATEGY_MAP.remove(clazzName + SPLIT + methodName);
     }
 
-    public Object doMock(String clazzName, String methodName, Class<?> returnClazz, Object[] parameter) {
-        return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz, parameter);
+    public Object doMock(String clazzName, String methodName, Class<?> returnClazz, CustomVariable[] customVariables,String[] taskDefinition, Object[] parameters) {
+        return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz,customVariables, parameters);
     }
 }

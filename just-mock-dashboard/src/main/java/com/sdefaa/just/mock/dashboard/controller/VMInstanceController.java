@@ -4,6 +4,8 @@ import com.sdefaa.just.mock.dashboard.converter.ToRegisteredApiInfoVOConverter;
 import com.sdefaa.just.mock.dashboard.converter.ToVMInstanceVOConverter;
 import com.sdefaa.just.mock.dashboard.enums.ResultStatus;
 import com.sdefaa.just.mock.dashboard.pojo.ResponseWrapper;
+import com.sdefaa.just.mock.dashboard.pojo.dto.PutMockDTO;
+import com.sdefaa.just.mock.dashboard.pojo.dto.RemoveMockDTO;
 import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
 import com.sdefaa.just.mock.dashboard.pojo.vo.RegisteredApiInfoVO;
 import com.sdefaa.just.mock.dashboard.pojo.vo.VMInstanceVO;
@@ -69,4 +71,15 @@ public class VMInstanceController {
     return ResponseWrapper.wrap(ResultStatus.SUCCESS, registeredApiInfoVOS);
   }
 
+  @PostMapping("/v1/api/vm/instance/mock/remove")
+  public ResponseWrapper<Void> removeMock(@RequestBody RemoveMockDTO removeMockDTO) {
+    vmInstanceService.removeMock(removeMockDTO);
+    return ResponseWrapper.wrap(ResultStatus.SUCCESS);
+  }
+
+  @PostMapping("/v1/api/vm/instance/mock/put")
+  public ResponseWrapper<Void> putMock(@RequestBody PutMockDTO putMockDTO) {
+    vmInstanceService.putMock(putMockDTO);
+    return ResponseWrapper.wrap(ResultStatus.SUCCESS);
+  }
 }

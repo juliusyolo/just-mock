@@ -12,4 +12,5 @@ import lombok.Data;
 @Data
 public class AgentConfigProperties {
     private String registryUrl;
+    private Boolean debug;
 }

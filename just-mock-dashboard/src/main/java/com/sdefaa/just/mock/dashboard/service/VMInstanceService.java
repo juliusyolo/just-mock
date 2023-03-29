@@ -1,8 +1,10 @@
 package com.sdefaa.just.mock.dashboard.service;
 
-import com.sdefaa.just.mock.dashboard.pojo.dto.RegisteredApiInfoDTO;
-import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
 import com.sdefaa.just.mock.common.pojo.ApiRegistryDTO;
+import com.sdefaa.just.mock.dashboard.pojo.dto.PutMockDTO;
+import com.sdefaa.just.mock.dashboard.pojo.dto.RegisteredApiInfoDTO;
+import com.sdefaa.just.mock.dashboard.pojo.dto.RemoveMockDTO;
+import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
 
 import java.util.List;
 
@@ -23,4 +25,8 @@ public interface VMInstanceService {
   void detachVMInstance(String pid);
 
   void registerApiList(ApiRegistryDTO apiRegistryDTO);
+
+  void removeMock(RemoveMockDTO removeMockDTO);
+  void putMock(PutMockDTO putMockDTO);
+
 }
