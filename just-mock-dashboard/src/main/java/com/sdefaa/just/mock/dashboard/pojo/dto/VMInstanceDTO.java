@@ -16,5 +16,5 @@ public class VMInstanceDTO {
     private String platform;
     private String vendor;
     private Boolean attached;
-
+    private String environmentVariables;
 }

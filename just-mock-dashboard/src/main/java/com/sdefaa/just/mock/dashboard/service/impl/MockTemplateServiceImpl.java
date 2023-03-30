@@ -1,5 +1,7 @@
 package com.sdefaa.just.mock.dashboard.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.just.mock.dashboard.converter.ToMockTemplateInfoDTOConverter;
 import com.sdefaa.just.mock.dashboard.converter.ToMockTemplateInfoModelConverter;
 import com.sdefaa.just.mock.dashboard.enums.ResultStatus;
@@ -25,11 +27,23 @@ public class MockTemplateServiceImpl implements MockTemplateService {
 
   @Autowired
   private MockTemplateInfoMapper mockTemplateInfoMapper;
-
+  @Autowired
+  private ObjectMapper objectMapper;
   @Override
   public List<MockTemplateInfoDTO> getMockTemplateInfoList() {
     List<MockTemplateInfoModel> mockTemplateInfoModels = mockTemplateInfoMapper.selectMockTemplateInfoModelList();
-    return mockTemplateInfoModels.stream().map(ToMockTemplateInfoDTOConverter.INSTANCE::covert).collect(Collectors.toList());
+    return mockTemplateInfoModels.stream().map(mockTemplateInfoModel -> {
+      MockTemplateInfoDTO mockTemplateInfoDTO = ToMockTemplateInfoDTOConverter.INSTANCE.covert(mockTemplateInfoModel);
+      try{
+        mockTemplateInfoDTO.setRandomVariables(objectMapper.readValue(mockTemplateInfoModel.getRandomVariables(), new TypeReference<>() {
+        }));
+        mockTemplateInfoDTO.setTaskDefinitions(objectMapper.readValue(mockTemplateInfoModel.getTaskDefinitions(), new TypeReference<>() {
+        }));
+        return mockTemplateInfoDTO;
+      }catch (Exception e){
+        throw new GlobalException(ResultStatus.QUERY_TEMPLATE_EXCEPTION,e);
+      }
+    }).collect(Collectors.toList());
   }
 
   @Override
@@ -53,6 +67,8 @@ public class MockTemplateServiceImpl implements MockTemplateService {
       if (Objects.equals(mockTemplateInfoModel.getEl(), "")) {
         mockTemplateInfoModel.setEl(null);
       }
+      mockTemplateInfoModel.setRandomVariables(objectMapper.writeValueAsString(mockTemplateInfoDTO.getRandomVariables()));
+      mockTemplateInfoModel.setTaskDefinitions(objectMapper.writeValueAsString(mockTemplateInfoDTO.getTaskDefinitions()));
       if (Objects.isNull(mockTemplateInfoModel.getId())) {
         effectRows = mockTemplateInfoMapper.insertMockTemplateInfoModel(mockTemplateInfoModel);
       } else {

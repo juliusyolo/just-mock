@@ -6,24 +6,40 @@
   </div>
   <a-table :columns="columns" :data="data" :loading="loading" :pagination="false">
     <template #attached="{ record }">
-      <a-tag v-if="record.attached" color="green">是</a-tag>
+      <a-tooltip v-if="record.attached" :content="record.environmentVariables?record.environmentVariables:'没有设置全局环境变量'">
+        <a-tag color="green">是</a-tag>
+      </a-tooltip>
       <a-tag v-else color="red">否</a-tag>
     </template>
     <template #optional="{ record }">
-      <a-button v-if="record.attached" @click="doAttachVMInstance(record.pid)" :loading="attachLoading">已连接
+      <a-button v-if="record.attached" @click="doAttachVMInstanceWithNothing">已连接
       </a-button>
-      <a-button v-else @click="doAttachVMInstance(record.pid)" :loading="attachLoading">连接</a-button>
+      <a-popconfirm v-else content="连接是否需要设置目标应用的环境变量?" cancel-text="否" ok-text="是" @cancel="doAttachVMInstance(record.pid)" @ok="doAttachVMInstanceWithEnvironmentVariable(record.pid)">
+        <a-button :loading="attachLoading">连接</a-button>
+      </a-popconfirm>
       <a-divider direction="vertical"/>
       <a-button :disabled="!record.attached" @click="mockClick(record.pid,record.name)">开始Mock
       </a-button>
     </template>
   </a-table>
+  <a-modal width="50%" v-model:visible="modalVisible" @cancel="handleCancel" :on-before-ok="handleBeforeOk"
+           unmountOnClose>
+    <template #title>
+      添加环境变量
+    </template>
+    <div>
+      <h3>环境变量:</h3>
+      <a-input-tag v-model="inputTags" placeholder="请输入标签..." @change="tagInputChange" allow-clear/>
+      <h3>备注:</h3>
+      <a-textarea disabled default-value="应添加该应用拥有的全局变环境量或静态方法，会添加到环境变量末尾。全局环境变量无效会导致连接异常。" :auto-size="true"/>
+    </div>
+  </a-modal>
 </template>
 
 <script lang="ts">
 import {defineComponent, onMounted, onUnmounted, ref} from 'vue'
-import {VmInstanceArray} from "../api/vm/types";
-import {attachVMInstance, getAllVMInstances} from "../api/vm";
+import {AttachVMInstance, MockTemplateInfo, VmInstanceArray} from "../api/vm/types";
+import {attachVMInstance, getAllVMInstances, putMockTemplateInfo} from "../api/vm";
 import {Message} from "@arco-design/web-vue";
 import {useRouter} from "vue-router";
 
@@ -32,6 +48,9 @@ export default defineComponent({
     const loading = ref(false)
     const data = ref<VmInstanceArray>([])
     const attachLoading = ref(false)
+    const attachVMInstanceModel = ref<AttachVMInstance>()
+    const inputTags = ref<Array<string>>([])
+    const modalVisible = ref<boolean>(false)
     const router = useRouter()
     let intervalId: any = null;
     const queryAllVMInstances = () => {
@@ -53,9 +72,21 @@ export default defineComponent({
       })
     }
 
+    const doAttachVMInstanceWithNothing = () => {
+      Message.warning({content:  '该虚拟机实例已经连接！', duration: 1000})
+    }
+
     const doAttachVMInstance = (pid: string) => {
+      attachVMInstanceModel.value = {
+        pid: pid,
+        environmentVariables: []
+      }
+      doAttachVMInstance0(attachVMInstanceModel.value)
+    }
+
+    const doAttachVMInstance0 = (attachVMInstanceModel: AttachVMInstance)=>{
       attachLoading.value = true
-      attachVMInstance(pid).then(() => {
+      attachVMInstance(attachVMInstanceModel).then(() => {
         attachLoading.value = false
         Message.success({content: '连接成功！', duration: 1000, onClose: () => queryAllVMInstances()})
       }).catch(error => {
@@ -63,7 +94,13 @@ export default defineComponent({
         Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
       })
     }
-
+    const doAttachVMInstanceWithEnvironmentVariable = (pid: string) => {
+      attachVMInstanceModel.value = {
+        pid: pid,
+        environmentVariables: []
+      }
+      modalVisible.value = true
+    }
     onMounted(() => {
       queryAllVMInstances()
       intervalId = setInterval(() => {
@@ -93,14 +130,40 @@ export default defineComponent({
     const mockClick = (pid: string,name:string) => {
       router.push({path:'/mock/info/' + pid,query:{name}})
     }
+    const handleBeforeOk = async () => {
+      if (!attachVMInstanceModel.value||attachVMInstanceModel.value?.environmentVariables.length===0){
+        console.log(attachVMInstanceModel.value)
+        Message.error({content: '环境变量必填！', duration: 2 * 1000})
+        return false
+      }
+      if (attachVMInstanceModel.value){
+        doAttachVMInstance0(attachVMInstanceModel.value)
+      }
+      inputTags.value = []
+      return true
+    };
+    const handleCancel = () => {
+      modalVisible.value = false
+      inputTags.value = []
+    }
+    const tagInputChange = (tags:Array<string>) =>{
+      attachVMInstanceModel.value = { ...attachVMInstanceModel.value,environmentVariables:tags } as AttachVMInstance
+    }
     return {
       columns,
       loading,
       data,
       attachLoading,
+      inputTags,
+      modalVisible,
       queryAllVMInstances,
+      doAttachVMInstanceWithEnvironmentVariable,
       doAttachVMInstance,
-      mockClick
+      doAttachVMInstanceWithNothing,
+      mockClick,
+      handleBeforeOk,
+      handleCancel,
+      tagInputChange
     }
   }
 })

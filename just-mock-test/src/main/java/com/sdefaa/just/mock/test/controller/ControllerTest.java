@@ -18,6 +18,7 @@ public class ControllerTest {
 
   @GetMapping("/hello1")
   public Integer say(){
+//    com.sdefaa.just.mock.test.controller.ControllerTest.threadLocal.get()
     return 1;
   }
 

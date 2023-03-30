@@ -4,6 +4,7 @@ import com.sdefaa.just.mock.dashboard.converter.ToRegisteredApiInfoVOConverter;
 import com.sdefaa.just.mock.dashboard.converter.ToVMInstanceVOConverter;
 import com.sdefaa.just.mock.dashboard.enums.ResultStatus;
 import com.sdefaa.just.mock.dashboard.pojo.ResponseWrapper;
+import com.sdefaa.just.mock.dashboard.pojo.dto.AttachVMInstanceDTO;
 import com.sdefaa.just.mock.dashboard.pojo.dto.PutMockDTO;
 import com.sdefaa.just.mock.dashboard.pojo.dto.RemoveMockDTO;
 import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
@@ -40,9 +41,9 @@ public class VMInstanceController {
         return ResponseWrapper.wrap(ResultStatus.SUCCESS, vmInstanceVOs);
     }
 
-    @GetMapping("/v1/api/vm/instance/{pid}/attach")
-    public ResponseWrapper<VMInstanceVO> attachVMInstance(@PathVariable("pid") String pid) {
-        VMInstanceDTO vmInstanceDTO = vmInstanceService.attachVMInstance(pid);
+    @PostMapping("/v1/api/vm/instance/attach")
+    public ResponseWrapper<VMInstanceVO> attachVMInstance(@RequestBody AttachVMInstanceDTO attachVMInstanceDTO) {
+        VMInstanceDTO vmInstanceDTO = vmInstanceService.attachVMInstance(attachVMInstanceDTO);
         VMInstanceVO vmInstanceVO = ToVMInstanceVOConverter.INSTANCE.covert(vmInstanceDTO);
         return ResponseWrapper.wrap(ResultStatus.SUCCESS, vmInstanceVO);
     }

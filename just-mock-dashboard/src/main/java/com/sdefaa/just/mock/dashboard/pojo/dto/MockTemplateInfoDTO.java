@@ -1,8 +1,10 @@
 package com.sdefaa.just.mock.dashboard.pojo.dto;
 
+import com.sdefaa.just.mock.common.pojo.RandomVariable;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author Julius Wong
@@ -14,5 +16,7 @@ public class MockTemplateInfoDTO {
   private String el;
   private String templateContent;
   private String tag;
+  private List<RandomVariable> randomVariables;
+  private List<String> taskDefinitions;
 
 }

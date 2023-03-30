@@ -5,7 +5,7 @@ import com.sdefaa.just.mock.dashboard.converter.ToVMInstanceDTOConverter;
 import com.sdefaa.just.mock.dashboard.enums.ResultStatus;
 import com.sdefaa.just.mock.dashboard.exception.GlobalException;
 import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
-import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachModel;
+import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachInfoModel;
 import com.sun.tools.attach.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class VMInstanceBOImpl implements VMInstanceBO {
   @Value("${mock.config.path}")
   private String mockConfigPath;
   @Override
-  public List<VMInstanceDTO> vmInstanceWrap(List<VMInstanceAttachModel> vmInstanceAttachModelList) {
+  public List<VMInstanceDTO> vmInstanceWrap(List<VMInstanceAttachInfoModel> vmInstanceAttachInfoModelList) {
     List<VirtualMachineDescriptor> virtualMachineDescriptors = VirtualMachine.list();
     // 所有的本地虚拟机实例
     List<VMInstanceDTO> allVMInstanceDTOs = virtualMachineDescriptors.stream().filter(virtualMachineDescriptor -> !Objects.equals(virtualMachineDescriptor.displayName(),VM_SELF)).map(virtualMachineDescriptor -> {
@@ -43,7 +43,7 @@ public class VMInstanceBOImpl implements VMInstanceBO {
       return vmInstanceDTO;
     }).toList();
     // 数据库里存在连接的虚拟机实例
-    List<VMInstanceDTO> attachedVMInstanceDTOs = vmInstanceAttachModelList.stream().map(ToVMInstanceDTOConverter.INSTANCE::covert).toList();
+    List<VMInstanceDTO> attachedVMInstanceDTOs = vmInstanceAttachInfoModelList.stream().map(ToVMInstanceDTOConverter.INSTANCE::covert).toList();
     // 未被连接的虚拟机实例
     List<VMInstanceDTO> unattachedVMInstanceDTOs = allVMInstanceDTOs.stream()
       .filter(vmInstanceDTO -> attachedVMInstanceDTOs.stream().noneMatch(attachedVMInstanceDTO -> Objects.equals(vmInstanceDTO.getPid(), attachedVMInstanceDTO.getPid())))
@@ -61,7 +61,7 @@ public class VMInstanceBOImpl implements VMInstanceBO {
   }
 
   @Override
-  public VMInstanceDTO attachVMInstance(String pid) {
+  public VMInstanceDTO attachVMInstance(String pid,String environmentVariables) {
     List<VirtualMachineDescriptor> virtualMachineDescriptors = VirtualMachine.list();
     Optional<VirtualMachineDescriptor> vmDescriptor = virtualMachineDescriptors.stream().filter(virtualMachineDescriptor -> Objects.equals(virtualMachineDescriptor.id(), pid)).findFirst();
     if (vmDescriptor.isEmpty()) {
@@ -70,7 +70,11 @@ public class VMInstanceBOImpl implements VMInstanceBO {
     VirtualMachineDescriptor virtualMachineDescriptor = vmDescriptor.get();
     try {
       VirtualMachine vm = VirtualMachine.attach(virtualMachineDescriptor);
-      vm.loadAgent(mockAgentPath,mockConfigPath.concat(" ").concat(pid));
+      if (Objects.nonNull(environmentVariables)){
+        vm.loadAgent(mockAgentPath,mockConfigPath.concat(" ").concat(pid).concat(" ").concat(environmentVariables));
+      }else {
+        vm.loadAgent(mockAgentPath,mockConfigPath.concat(" ").concat(pid));
+      }
       vm.detach();
     } catch (AttachNotSupportedException e) {
       throw new GlobalException(ResultStatus.ATTACH_NOT_SUPPORTED_EXCEPTION, e);

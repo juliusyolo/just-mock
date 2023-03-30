@@ -4,6 +4,7 @@ export type VmInstance = {
   platform: string;
   vendor: string;
   attached: boolean;
+  environmentVariables: string;
 }
 
 export type VmInstanceArray = Array<VmInstance>;
@@ -35,6 +36,8 @@ export type MockTemplateInfo = {
   templateContent: string;
   el: string;
   tag: string;
+  taskDefinitions: Array<string>;
+  randomVariables: Array<RandomVariable>;
 }
 
 export type MockTemplateInfoArray = Array<MockTemplateInfo>;
@@ -43,8 +46,25 @@ export type MockTemplateInfoArray = Array<MockTemplateInfo>;
 export type PutMockInfo = {
   pid: string;
   className: string;
-  methodName:string;
+  methodName: string;
   mockTemplateId: number;
   templateContent: string;
   el: string;
+  taskDefinitions: Array<string>;
+  randomVariables: Array<RandomVariable>;
+}
+
+export type RandomVariable = {
+  name: string;
+  sequence: string;
+}
+
+export type InternalRandomVariable = {
+  name: string;
+  sequences: Array<string>;
+}
+
+export type AttachVMInstance = {
+  pid: string;
+  environmentVariables: Array<string>;
 }

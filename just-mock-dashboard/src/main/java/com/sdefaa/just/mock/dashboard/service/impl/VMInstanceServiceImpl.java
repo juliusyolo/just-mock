@@ -11,13 +11,12 @@ import com.sdefaa.just.mock.dashboard.converter.ToVMInstanceAttachModelConverter
 import com.sdefaa.just.mock.dashboard.converter.ToVMInstanceMockInfoModelConverter;
 import com.sdefaa.just.mock.dashboard.enums.ResultStatus;
 import com.sdefaa.just.mock.dashboard.exception.GlobalException;
-import com.sdefaa.just.mock.dashboard.mapper.VMInstanceAttachMapper;
+import com.sdefaa.just.mock.dashboard.mapper.VMInstanceAttachExtraInfoMapper;
+import com.sdefaa.just.mock.dashboard.mapper.VMInstanceAttachInfoMapper;
 import com.sdefaa.just.mock.dashboard.mapper.VMInstanceMockInfoMapper;
-import com.sdefaa.just.mock.dashboard.pojo.dto.PutMockDTO;
-import com.sdefaa.just.mock.dashboard.pojo.dto.RegisteredApiInfoDTO;
-import com.sdefaa.just.mock.dashboard.pojo.dto.RemoveMockDTO;
-import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
-import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachModel;
+import com.sdefaa.just.mock.dashboard.pojo.dto.*;
+import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachExtraInfoModel;
+import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachInfoModel;
 import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceMockInfoModel;
 import com.sdefaa.just.mock.dashboard.task.VMInstancePingTask;
 import com.sdefaa.just.mock.common.pojo.ApiRegistryDTO;
@@ -45,9 +44,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class VMInstanceServiceImpl implements VMInstanceService {
   @Autowired
-  private VMInstanceAttachMapper vmInstanceAttachMapper;
+  private VMInstanceAttachInfoMapper vmInstanceAttachInfoMapper;
   @Autowired
   private VMInstanceMockInfoMapper vmInstanceMockInfoMapper;
+  @Autowired
+  private VMInstanceAttachExtraInfoMapper vmInstanceAttachExtraInfoMapper;
   @Autowired
   private ObjectMapper objectMapper;
   @Autowired
@@ -61,8 +62,8 @@ public class VMInstanceServiceImpl implements VMInstanceService {
 
   @Override
   public List<VMInstanceDTO> getAllVMInstances() {
-    List<VMInstanceAttachModel> vmInstanceAttachModelList = vmInstanceAttachMapper.selectVMInstanceAttachModelList();
-    return vmInstanceBO.vmInstanceWrap(vmInstanceAttachModelList);
+    List<VMInstanceAttachInfoModel> vmInstanceAttachInfoModelList = vmInstanceAttachInfoMapper.selectVMInstanceAttachModelList();
+    return vmInstanceBO.vmInstanceWrap(vmInstanceAttachInfoModelList);
   }
 
   @Override
@@ -72,45 +73,42 @@ public class VMInstanceServiceImpl implements VMInstanceService {
   }
 
   @Override
-  public VMInstanceDTO attachVMInstance(String pid) {
+  @Transactional(rollbackFor = Exception.class)
+  public VMInstanceDTO attachVMInstance(AttachVMInstanceDTO attachVMInstanceDTO) {
+    String environments = null;
+    if(Objects.nonNull(attachVMInstanceDTO.getEnvironmentVariables())&&!attachVMInstanceDTO.getEnvironmentVariables().isEmpty()){
+      environments = attachVMInstanceDTO.getEnvironmentVariables().stream().collect(Collectors.joining(" "));
+    }
+    VMInstanceDTO vmInstanceDTO = vmInstanceBO.attachVMInstance(attachVMInstanceDTO.getPid(),environments);
+    VMInstanceAttachInfoModel vmInstanceAttachInfoModel = ToVMInstanceAttachModelConverter.INSTANCE.covert(vmInstanceDTO);
+    vmInstanceAttachInfoModel.setEnvironmentVariables(environments);
+
     int effectRows;
-    VMInstanceAttachModel vmInstanceAttachModel = new VMInstanceAttachModel();
-    vmInstanceAttachModel.setPid(pid);
     try {
-      effectRows = vmInstanceAttachMapper.insertVMInstanceAttachModel(vmInstanceAttachModel);
+      effectRows = vmInstanceAttachInfoMapper.insertVMInstanceAttachModel(vmInstanceAttachInfoModel);
     } catch (Exception e) {
       throw new GlobalException(ResultStatus.VM_INSERT_EXCEPTION, e);
     }
     if (effectRows != 1) {
       throw new GlobalException(ResultStatus.VM_INSERT_FAILED);
     }
-    VMInstanceDTO vmInstanceDTO = vmInstanceBO.attachVMInstance(pid);
-    vmInstanceAttachModel = ToVMInstanceAttachModelConverter.INSTANCE.covert(vmInstanceDTO);
-    int updateEffectRows;
-    try {
-      updateEffectRows = vmInstanceAttachMapper.updateVMInstanceAttachModel(vmInstanceAttachModel);
-    } catch (Exception e) {
-      throw new GlobalException(ResultStatus.VM_INSERT_EXCEPTION, e);
-    }
-    if (updateEffectRows != 1) {
-      throw new GlobalException(ResultStatus.VM_INSERT_FAILED);
-    }
     return vmInstanceDTO;
   }
 
   @Override
-  @Transactional(rollbackFor = GlobalException.class)
+  @Transactional(rollbackFor = Exception.class)
   public void detachVMInstance(String pid) {
     try {
-      vmInstanceAttachMapper.deleteVMInstanceAttachModelByPid(pid);
+      vmInstanceAttachInfoMapper.deleteVMInstanceAttachModelByPid(pid);
       vmInstanceMockInfoMapper.deleteVMInstanceMockInfoModelByPid(pid);
+      vmInstanceAttachExtraInfoMapper.deleteVMInstanceAttachExtraInfoModelByPid(pid);
     } catch (Exception e) {
       throw new GlobalException(ResultStatus.VM_DETACH_EXCEPTION);
     }
   }
 
   @Override
-  @Transactional(rollbackFor = GlobalException.class)
+  @Transactional(rollbackFor = Exception.class)
   public void registerApiList(ApiRegistryDTO apiRegistryDTO) {
     List<VMInstanceMockInfoModel> vmInstanceMockInfoModelList = apiRegistryDTO.getApiInfos().stream().map(apiInfo -> {
       VMInstanceMockInfoModel vmInstanceMockInfoModel = ToVMInstanceMockInfoModelConverter.INSTANCE.covert(apiInfo);
@@ -134,10 +132,10 @@ public class VMInstanceServiceImpl implements VMInstanceService {
         throw new GlobalException(ResultStatus.REGISTER_API_FAILED);
       }
     }
-    VMInstanceAttachModel vmInstanceAttachModel = new VMInstanceAttachModel();
-    vmInstanceAttachModel.setPid(apiRegistryDTO.getPid());
-    vmInstanceAttachModel.setPort(apiRegistryDTO.getPort());
-    int effectRows = vmInstanceAttachMapper.updateVMInstanceAttachModel(vmInstanceAttachModel);
+    VMInstanceAttachExtraInfoModel vmInstanceAttachExtraInfoModel = new VMInstanceAttachExtraInfoModel();
+    vmInstanceAttachExtraInfoModel.setPid(apiRegistryDTO.getPid());
+    vmInstanceAttachExtraInfoModel.setPort(apiRegistryDTO.getPort());
+    int effectRows = vmInstanceAttachExtraInfoMapper.insertVMInstanceAttachExtraInfoModel(vmInstanceAttachExtraInfoModel);
     if (effectRows != 1) {
       throw new GlobalException(ResultStatus.REGISTER_API_FAILED);
     }
@@ -145,7 +143,7 @@ public class VMInstanceServiceImpl implements VMInstanceService {
   }
 
   @Override
-  @Transactional(rollbackFor = GlobalException.class)
+  @Transactional(rollbackFor = Exception.class)
   public void removeMock(RemoveMockDTO removeMockDTO) {
     VMInstanceMockInfoModel vmInstanceMockInfoModel = ToVMInstanceMockInfoModelConverter.INSTANCE.covert(removeMockDTO);
     vmInstanceMockInfoModel.setMockEnable(false);
@@ -158,9 +156,9 @@ public class VMInstanceServiceImpl implements VMInstanceService {
     if (updateEffectRows != 1) {
       throw new GlobalException(ResultStatus.UPDATE_MOCK_ENABLE_FLAG_FAILED);
     }
-    VMInstanceAttachModel vmInstanceAttachModel;
+    VMInstanceAttachExtraInfoModel vmInstanceAttachExtraInfoModel;
     try {
-      vmInstanceAttachModel = vmInstanceAttachMapper.selectVMInstanceAttachModelByPid(removeMockDTO.getPid());
+      vmInstanceAttachExtraInfoModel = vmInstanceAttachExtraInfoMapper.selectVMInstanceAttachExtraInfoModelByPid(removeMockDTO.getPid());
     } catch (Exception e) {
       throw new GlobalException(ResultStatus.QUERY_MOCK_COMMAND_PORT_EXCEPTION, e);
     }
@@ -170,7 +168,7 @@ public class VMInstanceServiceImpl implements VMInstanceService {
     apiMockCommandDTO.setMethodName(removeMockDTO.getMethodName());
     ApiMockCommandResponseDTO apiMockCommandResponseDTO;
     try {
-      apiMockCommandResponseDTO = restTemplate.postForObject("http://127.0.0.1:" + vmInstanceAttachModel.getPort() + CommonConstant.COMMAND_URL, apiMockCommandDTO, ApiMockCommandResponseDTO.class);
+      apiMockCommandResponseDTO = restTemplate.postForObject("http://127.0.0.1:" + vmInstanceAttachExtraInfoModel.getPort() + CommonConstant.COMMAND_URL, apiMockCommandDTO, ApiMockCommandResponseDTO.class);
       log.info("MockCommand Response: {}", apiMockCommandResponseDTO);
     } catch (RestClientException e) {
       throw new GlobalException(ResultStatus.CALL_MOCK_COMMAND_EXCEPTION, e);
@@ -181,6 +179,7 @@ public class VMInstanceServiceImpl implements VMInstanceService {
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void putMock(PutMockDTO putMockDTO) {
     VMInstanceMockInfoModel vmInstanceMockInfoModel = ToVMInstanceMockInfoModelConverter.INSTANCE.covert(putMockDTO);
     vmInstanceMockInfoModel.setMockEnable(true);
@@ -193,9 +192,9 @@ public class VMInstanceServiceImpl implements VMInstanceService {
     if (updateEffectRows != 1) {
       throw new GlobalException(ResultStatus.UPDATE_MOCK_ENABLE_FLAG_FAILED);
     }
-    VMInstanceAttachModel vmInstanceAttachModel;
+    VMInstanceAttachExtraInfoModel vmInstanceAttachExtraInfoModel;
     try {
-      vmInstanceAttachModel = vmInstanceAttachMapper.selectVMInstanceAttachModelByPid(putMockDTO.getPid());
+      vmInstanceAttachExtraInfoModel = vmInstanceAttachExtraInfoMapper.selectVMInstanceAttachExtraInfoModelByPid(putMockDTO.getPid());
     } catch (Exception e) {
       throw new GlobalException(ResultStatus.QUERY_MOCK_COMMAND_PORT_EXCEPTION, e);
     }
@@ -207,7 +206,7 @@ public class VMInstanceServiceImpl implements VMInstanceService {
     apiMockCommandDTO.setTemplateContent(putMockDTO.getTemplateContent());
     ApiMockCommandResponseDTO apiMockCommandResponseDTO;
     try {
-      apiMockCommandResponseDTO = restTemplate.postForObject("http://127.0.0.1:" + vmInstanceAttachModel.getPort() + CommonConstant.COMMAND_URL, apiMockCommandDTO, ApiMockCommandResponseDTO.class);
+      apiMockCommandResponseDTO = restTemplate.postForObject("http://127.0.0.1:" + vmInstanceAttachExtraInfoModel.getPort() + CommonConstant.COMMAND_URL, apiMockCommandDTO, ApiMockCommandResponseDTO.class);
       log.info("MockCommand Response: {}", apiMockCommandResponseDTO);
     } catch (RestClientException e) {
       throw new GlobalException(ResultStatus.CALL_MOCK_COMMAND_EXCEPTION, e);

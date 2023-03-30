@@ -3,20 +3,16 @@ package com.sdefaa.just.mock.dashboard.pojo.model;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @author Julius Wong
  * @since 1.0.0
  */
 @Data
-public class MockTemplateInfoModel {
-  Long id;
-  private String el;
-  private String templateContent;
-  private String tag;
-  private String randomVariables;
-  private String taskDefinitions;
+public class VMInstanceAttachExtraInfoModel {
+  private Long id;
+  private String pid;
+  private Integer port;
   private LocalDateTime createTime;
   private LocalDateTime updateTime;
 }

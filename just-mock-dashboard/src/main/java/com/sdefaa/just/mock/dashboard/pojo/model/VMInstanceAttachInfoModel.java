@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
  * @since 1.0.0
  */
 @Data
-public class VMInstanceAttachModel {
+public class VMInstanceAttachInfoModel {
     private Long id;
     private String pid;
-    private Integer port;
     private String name;
     private String platform;
     private String vendor;
+    private String environmentVariables;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

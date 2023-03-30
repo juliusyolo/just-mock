@@ -1,5 +1,6 @@
 import axios, {AxiosResponse} from "axios";
 import {
+  AttachVMInstance,
   MockTemplateInfo,
   MockTemplateInfoArray,
   PutMockInfo,
@@ -25,8 +26,8 @@ export async function getAllVMInstances(): Promise<VmInstanceArray> {
   return await axios.get('/v1/api/vm/instances/list') as VmInstanceArray;
 }
 
-export async function attachVMInstance(pid:string):Promise<void>{
-  return await axios.get('/v1/api/vm/instance/'+pid+'/attach') as void;
+export async function attachVMInstance(attachVMInstance: AttachVMInstance):Promise<void>{
+  return await axios.post('/v1/api/vm/instance/attach',attachVMInstance) as void;
 }
 
 export async function getRegisteredApiList(pid:string):Promise<RegisteredApiInfoArray>{

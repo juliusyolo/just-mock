@@ -42,6 +42,12 @@
       <a-textarea v-model="mockTemplateInfoModel.templateContent" :auto-size="true"/>
       <h3>模板EL表达式:</h3>
       <a-textarea v-model="mockTemplateInfoModel.el" :auto-size="true"/>
+      <h3 v-if="mockTemplateInfoModel.randomVariables?.length>0">随机变量:</h3>
+      <a-textarea v-model="mockTemplateInfoModel.randomVariables" :auto-size="true"/>
+      <h3 v-if="mockTemplateInfoModel.taskDefinitions?.length>0">任务定义:</h3>
+      <template v-for="taskDefinition in mockTemplateInfoModel.taskDefinitions">
+        <a-textarea :model-value="taskDefinition" :auto-size="true"/>
+      </template>
       <h3>备注:</h3>
       <a-textarea disabled default-value="使用freemarker作为模板引擎，EL表达式支持JSR245规范，环境变量现有请求方法参数，以p0,p1,p2,p3以此类推。" :auto-size="true"/>
     </div>
@@ -52,15 +58,11 @@
 import {defineComponent, onMounted, ref} from 'vue'
 import {MockTemplateInfo, MockTemplateInfoArray, PutMockInfo, VmInstanceArray} from "../api/vm/types";
 import {
-  attachVMInstance,
-  getAllVMInstances,
   getMockTemplateInfoList,
-  putMock, putMockTemplateInfo,
-  removeMock,
+  putMockTemplateInfo,
   removeMockTemplateInfo
 } from "../api/vm";
 import {Message} from "@arco-design/web-vue";
-import {useRouter} from "vue-router";
 
 export default defineComponent({
   setup() {
@@ -126,7 +128,6 @@ export default defineComponent({
     }
     const tagInputChange = (tags:Array<string>) =>{
       mockTemplateInfoModel.value = {...mockTemplateInfoModel.value,tag: tags.join(";")} as MockTemplateInfo
-      console.log(mockTemplateInfoModel.value)
     }
     onMounted(() => {
       queryAllMockTemplateInfos()

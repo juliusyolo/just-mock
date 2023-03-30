@@ -1,7 +1,7 @@
 package com.sdefaa.just.mock.dashboard.converter;
 
 import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
-import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachModel;
+import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachInfoModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -12,5 +12,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface ToVMInstanceAttachModelConverter {
   ToVMInstanceAttachModelConverter INSTANCE = Mappers.getMapper(ToVMInstanceAttachModelConverter.class);
-  VMInstanceAttachModel covert(VMInstanceDTO vmInstanceDTO);
+  VMInstanceAttachInfoModel covert(VMInstanceDTO vmInstanceDTO);
 }

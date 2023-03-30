@@ -1,17 +1,17 @@
 package com.sdefaa.just.mock.common.strategy;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.just.mock.common.pojo.RandomVariable;
+import com.sdefaa.just.mock.common.task.AbstractPostProcessor;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 /**
@@ -29,12 +29,12 @@ public abstract class AbstractMockStrategy implements MockStrategy{
   /**
    * 是否开启mock
    * @param parameters mock方法的请求参数
-   * @return true开启，false不开启
+   * @result = true开启，false不开启
    */
-  protected abstract boolean canMock(RandomVariable[] randomVariables, Object[] parameters);
+  protected abstract boolean canMock(List<RandomVariable> randomVariables, Object[] parameters);
 
   @Override
-  public Object mock(Class<?> returnClass, RandomVariable[] randomVariables, Object[] parameters) {
+  public Object mock(Class<?> returnClass,  List<AbstractPostProcessor> postProcessors, List<RandomVariable> randomVariables, Object[] parameters) {
     Map<String,Object> modelMap = new HashMap<>();
     if (Objects.nonNull(parameters)){
       for (int i = 0; i < parameters.length; i++) {
@@ -56,71 +56,42 @@ public abstract class AbstractMockStrategy implements MockStrategy{
       throw new RuntimeException(e);
     }
     String str = writer.toString();
+    Object result;
     try {
-      if (returnClass.isPrimitive()) {
-        if (returnClass == boolean.class) {
-          return Boolean.parseBoolean(str);
-        } else if (returnClass == byte.class) {
-          return Byte.parseByte(str);
-        } else if (returnClass == short.class) {
-          return Short.parseShort(str);
-        } else if (returnClass == int.class) {
-          return Integer.parseInt(str);
-        } else if (returnClass == long.class) {
-          return Long.parseLong(str);
-        } else if (returnClass == float.class) {
-          return Float.parseFloat(str);
-        } else if (returnClass == double.class) {
-          return Double.parseDouble(str);
-        } else if (returnClass == char.class) {
-          return str.charAt(0);
-        }
-      } else if (isWrapperType(returnClass)) {
-        if (returnClass == Boolean.class) {
-          return Boolean.valueOf(str);
-        } else if (returnClass == Byte.class) {
-          return Byte.valueOf(str);
-        } else if (returnClass == Short.class) {
-          return Short.valueOf(str);
-        } else if (returnClass == Integer.class) {
-          return Integer.valueOf(str);
-        } else if (returnClass == Long.class) {
-          return Long.valueOf(str);
-        } else if (returnClass == Float.class) {
-          return Float.valueOf(str);
-        } else if (returnClass == Double.class) {
-          return Double.valueOf(str);
-        } else if (returnClass == Character.class) {
-          return str.charAt(0);
-        }
+      if (returnClass == boolean.class||returnClass == Boolean.class) {
+        result = Boolean.parseBoolean(str);
+      } else if (returnClass == byte.class||returnClass == Byte.class) {
+        result = Byte.parseByte(str);
+      } else if (returnClass == short.class||returnClass == Short.class) {
+        result = Short.parseShort(str);
+      } else if (returnClass == int.class||returnClass == Integer.class) {
+        result = Integer.parseInt(str);
+      } else if (returnClass == long.class||returnClass == Long.class) {
+        result = Long.parseLong(str);
+      } else if (returnClass == float.class||returnClass == Float.class) {
+        result = Float.parseFloat(str);
+      } else if (returnClass == double.class||returnClass == Double.class) {
+        result = Double.parseDouble(str);
+      } else if (returnClass == char.class||returnClass == Character.class) {
+        result = str.charAt(0);
       }else if (CharSequence.class.isAssignableFrom(returnClass)) {
-        return str;
+        result = str;
       }else if (returnClass.isEnum()){
-        return Enum.valueOf((Class<Enum>) returnClass, str);
+        result = Enum.valueOf((Class<Enum>) returnClass, str);
+      }else {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
+        result = objectMapper.readValue(str, returnClass);
       }
-    }catch (Exception e){
+    }catch (JsonProcessingException e) {
+      logger.info("无法将Mock内容转换对应响应实体，Mock失效,"+e);
+      throw new RuntimeException(e);
+    } catch (Exception e){
       logger.info("无法将Mock内容转换成对应简单响应实体，Mock失效,"+e);
       throw new RuntimeException(e);
     }
-    try {
-      ObjectMapper objectMapper = new ObjectMapper();
-      objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
-      return objectMapper.readValue(str, returnClass);
-    } catch ( Exception e) {
-      logger.info("无法将Mock内容转换对应响应实体，Mock失效,"+e);
-      throw new RuntimeException(e);
-    }
-  }
-
-  public static boolean isWrapperType(Class<?> clazz) {
-    return clazz.equals(Boolean.class) ||
-      clazz.equals(Byte.class) ||
-      clazz.equals(Short.class) ||
-      clazz.equals(Integer.class) ||
-      clazz.equals(Long.class) ||
-      clazz.equals(Float.class) ||
-      clazz.equals(Double.class) ||
-      clazz.equals(Character.class);
+    Optional.ofNullable(postProcessors).ifPresent(postProcessorList -> postProcessorList.forEach(CompletableFuture::runAsync));
+    return result;
   }
 
 }

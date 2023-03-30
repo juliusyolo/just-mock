@@ -32,6 +32,7 @@ public enum ResultStatus implements Status {
     REMOVE_MOCK_TEMPLATE_FAILED("000015", "移除Mock模板失败"),
     PUT_MOCK_TEMPLATE_EXCEPTION("000016", "配置Mock模板异常"),
     PUT_MOCK_TEMPLATE_FAILED("000017", "配置Mock模板失败"),
+    QUERY_TEMPLATE_EXCEPTION("000018", "查询Mock模板异常"),
     /**
      * 失败状态
      */

@@ -4,6 +4,7 @@ import com.sdefaa.just.mock.common.pojo.RandomVariable;
 import freemarker.template.Template;
 
 import javax.el.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -21,7 +22,7 @@ public class ConditionalMockStrategy extends AbstractMockStrategy {
   }
 
   @Override
-  protected boolean canMock(RandomVariable[] randomVariables, Object[] parameters) {
+  protected boolean canMock(List<RandomVariable> randomVariables, Object[] parameters) {
     if (Objects.isNull(randomVariables) && Objects.isNull(parameters)) {
       return true;
     }

@@ -3,7 +3,7 @@ package com.sdefaa.just.mock.agent.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.just.mock.common.constant.CommonConstant;
 import com.sdefaa.just.mock.common.pojo.ApiMockCommandDTO;
-import com.sdefaa.just.mock.common.strategy.MockStrategyManager;
+import com.sdefaa.just.mock.common.strategy.MockManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -58,9 +58,9 @@ public class EmbeddedHttpServerHandler extends SimpleChannelInboundHandler<FullH
               ApiMockCommandDTO  apiMockCommandDTO = objectMapper.readValue(body, ApiMockCommandDTO.class);
               String commandType = apiMockCommandDTO.getCommandType();
               if (Objects.equals(commandType,ApiMockCommandDTO.CommandType.PUT.name())){
-                MockStrategyManager.INSTANCE.putMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName(),apiMockCommandDTO.getTemplateContent(),apiMockCommandDTO.getEl());
+                MockManager.INSTANCE.putMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName(),apiMockCommandDTO.getTemplateContent(),apiMockCommandDTO.getEl(),apiMockCommandDTO.getRandomVariables(),apiMockCommandDTO.getTaskDefinitions());
               }else if (Objects.equals(commandType,ApiMockCommandDTO.CommandType.REMOVE.name())){
-                MockStrategyManager.INSTANCE.removeMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName());
+                MockManager.INSTANCE.removeMock(apiMockCommandDTO.getClazzName(),apiMockCommandDTO.getMethodName());
               }else {
                 responseBody = "{\"code\":\"999999\",\"message\":\"命令未匹配\"}";
               }
