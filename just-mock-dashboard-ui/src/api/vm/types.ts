@@ -63,8 +63,27 @@ export type InternalRandomVariable = {
   name: string;
   sequences: Array<string>;
 }
+export type RandomVariableArray = Array<RandomVariable>;
+
+export type InternalRandomVariableArray = Array<InternalRandomVariable>;
 
 export type AttachVMInstance = {
   pid: string;
   environmentVariables: Array<string>;
+}
+
+
+export type TaskDefinition<T> = {
+  type: string;
+  content: T;
+}
+
+export enum TaskDefinitionType  {
+  HTTP_TASK = 'HTTP_TASK'
+}
+
+export type HttpTaskDefinitionContent = {
+  url:string;
+  payload: object;
+  method: 'GET'|'POST'
 }

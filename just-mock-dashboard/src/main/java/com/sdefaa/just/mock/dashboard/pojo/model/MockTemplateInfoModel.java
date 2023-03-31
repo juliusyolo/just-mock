@@ -3,7 +3,6 @@ package com.sdefaa.just.mock.dashboard.pojo.model;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @author Julius Wong

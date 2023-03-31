@@ -42,12 +42,8 @@
       <a-textarea v-model="mockTemplateInfoModel.templateContent" :auto-size="true"/>
       <h3>模板EL表达式:</h3>
       <a-textarea v-model="mockTemplateInfoModel.el" :auto-size="true"/>
-      <h3 v-if="mockTemplateInfoModel.randomVariables?.length>0">随机变量:</h3>
-      <a-textarea v-model="mockTemplateInfoModel.randomVariables" :auto-size="true"/>
-      <h3 v-if="mockTemplateInfoModel.taskDefinitions?.length>0">任务定义:</h3>
-      <template v-for="taskDefinition in mockTemplateInfoModel.taskDefinitions">
-        <a-textarea :model-value="taskDefinition" :auto-size="true"/>
-      </template>
+      <random-variable-input-box :random-variables="mockTemplateInfoModel.randomVariables" @change="randomVariablesChange"/>
+      <task-definition-input-box :task-definitions="mockTemplateInfoModel.taskDefinitions" @change="taskDefinitionsChange"/>
       <h3>备注:</h3>
       <a-textarea disabled default-value="使用freemarker作为模板引擎，EL表达式支持JSR245规范，环境变量现有请求方法参数，以p0,p1,p2,p3以此类推。" :auto-size="true"/>
     </div>
@@ -56,15 +52,24 @@
 
 <script lang="ts">
 import {defineComponent, onMounted, ref} from 'vue'
-import {MockTemplateInfo, MockTemplateInfoArray, PutMockInfo, VmInstanceArray} from "../api/vm/types";
+import {
+  MockTemplateInfo,
+  MockTemplateInfoArray,
+  PutMockInfo,
+  RandomVariableArray,
+  VmInstanceArray
+} from "../api/vm/types";
 import {
   getMockTemplateInfoList,
   putMockTemplateInfo,
   removeMockTemplateInfo
 } from "../api/vm";
 import {Message} from "@arco-design/web-vue";
+import RandomVariableInputBox from "../components/RandomVariableInputBox.vue";
+import TaskDefinitionInputBox from "../components/TaskDefinitionInputBox.vue";
 
 export default defineComponent({
+  components: {TaskDefinitionInputBox, RandomVariableInputBox},
   setup() {
     const loading = ref(false)
     const data = ref<MockTemplateInfoArray>([])
@@ -72,6 +77,7 @@ export default defineComponent({
     const isEditable = ref<boolean>(false)
     const mockTemplateInfoModel = ref<MockTemplateInfo>()
     const inputTags = ref<Array<string>>([])
+    const randomVariables = ref<RandomVariableArray>([])
     const queryAllMockTemplateInfos = () => {
       loading.value = true
       getMockTemplateInfoList().then((d) => {
@@ -150,6 +156,21 @@ export default defineComponent({
       title: '操作',
       slotName: 'optional',
     }];
+    const randomVariablesChange = (records:RandomVariableArray)=>{
+      mockTemplateInfoModel.value = {
+        ...mockTemplateInfoModel.value,
+        randomVariables: records
+      } as MockTemplateInfo
+      console.log("hello",records)
+      console.log(mockTemplateInfoModel.value)
+    }
+    const taskDefinitionsChange = (records:Array<string>) =>{
+      mockTemplateInfoModel.value = {
+        ...mockTemplateInfoModel.value,
+        taskDefinitions: records
+      } as MockTemplateInfo
+      console.log("hello",records)
+    }
     return {
       columns,
       loading,
@@ -158,6 +179,9 @@ export default defineComponent({
       mockTemplateInfoModel,
       inputTags,
       isEditable,
+      randomVariables,
+      randomVariablesChange,
+      taskDefinitionsChange,
       tagInputChange,
       dealAddTemplate,
       dealEditTemplate,
