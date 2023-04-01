@@ -40,11 +40,11 @@ public class VMInstancePingTask implements Runnable {
     public void run() {
         while (continued) {
             try {
+                Thread.sleep(5000);
                 ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://127.0.0.1:" + this.port +CommonConstant.PING_URL, String.class);
                 if (!Objects.equals(responseEntity.getBody(), CommonConstant.PONG)) {
                     maxPingCount--;
                 }
-                Thread.sleep(5000);
             } catch (Exception e) {
                 e.printStackTrace();
                 maxPingCount--;

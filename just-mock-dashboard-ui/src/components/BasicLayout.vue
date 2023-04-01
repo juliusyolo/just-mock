@@ -14,8 +14,8 @@
               <svg width="155" height="32">
                 <defs>
                   <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color: red; stop-opacity: 1" />
-                    <stop offset="100%" style="stop-color: blue; stop-opacity: 1" />
+                    <stop offset="0%" style="stop-color: red; stop-opacity: 1"/>
+                    <stop offset="100%" style="stop-color: blue; stop-opacity: 1"/>
                   </linearGradient>
                 </defs>
                 <text font-size="32" x="0" y="30" fill="url(#grad1)">Just Mock</text>
@@ -38,8 +38,8 @@
             <svg width="267" height="32">
             <defs>
               <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color: red; stop-opacity: 1" />
-                <stop offset="100%" style="stop-color: blue; stop-opacity: 1" />
+                <stop offset="0%" style="stop-color: red; stop-opacity: 1"/>
+                <stop offset="100%" style="stop-color: blue; stop-opacity: 1"/>
               </linearGradient>
             </defs>
             <text x="0" y="30" fill="url(#grad1)">非侵入式API Mock @Author sdefaa</text>
@@ -79,29 +79,34 @@ export default {
   text-align: center;
   justify-content: center;
 }
-.header-title{
+
+.header-title {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  .header-logo{
+
+  .header-logo {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: linear-gradient(to right,red,blue) no-repeat right bottom;
+    background: linear-gradient(to right, red, blue) no-repeat right bottom;
     background-size: 0 2px;
     transition: background-size 1300ms;
   }
-  .header-logo:hover{
+
+  .header-logo:hover {
     background-position-x: left;
     background-size: 100% 2px;
   }
-  .header-slot{
+
+  .header-slot {
     display: flex;
     justify-content: center;
   }
 }
+
 .footer-remark span {
-  background: linear-gradient(to right,red,blue) no-repeat right bottom;
+  background: linear-gradient(to right, red, blue) no-repeat right bottom;
   background-size: 0 2px;
   transition: background-size 1300ms;
 }

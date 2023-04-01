@@ -1,7 +1,8 @@
 package com.sdefaa.just.mock.common.task;
 
-import com.sdefaa.just.mock.common.strategy.AbstractMockStrategy;
+import com.sdefaa.just.mock.common.pojo.TaskDefinition;
 
+import java.net.MalformedURLException;
 import java.util.logging.Logger;
 
 /**
@@ -11,7 +12,7 @@ import java.util.logging.Logger;
 public abstract class AbstractPostProcessor implements Runnable {
   private static final Logger logger = Logger.getLogger(AbstractPostProcessor.class.getName());
 
-  protected abstract void process();
+  protected abstract void process() throws Exception;
 
   @Override
   public void run() {

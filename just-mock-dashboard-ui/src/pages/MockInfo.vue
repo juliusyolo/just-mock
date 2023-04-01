@@ -5,15 +5,18 @@ import {useRouter} from "vue-router";
 import {
   ArgInfo,
   MockTemplateInfo,
-  MockTemplateInfoArray, PutMockInfo,
+  MockTemplateInfoArray,
+  PutMockInfo,
   RegisteredApiInfo,
   RegisteredApiInfoArray
 } from "../api/vm/types";
 import {getMockTemplateInfoList, getRegisteredApiList, putMock, removeMock} from "../api/vm";
 import {Message} from "@arco-design/web-vue";
-
+import TaskDefinitionInputBox from "../components/TaskDefinitionInputBox.vue";
+import RandomVariableInputBox from "../components/RandomVariableInputBox.vue";
+import { IconInfoCircle } from '@arco-design/web-vue/es/icon';
 export default defineComponent({
-  components: {BasicLayout},
+  components: {BasicLayout, TaskDefinitionInputBox, RandomVariableInputBox,IconInfoCircle},
   setup() {
     const router = useRouter()
     const pid = router.currentRoute.value.params.pid
@@ -25,6 +28,7 @@ export default defineComponent({
     const modalVisible = ref<boolean>(false)
     const selectedMockTemplateInfo = ref<MockTemplateInfo>()
     const mockTemplateInfoData = ref<MockTemplateInfoArray>([])
+    const snapshotWarning = ref<boolean>(false)
     let intervalId: any = null;
     const columns = [{
       title: '接口类型',
@@ -67,9 +71,9 @@ export default defineComponent({
     })
     onUnmounted(() => clearInterval(intervalId))
     const expandable = reactive({
-        title: '接口详情',
-        width: 80
-      }
+          title: '接口详情',
+          width: 80
+        }
     );
     const expandedChange = (keys: string[]) => {
       expandKeys.value = keys.filter(value => !expandKeys.value.includes(value))
@@ -82,13 +86,16 @@ export default defineComponent({
     }
     const configMock = (record: RegisteredApiInfo) => {
       mockRecord.value = record
-      getMockTemplateInfoList().then(d=>{
+      getMockTemplateInfoList().then(d => {
         mockTemplateInfoData.value = d;
-        if (record.mockEnable){
-          selectedMockTemplateInfo.value = d.filter(e=>e.id === record.mockTemplateId)[0]
+        if (record.mockEnable) {
+          selectedMockTemplateInfo.value = d.filter(e => e.id === record.mockTemplateId)[0]
+          if (mockRecord.value?.mockTemplateSnapshot!==generateSnapshot(selectedMockTemplateInfo.value)){
+            snapshotWarning.value = true;
+          }
         }
         modalVisible.value = true;
-      }).catch(error=>{
+      }).catch(error => {
         Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
       })
     }
@@ -101,19 +108,26 @@ export default defineComponent({
         Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
       })
     }
+    const generateSnapshot = (record: MockTemplateInfo): string=>{
+      return record.templateContent + record.el + record.taskDefinitions + JSON.stringify(record.randomVariables)
+    }
     const handleBeforeOk = async () => {
       console.log(selectedMockTemplateInfo.value)
-      if (!selectedMockTemplateInfo.value){
+      if (!selectedMockTemplateInfo.value) {
         Message.error({content: '请选择模板！', duration: 2 * 1000})
       }
-      if (selectedMockTemplateInfo.value){
-        putMock({...mockRecord.value,...selectedMockTemplateInfo.value,mockTemplateId:selectedMockTemplateInfo.value.id} as PutMockInfo).then(()=>{
+      if (selectedMockTemplateInfo.value) {
+        putMock({
+          ...mockRecord.value, ...selectedMockTemplateInfo.value,
+          mockTemplateId: selectedMockTemplateInfo.value.id,
+          mockTemplateSnapshot: generateSnapshot(selectedMockTemplateInfo.value)
+        } as PutMockInfo).then(() => {
           Message.success({content: '配置Mock成功！', duration: 1000, onClose: () => queryRegisteredApiList()})
-        }).catch(error=>{
+        }).catch(error => {
           Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
         })
       }
-      return selectedMockTemplateInfo.value?true:false;
+      return selectedMockTemplateInfo.value ? true : false;
     };
     const handleCancel = () => {
       modalVisible.value = false;
@@ -130,6 +144,7 @@ export default defineComponent({
       modalVisible,
       selectedMockTemplateInfo,
       mockTemplateInfoData,
+      snapshotWarning,
       handleBeforeOk,
       handleCancel,
       configMock,
@@ -145,7 +160,7 @@ export default defineComponent({
   <BasicLayout>
     <template #header>
       <div style="display: flex;justify-content: center;align-items: center;color:#4b4b4b">
-        <b>应用名:</b>{{appName}}<b>，进程号:</b>{{ pid }}
+        <b>应用名:</b>{{ appName }}<b>，进程号:</b>{{ pid }}
       </div>
     </template>
     <template #content>
@@ -202,8 +217,14 @@ export default defineComponent({
           Mock配置
         </template>
         <div>
+          <a-input v-if="snapshotWarning" disabled default-value="该模板已发生改变，上次Mock配置可能较旧" placeholder="Error status" error>
+            <template #prefix>
+              <icon-info-circle/>
+            </template>
+          </a-input>
           <h3>选择模板:</h3>
-          <a-select v-model="selectedMockTemplateInfo" value-key="id" :style="{width:'100%'}" placeholder="请选择Mock模板...">
+          <a-select v-model="selectedMockTemplateInfo" value-key="id" :style="{width:'100%'}"
+                    placeholder="请选择Mock模板...">
             <a-option v-for="item of mockTemplateInfoData" :value="item" :label="item.tag"/>
             <template #label="{data}">
               <a-space>
@@ -218,9 +239,12 @@ export default defineComponent({
               <h3>模板EL表达式:</h3>
               <a-textarea disabled v-model="selectedMockTemplateInfo.el" :auto-size="true"/>
             </template>
+            <random-variable-input-box :disabled="true" :random-variables="selectedMockTemplateInfo.randomVariables"/>
+            <task-definition-input-box :disabled="true" :task-definitions="selectedMockTemplateInfo.taskDefinitions"/>
           </template>
           <h3>备注:</h3>
-          <a-textarea disabled default-value="配置Mock只用于一次性生效，修改模板信息，需要重新配置Mock。" :auto-size="true"/>
+          <a-textarea disabled default-value="配置Mock只用于一次性生效，修改模板信息，需要重新配置Mock。"
+                      :auto-size="true"/>
         </div>
       </a-modal>
     </template>

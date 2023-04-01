@@ -10,6 +10,6 @@ import java.util.List;
  * @since 1.0.0
  */
 public interface MockStrategy {
-    Object mock(Class<?> returnClass, List<AbstractPostProcessor> postProcessor, List<RandomVariable> randomVariables, Object[] parameters);
+    Object mock(Class<?> returnClass, List<String> taskDefinitions, List<RandomVariable> randomVariables, Object[] parameters);
 
 }

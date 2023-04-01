@@ -1,8 +1,6 @@
 package com.sdefaa.just.mock.dashboard.converter;
 
 import com.sdefaa.just.mock.dashboard.pojo.dto.MockTemplateInfoDTO;
-import com.sdefaa.just.mock.dashboard.pojo.dto.RegisteredApiInfoDTO;
-import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceMockInfoModel;
 import com.sdefaa.just.mock.dashboard.pojo.vo.MockTemplateInfoVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

@@ -27,10 +27,10 @@ public interface VMInstanceMockInfoMapper {
   @Select("select * from vm_instance_mock_info where pid = #{pid}")
   List<VMInstanceMockInfoModel> selectVMInstanceMockInfoModelList(@Param("pid")String pid);
 
-  @Update("update vm_instance_mock_info set mock_enable = 0, mock_template_id = null  where pid = #{pid} and class_name = #{className} and method_name=#{methodName}")
+  @Update("update vm_instance_mock_info set mock_enable = 0, mock_template_id = null, mock_template_snapshot = null  where pid = #{pid} and class_name = #{className} and method_name=#{methodName}")
   int updateVMInstanceMockInfoModelByPid(@Param("pid")String pid,@Param("className")String className,@Param("methodName")String methodName);
 
-  @Update("update vm_instance_mock_info set mock_enable = #{mockEnable}, mock_template_id = #{mockTemplateId} where pid = #{pid} and class_name = #{className} and method_name=#{methodName}")
+  @Update("update vm_instance_mock_info set mock_enable = #{mockEnable}, mock_template_id = #{mockTemplateId}, mock_template_snapshot = #{mockTemplateSnapshot} where pid = #{pid} and class_name = #{className} and method_name=#{methodName}")
   int updateVMInstanceMockInfoModel(VMInstanceMockInfoModel  vmInstanceMockInfoModel);
 
 }

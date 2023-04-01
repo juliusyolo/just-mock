@@ -1,5 +1,6 @@
 package com.sdefaa.just.mock.agent.server;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.just.mock.common.constant.CommonConstant;
 import com.sdefaa.just.mock.common.pojo.ApiMockCommandDTO;
@@ -15,13 +16,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * @author Julius Wong
  * @since 1.0.0
  */
 public class EmbeddedHttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
-
+    private static final Logger logger = Logger.getLogger(EmbeddedHttpServerHandler.class.getName());
     private static final Map<String, RequestHandler> REQUEST_HANDLER_MAPPING = new HashMap<>();
 
     static {
@@ -52,7 +54,9 @@ public class EmbeddedHttpServerHandler extends SimpleChannelInboundHandler<FullH
         RequestHandler ACTIVE = request -> {
             // 获取请求正文
             String body = request.content().toString(CharsetUtil.UTF_8);
+            logger.info("MOCK COMMAND REQUEST,"+body);
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
             String responseBody = "{\"code\":\"000000\",\"message\":\"成功\"}";
             try {
               ApiMockCommandDTO  apiMockCommandDTO = objectMapper.readValue(body, ApiMockCommandDTO.class);

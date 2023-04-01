@@ -6,7 +6,8 @@
   </div>
   <a-table :columns="columns" :data="data" :loading="loading" :pagination="false">
     <template #attached="{ record }">
-      <a-tooltip v-if="record.attached" :content="record.environmentVariables?record.environmentVariables:'没有设置全局环境变量'">
+      <a-tooltip v-if="record.attached"
+                 :content="record.environmentVariables?record.environmentVariables:'没有设置全局环境变量'">
         <a-tag color="green">是</a-tag>
       </a-tooltip>
       <a-tag v-else color="red">否</a-tag>
@@ -14,7 +15,9 @@
     <template #optional="{ record }">
       <a-button v-if="record.attached" @click="doAttachVMInstanceWithNothing">已连接
       </a-button>
-      <a-popconfirm v-else content="连接是否需要设置目标应用的环境变量?" cancel-text="否" ok-text="是" @cancel="doAttachVMInstance(record.pid)" @ok="doAttachVMInstanceWithEnvironmentVariable(record.pid)">
+      <a-popconfirm v-else content="连接是否需要设置目标应用的环境变量?" cancel-text="否" ok-text="是"
+                    @cancel="doAttachVMInstance(record.pid)"
+                    @ok="doAttachVMInstanceWithEnvironmentVariable(record.pid)">
         <a-button :loading="attachLoading">连接</a-button>
       </a-popconfirm>
       <a-divider direction="vertical"/>
@@ -31,15 +34,17 @@
       <h3>环境变量:</h3>
       <a-input-tag v-model="inputTags" placeholder="请输入标签..." @change="tagInputChange" allow-clear/>
       <h3>备注:</h3>
-      <a-textarea disabled default-value="应添加该应用拥有的全局变环境量或静态方法，会添加到环境变量末尾。全局环境变量无效会导致连接异常。" :auto-size="true"/>
+      <a-textarea disabled
+                  default-value="应添加该应用拥有的全局变环境量或静态方法，会添加到环境变量末尾。全局环境变量无效会导致连接异常。"
+                  :auto-size="true"/>
     </div>
   </a-modal>
 </template>
 
 <script lang="ts">
 import {defineComponent, onMounted, onUnmounted, ref} from 'vue'
-import {AttachVMInstance, MockTemplateInfo, VmInstanceArray} from "../api/vm/types";
-import {attachVMInstance, getAllVMInstances, putMockTemplateInfo} from "../api/vm";
+import {AttachVMInstance, VmInstanceArray} from "../api/vm/types";
+import {attachVMInstance, getAllVMInstances} from "../api/vm";
 import {Message} from "@arco-design/web-vue";
 import {useRouter} from "vue-router";
 
@@ -73,7 +78,7 @@ export default defineComponent({
     }
 
     const doAttachVMInstanceWithNothing = () => {
-      Message.warning({content:  '该虚拟机实例已经连接！', duration: 1000})
+      Message.warning({content: '该虚拟机实例已经连接！', duration: 1000})
     }
 
     const doAttachVMInstance = (pid: string) => {
@@ -84,7 +89,7 @@ export default defineComponent({
       doAttachVMInstance0(attachVMInstanceModel.value)
     }
 
-    const doAttachVMInstance0 = (attachVMInstanceModel: AttachVMInstance)=>{
+    const doAttachVMInstance0 = (attachVMInstanceModel: AttachVMInstance) => {
       attachLoading.value = true
       attachVMInstance(attachVMInstanceModel).then(() => {
         attachLoading.value = false
@@ -127,16 +132,16 @@ export default defineComponent({
       title: '操作',
       slotName: 'optional',
     }];
-    const mockClick = (pid: string,name:string) => {
-      router.push({path:'/mock/info/' + pid,query:{name}})
+    const mockClick = (pid: string, name: string) => {
+      router.push({path: '/mock/info/' + pid, query: {name}})
     }
     const handleBeforeOk = async () => {
-      if (!attachVMInstanceModel.value||attachVMInstanceModel.value?.environmentVariables.length===0){
+      if (!attachVMInstanceModel.value || attachVMInstanceModel.value?.environmentVariables.length === 0) {
         console.log(attachVMInstanceModel.value)
         Message.error({content: '环境变量必填！', duration: 2 * 1000})
         return false
       }
-      if (attachVMInstanceModel.value){
+      if (attachVMInstanceModel.value) {
         doAttachVMInstance0(attachVMInstanceModel.value)
       }
       inputTags.value = []
@@ -146,8 +151,8 @@ export default defineComponent({
       modalVisible.value = false
       inputTags.value = []
     }
-    const tagInputChange = (tags:Array<string>) =>{
-      attachVMInstanceModel.value = { ...attachVMInstanceModel.value,environmentVariables:tags } as AttachVMInstance
+    const tagInputChange = (tags: Array<string>) => {
+      attachVMInstanceModel.value = {...attachVMInstanceModel.value, environmentVariables: tags} as AttachVMInstance
     }
     return {
       columns,
@@ -170,11 +175,11 @@ export default defineComponent({
 </script>
 
 <style lang="less" scoped>
-.header-group{
+.header-group {
   display: flex;
   justify-content: space-between;
   margin: 0 0 2px 0;
-  padding:2px;
+  padding: 2px;
   border: 1px solid #E5E6EB;
   border-radius: 4px;
 }

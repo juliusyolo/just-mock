@@ -26,6 +26,8 @@ public class VMInstanceMockInfoModel {
   private Boolean mockEnable;
 
   private Long mockTemplateId;
+
+  private String mockTemplateSnapshot;
   private LocalDateTime createTime;
   private LocalDateTime updateTime;
 }

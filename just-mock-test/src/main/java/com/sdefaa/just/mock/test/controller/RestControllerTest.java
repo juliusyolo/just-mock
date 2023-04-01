@@ -3,8 +3,6 @@ package com.sdefaa.just.mock.test.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-
 /**
  * @author Julius Wong
  * <p>

@@ -1,89 +1,92 @@
 export type VmInstance = {
-  pid: string;
-  name: string;
-  platform: string;
-  vendor: string;
-  attached: boolean;
-  environmentVariables: string;
+    pid: string;
+    name: string;
+    platform: string;
+    vendor: string;
+    attached: boolean;
+    environmentVariables: string;
 }
 
 export type VmInstanceArray = Array<VmInstance>;
 
 export type RegisteredApiInfo = {
-  pid: string;
-  className: string;
-  classAnnotationsDesc: string;
-  methodName: string;
-  methodArgsDesc: string;
-  methodReturnDesc: string;
-  methodAnnotationsDesc: string;
-  apiUrl: string;
-  apiType: string;
-  apiMethod: string;
-  mockEnable: boolean;
-  mockTemplateId: number;
+    pid: string;
+    className: string;
+    classAnnotationsDesc: string;
+    methodName: string;
+    methodArgsDesc: string;
+    methodReturnDesc: string;
+    methodAnnotationsDesc: string;
+    apiUrl: string;
+    apiType: string;
+    apiMethod: string;
+    mockEnable: boolean;
+    mockTemplateId: number;
+    mockTemplateSnapshot: string;
 }
 export type RegisteredApiInfoArray = Array<RegisteredApiInfo>;
 
 export type ArgInfo = {
-  type: string;
-  jsonStruct: object;
+    type: string;
+    jsonStruct: object;
 }
 
 
 export type MockTemplateInfo = {
-  id: number;
-  templateContent: string;
-  el: string;
-  tag: string;
-  taskDefinitions: Array<string>;
-  randomVariables: Array<RandomVariable>;
+    id: number;
+    templateContent: string;
+    el: string;
+    tag: string;
+    taskDefinitions: Array<string>;
+    randomVariables: Array<RandomVariable>;
 }
 
 export type MockTemplateInfoArray = Array<MockTemplateInfo>;
 
 
 export type PutMockInfo = {
-  pid: string;
-  className: string;
-  methodName: string;
-  mockTemplateId: number;
-  templateContent: string;
-  el: string;
-  taskDefinitions: Array<string>;
-  randomVariables: Array<RandomVariable>;
+    pid: string;
+    className: string;
+    methodName: string;
+    mockTemplateId: number;
+    templateContent: string;
+    el: string;
+    taskDefinitions: Array<string>;
+    randomVariables: Array<RandomVariable>;
+    mockTemplateSnapshot: string;
 }
 
 export type RandomVariable = {
-  name: string;
-  sequence: string;
+    name: string;
+    sequence: string;
 }
 
 export type InternalRandomVariable = {
-  name: string;
-  sequences: Array<string>;
+    name: string;
+    sequences: Array<string>;
 }
 export type RandomVariableArray = Array<RandomVariable>;
 
 export type InternalRandomVariableArray = Array<InternalRandomVariable>;
 
 export type AttachVMInstance = {
-  pid: string;
-  environmentVariables: Array<string>;
+    pid: string;
+    environmentVariables: Array<string>;
 }
 
 
 export type TaskDefinition<T> = {
-  type: string;
-  content: T;
+    type: string;
+    content: T;
 }
 
-export enum TaskDefinitionType  {
-  HTTP_TASK = 'HTTP_TASK'
+export enum TaskDefinitionType {
+    HTTP_TASK = 'HTTP_TASK'
 }
 
 export type HttpTaskDefinitionContent = {
-  url:string;
-  payload: object;
-  method: 'GET'|'POST'
+    url: string;
+    payloadType: 'query'|'application/json'|'application/x-www-form-urlencoded'
+    payload: string;
+    method: 'GET' | 'POST'
 }

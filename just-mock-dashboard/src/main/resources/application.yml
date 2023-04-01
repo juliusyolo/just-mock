@@ -1,21 +1,21 @@
 spring:
   datasource:
     username: root
-    password: 527901748
+    password: flowable
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/just_mock?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 
-mock:
-  agent:
-    path: /Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/target/just-mock-agent-1.0.0-RELEASE.jar
-  config:
-    path: /Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/src/main/resources/agent.yml
-
 #mock:
 #  agent:
-#    path: E:\\Workspace\\IdeaProjects\\creative-explorer-all\\just-mock\\just-mock-agent\\target\\just-mock-agent-1.0.0-RELEASE.jar
+#    path: /Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/target/just-mock-agent-1.0.0-RELEASE.jar
 #  config:
-#    path: E:\\Workspace\\IdeaProjects\\creative-explorer-all\\just-mock\\just-mock-agent\\src\\main\\resources\\agent.yml
+#    path: /Users/julius/WorkSpace/IdeaProjects/just-mock/just-mock-agent/src/main/resources/agent.yml
+
+mock:
+  agent:
+    path: E:\\Workspace\\IdeaProjects\\creative-explorer-all\\just-mock\\just-mock-agent\\target\\just-mock-agent-1.0.0-RELEASE.jar
+  config:
+    path: E:\\Workspace\\IdeaProjects\\creative-explorer-all\\just-mock\\just-mock-agent\\src\\main\\resources\\agent.yml
 management:
   endpoint:
     shutdown:

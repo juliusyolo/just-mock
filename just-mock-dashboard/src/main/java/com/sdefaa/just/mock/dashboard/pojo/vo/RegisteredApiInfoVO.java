@@ -19,6 +19,6 @@ public class RegisteredApiInfoVO {
   private String apiType;
   private String apiMethod;
   private Boolean mockEnable;
-
   private Long mockTemplateId;
+  private String mockTemplateSnapshot;
 }

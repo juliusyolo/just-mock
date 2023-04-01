@@ -1,7 +1,6 @@
 package com.sdefaa.just.mock.dashboard.service;
 
 import com.sdefaa.just.mock.dashboard.pojo.dto.MockTemplateInfoDTO;
-import com.sdefaa.just.mock.dashboard.pojo.vo.MockTemplateInfoVO;
 
 import java.util.List;
 

@@ -18,7 +18,7 @@ public interface MockTemplateInfoMapper {
   @Delete("delete from mock_template_info where id = #{id}")
   int deleteMockTemplateInfoModel(@Param("id")Long id);
 
-  @Insert("insert into mock_template_info(template_content,el,tag) values(#{templateContent},#{el},#{tag})")
+  @Insert("insert into mock_template_info(template_content,el,tag,random_variables,task_definitions) values(#{templateContent},#{el},#{tag},#{randomVariables},#{taskDefinitions})")
   int insertMockTemplateInfoModel(MockTemplateInfoModel mockTemplateInfoModel);
 
   @Update("<script>update mock_template_info " +
@@ -26,6 +26,8 @@ public interface MockTemplateInfoMapper {
     "el = #{el}," +
     "<if test='templateContent!=null'>template_content = #{templateContent},</if>" +
     "<if test='tag!=null'>tag = #{tag},</if>" +
+    "<if test='randomVariables!=null'>random_variables = #{randomVariables},</if>" +
+    "<if test='taskDefinitions!=null'>task_definitions = #{taskDefinitions},</if>" +
     "</set>" +
     "where id = #{id}" +
     "</script>")

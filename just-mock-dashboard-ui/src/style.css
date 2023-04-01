@@ -1,3 +1,13 @@
 .arco-textarea[disabled] {
-  -webkit-text-fill-color: #2b2b2b;
+    -webkit-text-fill-color: #2b2b2b;
+}
+
+.arco-input-wrapper .arco-input[disabled] {
+    -webkit-text-fill-color: #2b2b2b;
+}
+
+.arco-input-tag.arco-input-tag-disabled .arco-input-tag-tag {
+    color: #2b2b2b;
+    background-color: var(--color-fill-2);
+    border-color: var(--color-fill-3);
 }

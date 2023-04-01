@@ -13,17 +13,18 @@ import java.util.List;
  * @since 1.0.0
  */
 public interface VMInstanceService {
-   List<VMInstanceDTO> getAllVMInstances();
+    List<VMInstanceDTO> getAllVMInstances();
 
-   List<RegisteredApiInfoDTO> getRegisteredApiList(String pid);
+    List<RegisteredApiInfoDTO> getRegisteredApiList(String pid);
 
-  VMInstanceDTO attachVMInstance(AttachVMInstanceDTO  attachVMInstanceDTO);
+    VMInstanceDTO attachVMInstance(AttachVMInstanceDTO attachVMInstanceDTO);
 
-  void detachVMInstance(String pid);
+    void detachVMInstance(String pid);
 
-  void registerApiList(ApiRegistryDTO apiRegistryDTO);
+    void registerApiList(ApiRegistryDTO apiRegistryDTO);
 
-  void removeMock(RemoveMockDTO removeMockDTO);
-  void putMock(PutMockDTO putMockDTO);
+    void removeMock(RemoveMockDTO removeMockDTO);
+
+    void putMock(PutMockDTO putMockDTO);
 
 }

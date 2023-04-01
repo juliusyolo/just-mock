@@ -3,7 +3,6 @@ package com.sdefaa.just.mock.dashboard.pojo.vo;
 import com.sdefaa.just.mock.common.pojo.RandomVariable;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
