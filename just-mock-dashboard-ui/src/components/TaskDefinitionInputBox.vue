@@ -42,7 +42,7 @@ export default defineComponent({
       type: TaskDefinitionType.HTTP_TASK,
       content: {
         url: "",
-        payloadType:'application/json',
+        payloadType: 'application/json',
         payload: "{}",
         method: "POST"
       }

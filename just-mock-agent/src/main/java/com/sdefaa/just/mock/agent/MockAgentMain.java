@@ -34,90 +34,90 @@ import java.util.stream.Collectors;
  */
 public class MockAgentMain {
 
-  private static final Logger logger = Logger.getLogger(MockAgentMain.class.getName());
-  private static final AtomicBoolean LOADED = new AtomicBoolean(false);
+    private static final Logger logger = Logger.getLogger(MockAgentMain.class.getName());
+    private static final AtomicBoolean LOADED = new AtomicBoolean(false);
 
-  public static final AtomicBoolean TRANSFORM_HAS_EXCEPTION = new AtomicBoolean(false);
+    public static final AtomicBoolean TRANSFORM_HAS_EXCEPTION = new AtomicBoolean(false);
 
-  private static final String WHITE_SPACE = " ";
+    private static final String WHITE_SPACE = " ";
 
-  /**
-   * @param args config.yml pid environmentVariable1 environmentVariable2 ...
-   */
-  public static void agentmain(String args, Instrumentation instrumentation) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-    if (LOADED.compareAndSet(false, true)) {
-      String[] argvs = args.split(WHITE_SPACE);
-      int availablePort = CommonUtils.getAvailablePort();
-      // 启动内嵌HttpServer，用于心跳检测和注册Mock拦截
-      EmbeddedHttpServer server = new EmbeddedHttpServer(availablePort);
-      CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-        try {
-          server.start();
-        } catch (InterruptedException e) {
-          logger.info("interrupted");
-          server.stop();
+    /**
+     * @param args config.yml pid environmentVariable1 environmentVariable2 ...
+     */
+    public static void agentmain(String args, Instrumentation instrumentation) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        if (LOADED.compareAndSet(false, true)) {
+            String[] argvs = args.split(WHITE_SPACE);
+            int availablePort = CommonUtils.getAvailablePort();
+            // 启动内嵌HttpServer，用于心跳检测和注册Mock拦截
+            EmbeddedHttpServer server = new EmbeddedHttpServer(availablePort);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                try {
+                    server.start();
+                } catch (InterruptedException e) {
+                    logger.info("interrupted");
+                    server.stop();
+                }
+            });
+            // 添加虚拟机shutdownHook
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                future.cancel(true);
+                server.stop();
+            }));
+            AgentConfigProperties agentConfigProperties = JustMockAgentConfigLoader.INSTANCE.load(argvs[0]).agentConfigProperties();
+            Class[] allLoadedClasses = instrumentation.getAllLoadedClasses();
+            List<TargetClass> loadedTargetClasses = Arrays.stream(allLoadedClasses)
+                    .map(CommonUtils::generateTargetClass)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            List<String> environmentVariableList;
+            if (argvs.length > 2) {
+                environmentVariableList = new ArrayList<>();
+                for (int i = 2; i < argvs.length; i++) {
+                    environmentVariableList.add(argvs[i]);
+                }
+            } else {
+                environmentVariableList = null;
+            }
+            loadedTargetClasses.forEach(targetClass -> targetClass.getTargetMethods().forEach(targetMethod -> {
+                instrumentation.addTransformer(new MockClassFileTransformer(targetClass.getClazz().getName(), targetMethod.getMethod().getName(), environmentVariableList), true);
+                try {
+                    instrumentation.retransformClasses(targetClass.getClazz());
+                } catch (UnmodifiableClassException e) {
+                    logger.info("unmodifiable class exception:" + targetClass.getClazz().getName());
+                    throw new RuntimeException(e);
+                }
+            }));
+            if (TRANSFORM_HAS_EXCEPTION.get()) {
+                throw new RuntimeException("目标类转换存在异常");
+            }
+            List<ApiInfo> apiInfoList = loadedTargetClasses.stream()
+                    .flatMap(CommonUtils::generateApiInfoFromTargetClass)
+                    .toList();
+            ApiRegistryDTO apiRegistryDTO = new ApiRegistryDTO();
+            apiRegistryDTO.setApiInfos(apiInfoList);
+            apiRegistryDTO.setPid(argvs[1]);
+            apiRegistryDTO.setPort(availablePort);
+            //  Upload apiInfoList
+            registry(agentConfigProperties.getRegistryUrl(), apiRegistryDTO);
         }
-      });
-      // 添加虚拟机shutdownHook
-      Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-        future.cancel(true);
-        server.stop();
-      }));
-      AgentConfigProperties agentConfigProperties = JustMockAgentConfigLoader.INSTANCE.load(argvs[0]).agentConfigProperties();
-      Class[] allLoadedClasses = instrumentation.getAllLoadedClasses();
-      List<TargetClass> loadedTargetClasses = Arrays.stream(allLoadedClasses)
-        .map(CommonUtils::generateTargetClass)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
-      List<String> environmentVariableList;
-      if (argvs.length > 2) {
-        environmentVariableList = new ArrayList<>();
-        for (int i = 2; i < argvs.length; i++) {
-          environmentVariableList.add(argvs[i]);
-        }
-      } else {
-        environmentVariableList = null;
-      }
-      loadedTargetClasses.forEach(targetClass -> targetClass.getTargetMethods().forEach(targetMethod -> {
-        instrumentation.addTransformer(new MockClassFileTransformer(targetClass.getClazz().getName(), targetMethod.getMethod().getName(), environmentVariableList), true);
-        try {
-          instrumentation.retransformClasses(targetClass.getClazz());
-        } catch (UnmodifiableClassException e) {
-          logger.info("unmodifiable class exception:" + targetClass.getClazz().getName());
-          throw new RuntimeException(e);
-        }
-      }));
-      if (TRANSFORM_HAS_EXCEPTION.get()){
-        throw new RuntimeException("目标类转换存在异常");
-      }
-      List<ApiInfo> apiInfoList = loadedTargetClasses.stream()
-        .flatMap(CommonUtils::generateApiInfoFromTargetClass)
-        .toList();
-      ApiRegistryDTO apiRegistryDTO = new ApiRegistryDTO();
-      apiRegistryDTO.setApiInfos(apiInfoList);
-      apiRegistryDTO.setPid(argvs[1]);
-      apiRegistryDTO.setPort(availablePort);
-      //  Upload apiInfoList
-      registry(agentConfigProperties.getRegistryUrl(), apiRegistryDTO);
     }
-  }
 
-  public static void registry(String url, ApiRegistryDTO apiRegistryDTO) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    byte[] bytes = objectMapper.writeValueAsBytes(apiRegistryDTO);
-    URL obj = new URL(url);
-    HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-    con.setRequestMethod("POST");
-    con.setRequestProperty("Content-Type", CommonConstant.APPLICATION_JSON);
-    con.setRequestProperty("Content-Length", String.valueOf(bytes.length));
-    con.setDoOutput(true);
-    try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
-      wr.write(bytes);
+    public static void registry(String url, ApiRegistryDTO apiRegistryDTO) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        byte[] bytes = objectMapper.writeValueAsBytes(apiRegistryDTO);
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", CommonConstant.APPLICATION_JSON);
+        con.setRequestProperty("Content-Length", String.valueOf(bytes.length));
+        con.setDoOutput(true);
+        try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+            wr.write(bytes);
+        }
+        int responseCode = con.getResponseCode();
+        Map<String, Object> response = objectMapper.readValue(con.getInputStream(), new TypeReference<>() {
+        });
+        logger.info("register Api, status code:" + responseCode + ",message:" + response.toString());
     }
-    int responseCode = con.getResponseCode();
-    Map<String, Object> response = objectMapper.readValue(con.getInputStream(), new TypeReference<>() {
-    });
-    logger.info("register Api, status code:" + responseCode + ",message:" + response.toString());
-  }
 
 }

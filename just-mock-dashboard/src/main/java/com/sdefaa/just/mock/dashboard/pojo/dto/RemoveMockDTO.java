@@ -8,7 +8,7 @@ import lombok.Data;
  */
 @Data
 public class RemoveMockDTO {
-  private String pid;
-  private String className;
-  private String methodName;
+    private String pid;
+    private String className;
+    private String methodName;
 }

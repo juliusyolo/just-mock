@@ -25,14 +25,14 @@ public class VMInstancePingTask implements Runnable {
     private final String pid;
     private final int port;
 
-  public VMInstancePingTask(RestTemplate restTemplate, VMInstanceService vmInstanceService, String pid, int port) {
-    this.restTemplate = restTemplate;
-    this.vmInstanceService = vmInstanceService;
-    this.pid = pid;
-    this.port = port;
-  }
+    public VMInstancePingTask(RestTemplate restTemplate, VMInstanceService vmInstanceService, String pid, int port) {
+        this.restTemplate = restTemplate;
+        this.vmInstanceService = vmInstanceService;
+        this.pid = pid;
+        this.port = port;
+    }
 
-  private volatile boolean continued = true;
+    private volatile boolean continued = true;
 
     private volatile int maxPingCount = 3;
 
@@ -41,7 +41,7 @@ public class VMInstancePingTask implements Runnable {
         while (continued) {
             try {
                 Thread.sleep(5000);
-                ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://127.0.0.1:" + this.port +CommonConstant.PING_URL, String.class);
+                ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://127.0.0.1:" + this.port + CommonConstant.PING_URL, String.class);
                 if (!Objects.equals(responseEntity.getBody(), CommonConstant.PONG)) {
                     maxPingCount--;
                 }
@@ -50,9 +50,9 @@ public class VMInstancePingTask implements Runnable {
                 maxPingCount--;
             }
             if (maxPingCount == 0) {
-              continued = false;
-              log.info("retry 3 times for ping {},should detached!",this.pid);
-              vmInstanceService.detachVMInstance(this.pid);
+                continued = false;
+                log.info("retry 3 times for ping {},should detached!", this.pid);
+                vmInstanceService.detachVMInstance(this.pid);
             }
         }
     }

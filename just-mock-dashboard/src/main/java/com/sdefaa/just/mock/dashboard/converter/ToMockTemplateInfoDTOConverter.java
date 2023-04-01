@@ -12,9 +12,9 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper
 public interface ToMockTemplateInfoDTOConverter {
-  ToMockTemplateInfoDTOConverter INSTANCE = Mappers.getMapper(ToMockTemplateInfoDTOConverter.class);
+    ToMockTemplateInfoDTOConverter INSTANCE = Mappers.getMapper(ToMockTemplateInfoDTOConverter.class);
 
-  @Mapping(target = "randomVariables",ignore = true)
-  @Mapping(target = "taskDefinitions",ignore = true)
-  MockTemplateInfoDTO covert(MockTemplateInfoModel mockTemplateInfoModel);
+    @Mapping(target = "randomVariables", ignore = true)
+    @Mapping(target = "taskDefinitions", ignore = true)
+    MockTemplateInfoDTO covert(MockTemplateInfoModel mockTemplateInfoModel);
 }

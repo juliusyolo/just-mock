@@ -11,23 +11,23 @@ import java.time.LocalDateTime;
  */
 @Data
 public class VMInstanceMockInfoModel {
-  private Long id;
-  private String pid;
-  private String className;
-  private String methodName;
-  private String methodArgsDesc;
-  private String methodReturnDesc;
-  private String apiUrl;
-  private String apiType;
-  private String apiMethod;
-  private String methodAnnotationsDesc;
-  private String classAnnotationsDesc;
+    private Long id;
+    private String pid;
+    private String className;
+    private String methodName;
+    private String methodArgsDesc;
+    private String methodReturnDesc;
+    private String apiUrl;
+    private String apiType;
+    private String apiMethod;
+    private String methodAnnotationsDesc;
+    private String classAnnotationsDesc;
 
-  private Boolean mockEnable;
+    private Boolean mockEnable;
 
-  private Long mockTemplateId;
+    private Long mockTemplateId;
 
-  private String mockTemplateSnapshot;
-  private LocalDateTime createTime;
-  private LocalDateTime updateTime;
+    private String mockTemplateSnapshot;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 }

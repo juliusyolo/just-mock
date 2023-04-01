@@ -3,7 +3,7 @@ package com.sdefaa.just.mock.common.enums;
 /**
  * @author Julius Wong
  * <p>
- *     API类型枚举
+ * API类型枚举
  * </p>
  * @since 1.0.0
  */

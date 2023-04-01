@@ -13,9 +13,9 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper
 public interface ToVMInstanceDTOConverter {
-  ToVMInstanceDTOConverter INSTANCE = Mappers.getMapper(ToVMInstanceDTOConverter.class);
+    ToVMInstanceDTOConverter INSTANCE = Mappers.getMapper(ToVMInstanceDTOConverter.class);
 
-  @Mapping(constant = "true",target = "attached")
-  VMInstanceDTO covert(VMInstanceAttachInfoModel vmInstanceAttachInfoModel);
+    @Mapping(constant = "true", target = "attached")
+    VMInstanceDTO covert(VMInstanceAttachInfoModel vmInstanceAttachInfoModel);
 
 }

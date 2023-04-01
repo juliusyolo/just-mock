@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 class JustMockTestApplicationTests {
     @Autowired
     FeignTest feignTest;
+
     @Test
     void contextLoads() throws IOException {
         Class<?> clazz = feignTest.getClass();

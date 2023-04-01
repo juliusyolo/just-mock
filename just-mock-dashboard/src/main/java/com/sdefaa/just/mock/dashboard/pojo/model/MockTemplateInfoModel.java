@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
  */
 @Data
 public class MockTemplateInfoModel {
-  Long id;
-  private String el;
-  private String templateContent;
-  private String tag;
-  private String randomVariables;
-  private String taskDefinitions;
-  private LocalDateTime createTime;
-  private LocalDateTime updateTime;
+    Long id;
+    private String el;
+    private String templateContent;
+    private String tag;
+    private String randomVariables;
+    private String taskDefinitions;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 }

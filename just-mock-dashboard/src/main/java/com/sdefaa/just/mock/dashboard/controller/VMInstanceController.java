@@ -61,26 +61,26 @@ public class VMInstanceController {
 
     @PostMapping("/v1/api/vm/instance/api/register")
     public ResponseWrapper<Void> registerApiList(@RequestBody ApiRegistryDTO apiRegistryDTO) {
-        log.info("register api:{}",apiRegistryDTO.toString());
+        log.info("register api:{}", apiRegistryDTO.toString());
         vmInstanceService.registerApiList(apiRegistryDTO);
         return ResponseWrapper.wrap(ResultStatus.SUCCESS);
     }
 
-  @GetMapping("/v1/api/vm/instance/{pid}/api/list")
-  public ResponseWrapper<List<RegisteredApiInfoVO>> getRegisteredApiList(@PathVariable("pid") String pid) {
-    List<RegisteredApiInfoVO> registeredApiInfoVOS = vmInstanceService.getRegisteredApiList(pid).stream().map(ToRegisteredApiInfoVOConverter.INSTANCE::covert).collect(Collectors.toList());
-    return ResponseWrapper.wrap(ResultStatus.SUCCESS, registeredApiInfoVOS);
-  }
+    @GetMapping("/v1/api/vm/instance/{pid}/api/list")
+    public ResponseWrapper<List<RegisteredApiInfoVO>> getRegisteredApiList(@PathVariable("pid") String pid) {
+        List<RegisteredApiInfoVO> registeredApiInfoVOS = vmInstanceService.getRegisteredApiList(pid).stream().map(ToRegisteredApiInfoVOConverter.INSTANCE::covert).collect(Collectors.toList());
+        return ResponseWrapper.wrap(ResultStatus.SUCCESS, registeredApiInfoVOS);
+    }
 
-  @PostMapping("/v1/api/vm/instance/mock/remove")
-  public ResponseWrapper<Void> removeMock(@RequestBody RemoveMockDTO removeMockDTO) {
-    vmInstanceService.removeMock(removeMockDTO);
-    return ResponseWrapper.wrap(ResultStatus.SUCCESS);
-  }
+    @PostMapping("/v1/api/vm/instance/mock/remove")
+    public ResponseWrapper<Void> removeMock(@RequestBody RemoveMockDTO removeMockDTO) {
+        vmInstanceService.removeMock(removeMockDTO);
+        return ResponseWrapper.wrap(ResultStatus.SUCCESS);
+    }
 
-  @PostMapping("/v1/api/vm/instance/mock/put")
-  public ResponseWrapper<Void> putMock(@RequestBody PutMockDTO putMockDTO) {
-    vmInstanceService.putMock(putMockDTO);
-    return ResponseWrapper.wrap(ResultStatus.SUCCESS);
-  }
+    @PostMapping("/v1/api/vm/instance/mock/put")
+    public ResponseWrapper<Void> putMock(@RequestBody PutMockDTO putMockDTO) {
+        vmInstanceService.putMock(putMockDTO);
+        return ResponseWrapper.wrap(ResultStatus.SUCCESS);
+    }
 }

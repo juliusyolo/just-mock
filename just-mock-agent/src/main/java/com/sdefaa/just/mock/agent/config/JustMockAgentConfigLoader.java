@@ -19,16 +19,17 @@ public class JustMockAgentConfigLoader {
 
     private JustMockAgentConfigProperties justMockAgentConfigProperties;
 
-    private final  YAMLMapper yamlMapper = new YAMLMapper();
+    private final YAMLMapper yamlMapper = new YAMLMapper();
 
-    private JustMockAgentConfigLoader(){}
+    private JustMockAgentConfigLoader() {
+    }
 
     public JustMockAgentConfigLoader load(String filePath) throws IOException {
         justMockAgentConfigProperties = yamlMapper.readValue(new File(filePath), JustMockAgentConfigProperties.class);
         return this;
     }
 
-    public AgentConfigProperties agentConfigProperties(){
+    public AgentConfigProperties agentConfigProperties() {
         return justMockAgentConfigProperties.getMock().getAgent();
     }
 }

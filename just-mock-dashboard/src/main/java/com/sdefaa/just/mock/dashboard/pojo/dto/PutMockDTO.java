@@ -11,14 +11,14 @@ import java.util.List;
  */
 @Data
 public class PutMockDTO {
-  private String pid;
+    private String pid;
 
-  private Long mockTemplateId;
-  private String className;
-  private String methodName;
-  private String templateContent;
-  private String el;
-  private List<String> taskDefinitions;
-  private List<RandomVariable> randomVariables;
-  private String mockTemplateSnapshot;
+    private Long mockTemplateId;
+    private String className;
+    private String methodName;
+    private String templateContent;
+    private String el;
+    private List<String> taskDefinitions;
+    private List<RandomVariable> randomVariables;
+    private String mockTemplateSnapshot;
 }

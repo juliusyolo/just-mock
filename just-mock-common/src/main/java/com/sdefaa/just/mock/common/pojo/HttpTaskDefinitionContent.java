@@ -2,8 +2,6 @@ package com.sdefaa.just.mock.common.pojo;
 
 import lombok.Data;
 
-import java.util.Map;
-
 /**
  * @author Julius Wong
  * <p>

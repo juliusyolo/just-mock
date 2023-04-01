@@ -13,7 +13,7 @@ import java.util.List;
  * @since 1.0.0
  */
 public interface VMInstanceBO {
-  List<VMInstanceDTO> vmInstanceWrap(List<VMInstanceAttachInfoModel> vmInstanceAttachInfoModelList);
+    List<VMInstanceDTO> vmInstanceWrap(List<VMInstanceAttachInfoModel> vmInstanceAttachInfoModelList);
 
-  VMInstanceDTO attachVMInstance(String pid,String environmentVariables);
+    VMInstanceDTO attachVMInstance(String pid, String environmentVariables);
 }

@@ -1,7 +1,6 @@
 package com.sdefaa.just.mock.common.strategy;
 
 import com.sdefaa.just.mock.common.pojo.RandomVariable;
-import com.sdefaa.just.mock.common.task.AbstractPostProcessor;
 
 import java.util.List;
 

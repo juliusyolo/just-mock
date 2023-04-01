@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
  */
 @Data
 public class VMInstanceAttachExtraInfoModel {
-  private Long id;
-  private String pid;
-  private Integer port;
-  private LocalDateTime createTime;
-  private LocalDateTime updateTime;
+    private Long id;
+    private String pid;
+    private Integer port;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 }

@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
  * <p>
  * @since 1.0.0
  */
-@FeignClient(name = "just-mock",url="http://localhost:8080")
+@FeignClient(name = "just-mock", url = "http://localhost:8080")
 public interface FeignTest {
 
-     @GetMapping("/hello")
-     String hello();
+    @GetMapping("/hello")
+    String hello();
 
 }

@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper
 public interface ToRegisteredApiInfoDTOConverter {
-  ToRegisteredApiInfoDTOConverter INSTANCE = Mappers.getMapper(ToRegisteredApiInfoDTOConverter.class);
+    ToRegisteredApiInfoDTOConverter INSTANCE = Mappers.getMapper(ToRegisteredApiInfoDTOConverter.class);
 
-  RegisteredApiInfoDTO covert(VMInstanceMockInfoModel vmInstanceMockInfoModel);
+    RegisteredApiInfoDTO covert(VMInstanceMockInfoModel vmInstanceMockInfoModel);
 }

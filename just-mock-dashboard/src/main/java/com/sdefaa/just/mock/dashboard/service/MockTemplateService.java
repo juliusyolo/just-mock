@@ -10,10 +10,10 @@ import java.util.List;
  */
 public interface MockTemplateService {
 
-  List<MockTemplateInfoDTO> getMockTemplateInfoList();
+    List<MockTemplateInfoDTO> getMockTemplateInfoList();
 
-  void removeMockTemplateInfo(Long id);
+    void removeMockTemplateInfo(Long id);
 
-  void putMockTemplateInfo(MockTemplateInfoDTO mockTemplateInfoDTO);
+    void putMockTemplateInfo(MockTemplateInfoDTO mockTemplateInfoDTO);
 
 }

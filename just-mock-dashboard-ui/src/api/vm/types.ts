@@ -86,7 +86,7 @@ export enum TaskDefinitionType {
 
 export type HttpTaskDefinitionContent = {
     url: string;
-    payloadType: 'query'|'application/json'|'application/x-www-form-urlencoded'
+    payloadType: 'query' | 'application/json' | 'application/x-www-form-urlencoded'
     payload: string;
     method: 'GET' | 'POST'
 }

@@ -12,15 +12,15 @@ import java.util.List;
 @Mapper
 public interface VMInstanceAttachInfoMapper {
 
-  @Select("select * from vm_instance_attach_info")
-  List<VMInstanceAttachInfoModel> selectVMInstanceAttachModelList();
+    @Select("select * from vm_instance_attach_info")
+    List<VMInstanceAttachInfoModel> selectVMInstanceAttachModelList();
 
-  @Insert("insert into vm_instance_attach_info(pid,name,platform,vendor,environment_variables) values(#{pid},#{name},#{platform},#{vendor},#{environmentVariables})")
-  int insertVMInstanceAttachModel(VMInstanceAttachInfoModel model);
+    @Insert("insert into vm_instance_attach_info(pid,name,platform,vendor,environment_variables) values(#{pid},#{name},#{platform},#{vendor},#{environmentVariables})")
+    int insertVMInstanceAttachModel(VMInstanceAttachInfoModel model);
 
 
-  @Delete("delete from vm_instance_attach_info where pid = #{pid}")
-  int deleteVMInstanceAttachModelByPid(@Param("pid")String pid);
+    @Delete("delete from vm_instance_attach_info where pid = #{pid}")
+    int deleteVMInstanceAttachModelByPid(@Param("pid") String pid);
 
 
 }

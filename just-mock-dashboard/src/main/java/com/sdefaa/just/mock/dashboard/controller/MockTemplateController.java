@@ -19,24 +19,24 @@ import java.util.stream.Collectors;
 @RestController
 public class MockTemplateController {
 
-  @Autowired
-  private MockTemplateService mockTemplateService;
+    @Autowired
+    private MockTemplateService mockTemplateService;
 
-  @GetMapping("/v1/api/mock/template/list")
-  public ResponseWrapper<List<MockTemplateInfoVO>> getMockTemplateInfoList(){
-    List<MockTemplateInfoVO> mockTemplateInfoVOS = mockTemplateService.getMockTemplateInfoList().stream().map(ToMockTemplateInfoVOConverter.INSTANCE::covert).collect(Collectors.toList());
-    return ResponseWrapper.wrap(ResultStatus.SUCCESS, mockTemplateInfoVOS);
-  }
+    @GetMapping("/v1/api/mock/template/list")
+    public ResponseWrapper<List<MockTemplateInfoVO>> getMockTemplateInfoList() {
+        List<MockTemplateInfoVO> mockTemplateInfoVOS = mockTemplateService.getMockTemplateInfoList().stream().map(ToMockTemplateInfoVOConverter.INSTANCE::covert).collect(Collectors.toList());
+        return ResponseWrapper.wrap(ResultStatus.SUCCESS, mockTemplateInfoVOS);
+    }
 
-  @GetMapping("/v1/api/mock/template/{id}/remove")
-  public ResponseWrapper<Void> removeMockTemplateInfo(@PathVariable("id")Long id){
-    mockTemplateService.removeMockTemplateInfo(id);
-    return ResponseWrapper.wrap(ResultStatus.SUCCESS);
-  }
+    @GetMapping("/v1/api/mock/template/{id}/remove")
+    public ResponseWrapper<Void> removeMockTemplateInfo(@PathVariable("id") Long id) {
+        mockTemplateService.removeMockTemplateInfo(id);
+        return ResponseWrapper.wrap(ResultStatus.SUCCESS);
+    }
 
-  @PostMapping("/v1/api/mock/template/put")
-  public ResponseWrapper<Void> putMockTemplateInfo(@RequestBody MockTemplateInfoDTO mockTemplateInfoDTO){
-    mockTemplateService.putMockTemplateInfo(mockTemplateInfoDTO);
-    return ResponseWrapper.wrap(ResultStatus.SUCCESS);
-  }
+    @PostMapping("/v1/api/mock/template/put")
+    public ResponseWrapper<Void> putMockTemplateInfo(@RequestBody MockTemplateInfoDTO mockTemplateInfoDTO) {
+        mockTemplateService.putMockTemplateInfo(mockTemplateInfoDTO);
+        return ResponseWrapper.wrap(ResultStatus.SUCCESS);
+    }
 }

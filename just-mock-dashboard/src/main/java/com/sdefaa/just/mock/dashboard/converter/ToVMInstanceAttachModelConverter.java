@@ -11,6 +11,7 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper
 public interface ToVMInstanceAttachModelConverter {
-  ToVMInstanceAttachModelConverter INSTANCE = Mappers.getMapper(ToVMInstanceAttachModelConverter.class);
-  VMInstanceAttachInfoModel covert(VMInstanceDTO vmInstanceDTO);
+    ToVMInstanceAttachModelConverter INSTANCE = Mappers.getMapper(ToVMInstanceAttachModelConverter.class);
+
+    VMInstanceAttachInfoModel covert(VMInstanceDTO vmInstanceDTO);
 }

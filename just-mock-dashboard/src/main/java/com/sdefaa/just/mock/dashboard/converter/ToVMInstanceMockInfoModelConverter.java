@@ -14,11 +14,11 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface ToVMInstanceMockInfoModelConverter {
 
-  ToVMInstanceMockInfoModelConverter INSTANCE = Mappers.getMapper(ToVMInstanceMockInfoModelConverter.class);
+    ToVMInstanceMockInfoModelConverter INSTANCE = Mappers.getMapper(ToVMInstanceMockInfoModelConverter.class);
 
-  VMInstanceMockInfoModel covert(ApiInfo apiInfo);
+    VMInstanceMockInfoModel covert(ApiInfo apiInfo);
 
-  VMInstanceMockInfoModel covert(PutMockDTO putMockDTO);
+    VMInstanceMockInfoModel covert(PutMockDTO putMockDTO);
 
-  VMInstanceMockInfoModel covert(RemoveMockDTO removeMockDTO);
+    VMInstanceMockInfoModel covert(RemoveMockDTO removeMockDTO);
 }

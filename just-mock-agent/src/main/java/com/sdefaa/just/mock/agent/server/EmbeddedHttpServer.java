@@ -33,7 +33,7 @@ public class EmbeddedHttpServer {
         channelFuture.channel().closeFuture().sync();
     }
 
-    public void stop()  {
+    public void stop() {
         logger.info("stop embedded http server");
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();

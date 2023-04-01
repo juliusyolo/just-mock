@@ -41,17 +41,17 @@ public enum ResultStatus implements Status {
     private String message;
 
     ResultStatus(String code, String message) {
-      this.code = code;
-      this.message = message;
+        this.code = code;
+        this.message = message;
     }
 
     @Override
     public String getCode() {
-      return this.code;
+        return this.code;
     }
 
     @Override
     public String getMessage() {
-      return this.message;
+        return this.message;
     }
 }

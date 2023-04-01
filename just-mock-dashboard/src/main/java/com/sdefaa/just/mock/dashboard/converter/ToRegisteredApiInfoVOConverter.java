@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper
 public interface ToRegisteredApiInfoVOConverter {
-  ToRegisteredApiInfoVOConverter INSTANCE = Mappers.getMapper(ToRegisteredApiInfoVOConverter.class);
+    ToRegisteredApiInfoVOConverter INSTANCE = Mappers.getMapper(ToRegisteredApiInfoVOConverter.class);
 
-  RegisteredApiInfoVO covert(RegisteredApiInfoDTO registeredApiInfoDTO);
+    RegisteredApiInfoVO covert(RegisteredApiInfoDTO registeredApiInfoDTO);
 }

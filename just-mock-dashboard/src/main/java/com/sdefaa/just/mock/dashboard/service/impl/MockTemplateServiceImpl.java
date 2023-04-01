@@ -24,61 +24,62 @@ import java.util.stream.Collectors;
 @Service
 public class MockTemplateServiceImpl implements MockTemplateService {
 
-  @Autowired
-  private MockTemplateInfoMapper mockTemplateInfoMapper;
-  @Autowired
-  private ObjectMapper objectMapper;
-  @Override
-  public List<MockTemplateInfoDTO> getMockTemplateInfoList() {
-    List<MockTemplateInfoModel> mockTemplateInfoModels = mockTemplateInfoMapper.selectMockTemplateInfoModelList();
-    return mockTemplateInfoModels.stream().map(mockTemplateInfoModel -> {
-      MockTemplateInfoDTO mockTemplateInfoDTO = ToMockTemplateInfoDTOConverter.INSTANCE.covert(mockTemplateInfoModel);
-      try{
-        mockTemplateInfoDTO.setRandomVariables(objectMapper.readValue(mockTemplateInfoModel.getRandomVariables(), new TypeReference<>() {
-        }));
-        mockTemplateInfoDTO.setTaskDefinitions(objectMapper.readValue(mockTemplateInfoModel.getTaskDefinitions(), new TypeReference<>() {
-        }));
-        return mockTemplateInfoDTO;
-      }catch (Exception e){
-        throw new GlobalException(ResultStatus.QUERY_TEMPLATE_EXCEPTION,e);
-      }
-    }).collect(Collectors.toList());
-  }
+    @Autowired
+    private MockTemplateInfoMapper mockTemplateInfoMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-  @Override
-  public void removeMockTemplateInfo(Long id) {
-    int effectRows;
-    try {
-      effectRows = mockTemplateInfoMapper.deleteMockTemplateInfoModel(id);
-    } catch (Exception e) {
-      throw new GlobalException(ResultStatus.REMOVE_MOCK_TEMPLATE_EXCEPTION, e);
+    @Override
+    public List<MockTemplateInfoDTO> getMockTemplateInfoList() {
+        List<MockTemplateInfoModel> mockTemplateInfoModels = mockTemplateInfoMapper.selectMockTemplateInfoModelList();
+        return mockTemplateInfoModels.stream().map(mockTemplateInfoModel -> {
+            MockTemplateInfoDTO mockTemplateInfoDTO = ToMockTemplateInfoDTOConverter.INSTANCE.covert(mockTemplateInfoModel);
+            try {
+                mockTemplateInfoDTO.setRandomVariables(objectMapper.readValue(mockTemplateInfoModel.getRandomVariables(), new TypeReference<>() {
+                }));
+                mockTemplateInfoDTO.setTaskDefinitions(objectMapper.readValue(mockTemplateInfoModel.getTaskDefinitions(), new TypeReference<>() {
+                }));
+                return mockTemplateInfoDTO;
+            } catch (Exception e) {
+                throw new GlobalException(ResultStatus.QUERY_TEMPLATE_EXCEPTION, e);
+            }
+        }).collect(Collectors.toList());
     }
-    if (effectRows != 1) {
-      throw new GlobalException(ResultStatus.REMOVE_MOCK_TEMPLATE_EXCEPTION);
-    }
-  }
 
-  @Override
-  public void putMockTemplateInfo(MockTemplateInfoDTO mockTemplateInfoDTO) {
-    int effectRows;
-    MockTemplateInfoModel mockTemplateInfoModel = ToMockTemplateInfoModelConverter.INSTANCE.covert(mockTemplateInfoDTO);
-    try {
-      if (Objects.equals(mockTemplateInfoModel.getEl(), "")) {
-        mockTemplateInfoModel.setEl(null);
-      }
-      mockTemplateInfoModel.setRandomVariables(objectMapper.writeValueAsString(mockTemplateInfoDTO.getRandomVariables()));
-      mockTemplateInfoModel.setTaskDefinitions(objectMapper.writeValueAsString(mockTemplateInfoDTO.getTaskDefinitions()));
-      if (Objects.isNull(mockTemplateInfoModel.getId())) {
-        effectRows = mockTemplateInfoMapper.insertMockTemplateInfoModel(mockTemplateInfoModel);
-      } else {
-        effectRows = mockTemplateInfoMapper.updateMockTemplateInfoModel(mockTemplateInfoModel);
-      }
-    } catch (Exception e) {
-      throw new GlobalException(ResultStatus.PUT_MOCK_TEMPLATE_EXCEPTION, e);
+    @Override
+    public void removeMockTemplateInfo(Long id) {
+        int effectRows;
+        try {
+            effectRows = mockTemplateInfoMapper.deleteMockTemplateInfoModel(id);
+        } catch (Exception e) {
+            throw new GlobalException(ResultStatus.REMOVE_MOCK_TEMPLATE_EXCEPTION, e);
+        }
+        if (effectRows != 1) {
+            throw new GlobalException(ResultStatus.REMOVE_MOCK_TEMPLATE_EXCEPTION);
+        }
     }
-    if (effectRows != 1) {
-      throw new GlobalException(ResultStatus.PUT_MOCK_TEMPLATE_FAILED);
+
+    @Override
+    public void putMockTemplateInfo(MockTemplateInfoDTO mockTemplateInfoDTO) {
+        int effectRows;
+        MockTemplateInfoModel mockTemplateInfoModel = ToMockTemplateInfoModelConverter.INSTANCE.covert(mockTemplateInfoDTO);
+        try {
+            if (Objects.equals(mockTemplateInfoModel.getEl(), "")) {
+                mockTemplateInfoModel.setEl(null);
+            }
+            mockTemplateInfoModel.setRandomVariables(objectMapper.writeValueAsString(mockTemplateInfoDTO.getRandomVariables()));
+            mockTemplateInfoModel.setTaskDefinitions(objectMapper.writeValueAsString(mockTemplateInfoDTO.getTaskDefinitions()));
+            if (Objects.isNull(mockTemplateInfoModel.getId())) {
+                effectRows = mockTemplateInfoMapper.insertMockTemplateInfoModel(mockTemplateInfoModel);
+            } else {
+                effectRows = mockTemplateInfoMapper.updateMockTemplateInfoModel(mockTemplateInfoModel);
+            }
+        } catch (Exception e) {
+            throw new GlobalException(ResultStatus.PUT_MOCK_TEMPLATE_EXCEPTION, e);
+        }
+        if (effectRows != 1) {
+            throw new GlobalException(ResultStatus.PUT_MOCK_TEMPLATE_FAILED);
+        }
     }
-  }
 
 }

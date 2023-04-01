@@ -15,9 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TargetMethod {
-  private Method method;
+    private Method method;
 
-  private String signature;
-  private List<String> annotations;
+    private String signature;
+    private List<String> annotations;
 
 }

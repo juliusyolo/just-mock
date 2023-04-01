@@ -9,9 +9,9 @@ import lombok.Data;
  */
 @Data
 public class VMInstance {
-  private String pid;
-  private String name;
-  private String platform;
-  private String vendor;
+    private String pid;
+    private String name;
+    private String platform;
+    private String vendor;
 
 }

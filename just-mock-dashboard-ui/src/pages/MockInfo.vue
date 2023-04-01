@@ -14,9 +14,10 @@ import {getMockTemplateInfoList, getRegisteredApiList, putMock, removeMock} from
 import {Message} from "@arco-design/web-vue";
 import TaskDefinitionInputBox from "../components/TaskDefinitionInputBox.vue";
 import RandomVariableInputBox from "../components/RandomVariableInputBox.vue";
-import { IconInfoCircle } from '@arco-design/web-vue/es/icon';
+import {IconInfoCircle} from '@arco-design/web-vue/es/icon';
+
 export default defineComponent({
-  components: {BasicLayout, TaskDefinitionInputBox, RandomVariableInputBox,IconInfoCircle},
+  components: {BasicLayout, TaskDefinitionInputBox, RandomVariableInputBox, IconInfoCircle},
   setup() {
     const router = useRouter()
     const pid = router.currentRoute.value.params.pid
@@ -90,7 +91,7 @@ export default defineComponent({
         mockTemplateInfoData.value = d;
         if (record.mockEnable) {
           selectedMockTemplateInfo.value = d.filter(e => e.id === record.mockTemplateId)[0]
-          if (mockRecord.value?.mockTemplateSnapshot!==generateSnapshot(selectedMockTemplateInfo.value)){
+          if (mockRecord.value?.mockTemplateSnapshot !== generateSnapshot(selectedMockTemplateInfo.value)) {
             snapshotWarning.value = true;
           }
         }
@@ -108,7 +109,7 @@ export default defineComponent({
         Message.error({content: error.message ? error.message : '系统异常！', duration: 5 * 1000})
       })
     }
-    const generateSnapshot = (record: MockTemplateInfo): string=>{
+    const generateSnapshot = (record: MockTemplateInfo): string => {
       return record.templateContent + record.el + record.taskDefinitions + JSON.stringify(record.randomVariables)
     }
     const handleBeforeOk = async () => {
@@ -217,7 +218,8 @@ export default defineComponent({
           Mock配置
         </template>
         <div>
-          <a-input v-if="snapshotWarning" disabled default-value="该模板已发生改变，上次Mock配置可能较旧" placeholder="Error status" error>
+          <a-input v-if="snapshotWarning" disabled default-value="该模板已发生改变，上次Mock配置可能较旧"
+                   placeholder="Error status" error>
             <template #prefix>
               <icon-info-circle/>
             </template>

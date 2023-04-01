@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper
 public interface ToMockTemplateInfoVOConverter {
-  ToMockTemplateInfoVOConverter INSTANCE = Mappers.getMapper(ToMockTemplateInfoVOConverter.class);
+    ToMockTemplateInfoVOConverter INSTANCE = Mappers.getMapper(ToMockTemplateInfoVOConverter.class);
 
-  MockTemplateInfoVO covert(MockTemplateInfoDTO mockTemplateInfoDTO);
+    MockTemplateInfoVO covert(MockTemplateInfoDTO mockTemplateInfoDTO);
 }

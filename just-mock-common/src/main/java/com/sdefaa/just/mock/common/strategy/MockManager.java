@@ -1,8 +1,6 @@
 package com.sdefaa.just.mock.common.strategy;
 
 import com.sdefaa.just.mock.common.pojo.RandomVariable;
-import com.sdefaa.just.mock.common.task.AbstractPostProcessor;
-import com.sdefaa.just.mock.common.task.PostProcessorResolver;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -13,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * @author Julius Wong
@@ -37,23 +34,23 @@ public class MockManager {
     }
 
     public boolean shouldMock(String clazzName, String methodName, Object[] parameters) {
-      List<RandomVariable> randomVariables = MOCK_RANDOM_VARIABLE_MAP.get(clazzName + SPLIT + methodName);
-      return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(randomVariables,parameters);
+        List<RandomVariable> randomVariables = MOCK_RANDOM_VARIABLE_MAP.get(clazzName + SPLIT + methodName);
+        return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(randomVariables, parameters);
     }
 
-    public synchronized void putMock(String clazzName, String methodName, String templateContent, String el, List<RandomVariable> randomVariables,List<String> taskDefinitions) throws IOException {
-      stringTemplateLoader.putTemplate(clazzName + SPLIT + methodName, templateContent);
-      configuration.clearTemplateCache();
-      Template template = configuration.getTemplate(clazzName + SPLIT + methodName);
-      AbstractMockStrategy abstractMockStrategy;
-      if (Objects.nonNull(el)) {
-        abstractMockStrategy = new ConditionalMockStrategy(template, el);
-      } else {
-        abstractMockStrategy = new DefaultMockStrategy(template);
-      }
-      this.MOCK_STRATEGY_MAP.put(clazzName + SPLIT + methodName, abstractMockStrategy);
-      Optional.ofNullable(taskDefinitions).ifPresent(t -> this.MOCK_TASK_DEFINITION_POST_PROCESSOR_MAP.put(clazzName + SPLIT + methodName,t));
-      Optional.ofNullable(randomVariables).ifPresent(r -> this.MOCK_RANDOM_VARIABLE_MAP.put(clazzName + SPLIT + methodName, r));
+    public synchronized void putMock(String clazzName, String methodName, String templateContent, String el, List<RandomVariable> randomVariables, List<String> taskDefinitions) throws IOException {
+        stringTemplateLoader.putTemplate(clazzName + SPLIT + methodName, templateContent);
+        configuration.clearTemplateCache();
+        Template template = configuration.getTemplate(clazzName + SPLIT + methodName);
+        AbstractMockStrategy abstractMockStrategy;
+        if (Objects.nonNull(el)) {
+            abstractMockStrategy = new ConditionalMockStrategy(template, el);
+        } else {
+            abstractMockStrategy = new DefaultMockStrategy(template);
+        }
+        this.MOCK_STRATEGY_MAP.put(clazzName + SPLIT + methodName, abstractMockStrategy);
+        Optional.ofNullable(taskDefinitions).ifPresent(t -> this.MOCK_TASK_DEFINITION_POST_PROCESSOR_MAP.put(clazzName + SPLIT + methodName, t));
+        Optional.ofNullable(randomVariables).ifPresent(r -> this.MOCK_RANDOM_VARIABLE_MAP.put(clazzName + SPLIT + methodName, r));
     }
 
     public void removeMock(String clazzName, String methodName) {
@@ -64,7 +61,7 @@ public class MockManager {
         this.MOCK_TASK_DEFINITION_POST_PROCESSOR_MAP.remove(clazzName + SPLIT + methodName);
     }
 
-    public Object doMock(String clazzName, String methodName, Class<?> returnClazz,  Object[] parameters) {
+    public Object doMock(String clazzName, String methodName, Class<?> returnClazz, Object[] parameters) {
         List<RandomVariable> randomVariables = MOCK_RANDOM_VARIABLE_MAP.get(clazzName + SPLIT + methodName);
         List<String> taskDefinitions = MOCK_TASK_DEFINITION_POST_PROCESSOR_MAP.get(clazzName + SPLIT + methodName);
         return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz, taskDefinitions, randomVariables, parameters);

@@ -11,10 +11,11 @@ import org.springframework.stereotype.Component;
  * @since 1.0.0
  */
 @Component
-public class RestControllerTest  {
+public class RestControllerTest {
     @Autowired
     FeignTest feignTest;
-    public String hello(){
-       return feignTest.hello();
+
+    public String hello() {
+        return feignTest.hello();
     }
 }

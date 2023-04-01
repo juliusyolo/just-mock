@@ -10,6 +10,6 @@ import java.util.List;
  */
 @Data
 public class AttachVMInstanceDTO {
-  private String pid;
-  private List<String> environmentVariables;
+    private String pid;
+    private List<String> environmentVariables;
 }

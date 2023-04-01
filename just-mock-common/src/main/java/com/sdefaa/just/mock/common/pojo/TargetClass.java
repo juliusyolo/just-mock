@@ -15,14 +15,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TargetClass {
-  private List<String> annotations;
-  private Class clazz;
+    private List<String> annotations;
+    private Class clazz;
 
-  private List<TargetMethod> targetMethods;
+    private List<TargetMethod> targetMethods;
 
-  public TargetClass(Class clazz) {
-    this.clazz = clazz;
-    this.annotations = new ArrayList<>();
-    this.targetMethods = new ArrayList<>();
-  }
+    public TargetClass(Class clazz) {
+        this.clazz = clazz;
+        this.annotations = new ArrayList<>();
+        this.targetMethods = new ArrayList<>();
+    }
 }

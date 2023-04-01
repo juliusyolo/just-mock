@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper
 public interface ToVMInstanceVOConverter {
-  ToVMInstanceVOConverter INSTANCE = Mappers.getMapper(ToVMInstanceVOConverter.class);
+    ToVMInstanceVOConverter INSTANCE = Mappers.getMapper(ToVMInstanceVOConverter.class);
 
-  VMInstanceVO covert(VMInstanceDTO vmInstanceAttachModel);
+    VMInstanceVO covert(VMInstanceDTO vmInstanceAttachModel);
 }

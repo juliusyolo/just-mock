@@ -1,8 +1,5 @@
 package com.sdefaa.just.mock.common.task;
 
-import com.sdefaa.just.mock.common.pojo.TaskDefinition;
-
-import java.net.MalformedURLException;
 import java.util.logging.Logger;
 
 /**
@@ -10,18 +7,18 @@ import java.util.logging.Logger;
  * @since 1.0.0
  */
 public abstract class AbstractPostProcessor implements Runnable {
-  private static final Logger logger = Logger.getLogger(AbstractPostProcessor.class.getName());
+    private static final Logger logger = Logger.getLogger(AbstractPostProcessor.class.getName());
 
-  protected abstract void process() throws Exception;
+    protected abstract void process() throws Exception;
 
-  @Override
-  public void run() {
-    try {
-      Thread.sleep(2000);
-      this.process();
-    } catch (Exception e) {
-      logger.info("Mock后置处理发生异常," + e);
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(2000);
+            this.process();
+        } catch (Exception e) {
+            logger.info("Mock后置处理发生异常," + e);
+        }
+
     }
-
-  }
 }

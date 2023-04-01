@@ -9,5 +9,6 @@ package com.sdefaa.just.mock.dashboard.enums;
  */
 public interface Status {
     String getCode();
+
     String getMessage();
 }

@@ -11,10 +11,10 @@ import java.util.List;
  */
 @Data
 public class MockTemplateInfoVO {
-  private Long id;
-  private String el;
-  private String templateContent;
-  private String tag;
-  private List<RandomVariable> randomVariables;
-  private List<String> taskDefinitions;
+    private Long id;
+    private String el;
+    private String templateContent;
+    private String tag;
+    private List<RandomVariable> randomVariables;
+    private List<String> taskDefinitions;
 }

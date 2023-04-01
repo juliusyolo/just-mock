@@ -9,12 +9,12 @@ import org.apache.ibatis.annotations.*;
  */
 @Mapper
 public interface VMInstanceAttachExtraInfoMapper {
-  @Insert("insert into vm_instance_attach_extra_info(pid,port) values(#{pid},#{port})")
-  int insertVMInstanceAttachExtraInfoModel(VMInstanceAttachExtraInfoModel vmInstanceAttachExtraInfoModel);
+    @Insert("insert into vm_instance_attach_extra_info(pid,port) values(#{pid},#{port})")
+    int insertVMInstanceAttachExtraInfoModel(VMInstanceAttachExtraInfoModel vmInstanceAttachExtraInfoModel);
 
-  @Delete("delete from vm_instance_attach_extra_info where pid = #{pid}")
-  int deleteVMInstanceAttachExtraInfoModelByPid(@Param("pid") String pid);
+    @Delete("delete from vm_instance_attach_extra_info where pid = #{pid}")
+    int deleteVMInstanceAttachExtraInfoModelByPid(@Param("pid") String pid);
 
-  @Select("select * from vm_instance_attach_extra_info where pid = #{pid}")
-  VMInstanceAttachExtraInfoModel selectVMInstanceAttachExtraInfoModelByPid(@Param("pid") String pid);
+    @Select("select * from vm_instance_attach_extra_info where pid = #{pid}")
+    VMInstanceAttachExtraInfoModel selectVMInstanceAttachExtraInfoModelByPid(@Param("pid") String pid);
 }
