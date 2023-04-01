@@ -48,7 +48,7 @@
                                  @change="taskDefinitionsChange"/>
       <h3>备注:</h3>
       <a-textarea disabled
-                  default-value="使用freemarker作为模板引擎，EL表达式支持JSR245规范，环境变量现有请求方法参数，全局环境变量（变量名以p0,p1,p2,p3以此类推，全局环境变量在末尾），自定义随机变量（变量名以定义的为准）。"
+                  default-value="使用freemarker作为模板引擎，EL表达式支持JSR245规范，环境变量现有请求方法参数，全局环境变量（变量名以p0,p1,p2,p3以此类推，全局环境变量在末尾），自定义随机变量（变量名以定义的为准）。后置HTTP请求任务请求方法只支持GET/POST，请求类型为'query' | 'application/json' | 'application/x-www-form-urlencoded'。"
                   :auto-size="true"/>
     </div>
   </a-modal>
