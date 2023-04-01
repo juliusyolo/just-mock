@@ -52,7 +52,8 @@ public class VMInstanceBOImpl implements VMInstanceBO {
         // 过滤后的已连接的虚拟机实例
         List<VMInstanceDTO> filteredAttachedVMInstanceDTOs = allVMInstanceDTOs.stream()
                 .filter(vmInstanceDTO -> attachedVMInstanceDTOs.stream().anyMatch(attachedVMInstanceDTO -> Objects.equals(vmInstanceDTO.getPid(), attachedVMInstanceDTO.getPid())))
-                .peek(vmInstanceDTO -> vmInstanceDTO.setAttached(true))
+                .peek(vmInstanceDTO -> {vmInstanceDTO.setAttached(true);vmInstanceDTO.setEnvironmentVariables(attachedVMInstanceDTOs.stream().filter(attachedVMInstance->attachedVMInstance.getPid().equals(vmInstanceDTO.getPid())).findFirst().orElseThrow().getEnvironmentVariables());})
+
                 .toList();
         List<VMInstanceDTO> vmInstanceDTOList = new ArrayList<>();
         vmInstanceDTOList.addAll(unattachedVMInstanceDTOs);
