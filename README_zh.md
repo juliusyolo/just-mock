@@ -2,21 +2,21 @@
 
 [![Github release](https://img.shields.io/badge/release-v1.0.0-brightgreen)](https://github.com/4defaa/just-mock/releases)[![License](https://img.shields.io/badge/license-Apache--2.0-orange)](http://www.apache.org/licenses/LICENSE-2.0)
 
-[中文](./README_zh.md)
+[English](./README.md)
 
-#  What is this
+#  这是什么
 
-A non-intrusive Java API mock service based on java agent and Javassist.
+基于java agent和Javassist的非侵入式Java API Mock服务。
 
-# How this work
+# 如何工作的
 
 
 
-# Applicable Scope
+# 应用范围
 
-Java8+,API service based on SpringMVC,FeignClient.
+Java8+环境，基于 SpringMVC，FeignClient的API服务。
 
-# Build
+# 构建
 
 
 
