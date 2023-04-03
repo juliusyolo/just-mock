@@ -9,12 +9,13 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -48,7 +49,7 @@ public class HttpTaskPostProcessor extends AbstractPostProcessor {
             template.process(modelMap, writer);
             HttpURLConnection con = null;
             if (HttpMethodEnum.GET.name().equals(content.getMethod().toUpperCase())) {
-                URL obj = new URL(content.getUrl() + "?" + writer.toString());
+                URL obj = new URL(content.getUrl() + "?" + encodeQuery(writer.toString()));
                 con = (HttpURLConnection) obj.openConnection();
                 con.setRequestMethod(content.getMethod().toUpperCase());
             } else {
@@ -67,5 +68,27 @@ public class HttpTaskPostProcessor extends AbstractPostProcessor {
             String response = new BufferedReader(new InputStreamReader(con.getInputStream())).lines().collect(Collectors.joining(System.lineSeparator()));
             logger.info("Http Task Post Process,code:" + responseCode + ",message:" + response);
         }
+    }
+
+
+    public  String encodeQuery(String query) throws UnsupportedEncodingException {
+      Map<String, String> params = new LinkedHashMap<>();
+      String[] parts = query.split("&");
+      for (String part : parts) {
+        String[] keyValue = part.split("=", 2);
+        String key = keyValue[0];
+        String value = keyValue.length > 1 ? keyValue[1] : "";
+        params.put(key, value);
+      }
+      StringBuilder sb = new StringBuilder();
+      for (Map.Entry<String, String> entry : params.entrySet()) {
+        if (sb.length() > 0) {
+          sb.append("&");
+        }
+        String key = URLEncoder.encode(entry.getKey(), "UTF-8");
+        String value = URLEncoder.encode(entry.getValue(), "UTF-8");
+        sb.append(key).append("=").append(value);
+      }
+      return sb.toString();
     }
 }
