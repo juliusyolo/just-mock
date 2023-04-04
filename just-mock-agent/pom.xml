@@ -11,8 +11,8 @@
     <artifactId>just-mock-agent</artifactId>
     <version>${just.mock.agent.version}</version>
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -21,6 +21,10 @@
             <groupId>com.sdefaa</groupId>
             <artifactId>just-mock-common</artifactId>
         </dependency>
+      <dependency>
+        <groupId>com.sdefaa</groupId>
+        <artifactId>just-mock-agent-core</artifactId>
+      </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>

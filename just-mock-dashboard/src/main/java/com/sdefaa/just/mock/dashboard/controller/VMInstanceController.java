@@ -1,5 +1,7 @@
 package com.sdefaa.just.mock.dashboard.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.just.mock.common.pojo.ApiRegistryDTO;
 import com.sdefaa.just.mock.dashboard.converter.ToRegisteredApiInfoVOConverter;
 import com.sdefaa.just.mock.dashboard.converter.ToVMInstanceVOConverter;
@@ -13,6 +15,7 @@ import com.sdefaa.just.mock.dashboard.pojo.vo.RegisteredApiInfoVO;
 import com.sdefaa.just.mock.dashboard.pojo.vo.VMInstanceVO;
 import com.sdefaa.just.mock.dashboard.service.VMInstanceService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +32,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class VMInstanceController {
     private final VMInstanceService vmInstanceService;
-
+@Autowired
+    ObjectMapper objectMapper;
     public VMInstanceController(VMInstanceService vmInstanceService) {
         this.vmInstanceService = vmInstanceService;
     }
@@ -37,7 +41,7 @@ public class VMInstanceController {
     @GetMapping(value = "/v1/api/vm/instances/list")
     public ResponseWrapper<List<VMInstanceVO>> getAllVMInstances() {
         List<VMInstanceDTO> vmInstanceDTOList = vmInstanceService.getAllVMInstances();
-        List<VMInstanceVO> vmInstanceVOs = vmInstanceDTOList.stream().map(ToVMInstanceVOConverter.INSTANCE::covert).toList();
+        List<VMInstanceVO> vmInstanceVOs = vmInstanceDTOList.stream().map(ToVMInstanceVOConverter.INSTANCE::covert).collect(Collectors.toList());
         return ResponseWrapper.wrap(ResultStatus.SUCCESS, vmInstanceVOs);
     }
 
@@ -60,8 +64,8 @@ public class VMInstanceController {
     }
 
     @PostMapping("/v1/api/vm/instance/api/register")
-    public ResponseWrapper<Void> registerApiList(@RequestBody ApiRegistryDTO apiRegistryDTO) {
-        log.info("register api:{}", apiRegistryDTO.toString());
+    public ResponseWrapper<Void> registerApiList(@RequestBody ApiRegistryDTO apiRegistryDTO) throws JsonProcessingException {
+        log.info("register api:{}", objectMapper.writeValueAsString(apiRegistryDTO));
         vmInstanceService.registerApiList(apiRegistryDTO);
         return ResponseWrapper.wrap(ResultStatus.SUCCESS);
     }

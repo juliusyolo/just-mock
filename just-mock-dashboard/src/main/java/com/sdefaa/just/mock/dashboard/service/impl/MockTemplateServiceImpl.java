@@ -2,6 +2,7 @@ package com.sdefaa.just.mock.dashboard.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sdefaa.just.mock.common.pojo.RandomVariable;
 import com.sdefaa.just.mock.dashboard.converter.ToMockTemplateInfoDTOConverter;
 import com.sdefaa.just.mock.dashboard.converter.ToMockTemplateInfoModelConverter;
 import com.sdefaa.just.mock.dashboard.enums.ResultStatus;
@@ -35,9 +36,9 @@ public class MockTemplateServiceImpl implements MockTemplateService {
         return mockTemplateInfoModels.stream().map(mockTemplateInfoModel -> {
             MockTemplateInfoDTO mockTemplateInfoDTO = ToMockTemplateInfoDTOConverter.INSTANCE.covert(mockTemplateInfoModel);
             try {
-                mockTemplateInfoDTO.setRandomVariables(objectMapper.readValue(mockTemplateInfoModel.getRandomVariables(), new TypeReference<>() {
+                mockTemplateInfoDTO.setRandomVariables(objectMapper.readValue(mockTemplateInfoModel.getRandomVariables(), new TypeReference<List<RandomVariable>>() {
                 }));
-                mockTemplateInfoDTO.setTaskDefinitions(objectMapper.readValue(mockTemplateInfoModel.getTaskDefinitions(), new TypeReference<>() {
+                mockTemplateInfoDTO.setTaskDefinitions(objectMapper.readValue(mockTemplateInfoModel.getTaskDefinitions(), new TypeReference<List<String>>() {
                 }));
                 return mockTemplateInfoDTO;
             } catch (Exception e) {

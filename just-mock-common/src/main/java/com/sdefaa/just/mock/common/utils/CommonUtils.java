@@ -25,7 +25,7 @@ public class CommonUtils {
 
     private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final static String FEIGN_TARGET_CLASS = "@org.springframework.cloud.openfeign.FeignClient";
-    private final static List<String> TARGET_CLASSES = Arrays.asList("@org.springframework.stereotype.Controller", "@org.springframework.web.bind.annotation.RestController", FEIGN_TARGET_CLASS);
+    private final static List<String> TARGET_CLASSES = Arrays.asList("org.springframework.stereotype.Controller", "org.springframework.web.bind.annotation.RestController", FEIGN_TARGET_CLASS);
     private final static String REQUEST_MAPPING_TARGET_METHOD = "@org.springframework.web.bind.annotation.RequestMapping";
     public final static List<String> TARGET_METHODS = Arrays.asList("@org.springframework.web.bind.annotation.PostMapping", "@org.springframework.web.bind.annotation.GetMapping", "@org.springframework.web.bind.annotation.PutMapping", "@org.springframework.web.bind.annotation.PatchMapping", "@org.springframework.web.bind.annotation.DeleteMapping", REQUEST_MAPPING_TARGET_METHOD);
 
@@ -33,6 +33,9 @@ public class CommonUtils {
 
     private final static String PATH_REGEX = ".*(path=\\{(\"[^\"]*\")\\}).*";
     private final static String VALUE_REGEX = ".*(value=\\{(\"[^\"]*\")\\}).*";
+
+  private final static String PATH_REGEX_0 = ".*(path=\\[[^\"^\\]]+\\]),.*";
+  private final static String VALUE_REGEX_0 = ".*(value=\\[[^\"^\\]]+\\]),.*";
 
     public static Stream<ApiInfo> generateApiInfoFromTargetClass(TargetClass targetClass) {
         String apiType = generateApiType(targetClass.getAnnotations());
@@ -133,18 +136,43 @@ public class CommonUtils {
     }
 
     public static boolean currentClassHasTargetClassAnnotation(Class clazz) {
-        return Arrays.stream(clazz.getAnnotations()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains);
+       return TARGET_CLASSES.stream().anyMatch(s -> {
+         try {
+           return Objects.nonNull(clazz.getAnnotation(Class.forName(s)));
+         } catch (Exception e) {
+           return false;
+         }
+       });
+      //  return Arrays.stream(clazz.get()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains);
     }
 
     public static boolean superClassHasTargetClassAnnotation(Class clazz) {
+      try {
         if (Objects.isNull(clazz.getAnnotatedSuperclass())) {
-            return false;
+          return false;
         }
-        return Arrays.stream(clazz.getAnnotatedSuperclass().getAnnotations()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains);
+      }catch (Exception e){
+        return false;
+      }
+      return TARGET_CLASSES.stream().anyMatch(s -> {
+        try {
+          return Objects.nonNull(clazz.getAnnotatedSuperclass().getAnnotation((Class<? extends Annotation>) Class.forName(s)));
+        } catch (Exception e) {
+          return false;
+        }
+      });
+     //   return Arrays.stream(clazz.getAnnotatedSuperclass().getAnnotations()).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains);
     }
 
     public static boolean superInterfaceHasTargetClassAnnotation(Class clazz) {
-        return Arrays.stream(clazz.getInterfaces()).flatMap(aClass -> Arrays.stream(aClass.getAnnotations())).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains);
+//      return TARGET_CLASSES.stream().anyMatch(s -> {
+//        try {
+//          return Objects.nonNull(clazz.getAnnotatedSuperclass().getAnnotation((Class<? extends Annotation>) Class.forName(s)));
+//        } catch (ClassNotFoundException e) {
+//          return false;
+//        }
+//      });
+      return Arrays.stream(clazz.getInterfaces()).flatMap(aClass -> Arrays.stream(aClass.getAnnotations())).map(Annotation::toString).map(s -> s.replaceAll("(.*)\\(.*\\)", "$1")).anyMatch(TARGET_CLASSES::contains);
     }
 
     public static boolean hasTargetMethodAnnotation(Method method) {
@@ -165,7 +193,20 @@ public class CommonUtils {
     }
 
     private static String generateApiUrl(List<String> annotations) {
-        return annotations.stream().map(s -> s.replaceAll(PATH_REGEX, "$1").replaceAll(VALUE_REGEX, "$1").replaceAll("path=\\{", "").replaceAll("value=\\{", "").replaceAll("}$", "").replaceAll("\"", "").replaceAll(" ", "").trim()).collect(Collectors.joining(";"));
+        return annotations.stream().map(s ->
+            s.replaceAll(PATH_REGEX, "$1")
+            .replaceAll(VALUE_REGEX, "$1")
+            .replaceAll("path=\\{", "")
+            .replaceAll("value=\\{", "")
+            .replaceAll("}$", "")
+            .replaceAll("\"", "")
+            .replaceAll(PATH_REGEX_0, "$1")
+            .replaceAll(VALUE_REGEX_0, "$1")
+            .replaceAll("path=\\[", "")
+            .replaceAll("value=\\[", "")
+            .replaceAll("]$", "")
+            .replaceAll(" ", "")
+          .trim()).collect(Collectors.joining(";"));
     }
 
     private static String generateApiMethod(List<String> annotations) {

@@ -6,12 +6,14 @@ import com.sdefaa.just.mock.dashboard.enums.ResultStatus;
 import com.sdefaa.just.mock.dashboard.exception.GlobalException;
 import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
 import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachInfoModel;
+
 import com.sun.tools.attach.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Julius Wong
@@ -20,7 +22,7 @@ import java.util.*;
 @Component
 public class VMInstanceBOImpl implements VMInstanceBO {
 
-    private final static String VM_SELF = "com.sdefaa.just.mock.dashboard.JustMockDashboardApplication";
+    private final static String VM_SELF = "org.springframework.boot.loader.JarLauncher";
     @Value("${mock.agent.path}")
     private String mockAgentPath;
     @Value("${mock.config.path}")
@@ -42,19 +44,18 @@ public class VMInstanceBOImpl implements VMInstanceBO {
             vmInstanceDTO.setPlatform(virtualMachineDescriptor.provider().type());
             vmInstanceDTO.setAttached(false);
             return vmInstanceDTO;
-        }).toList();
+        }).collect(Collectors.toList());
         // 数据库里存在连接的虚拟机实例
-        List<VMInstanceDTO> attachedVMInstanceDTOs = vmInstanceAttachInfoModelList.stream().map(ToVMInstanceDTOConverter.INSTANCE::covert).toList();
+        List<VMInstanceDTO> attachedVMInstanceDTOs = vmInstanceAttachInfoModelList.stream().map(ToVMInstanceDTOConverter.INSTANCE::covert).collect(Collectors.toList());
         // 未被连接的虚拟机实例
         List<VMInstanceDTO> unattachedVMInstanceDTOs = allVMInstanceDTOs.stream()
                 .filter(vmInstanceDTO -> attachedVMInstanceDTOs.stream().noneMatch(attachedVMInstanceDTO -> Objects.equals(vmInstanceDTO.getPid(), attachedVMInstanceDTO.getPid())))
-                .toList();
+                .collect(Collectors.toList());
         // 过滤后的已连接的虚拟机实例
         List<VMInstanceDTO> filteredAttachedVMInstanceDTOs = allVMInstanceDTOs.stream()
                 .filter(vmInstanceDTO -> attachedVMInstanceDTOs.stream().anyMatch(attachedVMInstanceDTO -> Objects.equals(vmInstanceDTO.getPid(), attachedVMInstanceDTO.getPid())))
-                .peek(vmInstanceDTO -> {vmInstanceDTO.setAttached(true);vmInstanceDTO.setEnvironmentVariables(attachedVMInstanceDTOs.stream().filter(attachedVMInstance->attachedVMInstance.getPid().equals(vmInstanceDTO.getPid())).findFirst().orElseThrow().getEnvironmentVariables());})
-
-                .toList();
+                .peek(vmInstanceDTO -> {vmInstanceDTO.setAttached(true);vmInstanceDTO.setEnvironmentVariables(attachedVMInstanceDTOs.stream().filter(attachedVMInstance->attachedVMInstance.getPid().equals(vmInstanceDTO.getPid())).findFirst().orElse(new VMInstanceDTO()).getEnvironmentVariables());})
+                .collect(Collectors.toList());
         List<VMInstanceDTO> vmInstanceDTOList = new ArrayList<>();
         vmInstanceDTOList.addAll(unattachedVMInstanceDTOs);
         vmInstanceDTOList.addAll(filteredAttachedVMInstanceDTOs);
@@ -66,7 +67,7 @@ public class VMInstanceBOImpl implements VMInstanceBO {
     public VMInstanceDTO attachVMInstance(String pid, String environmentVariables) {
         List<VirtualMachineDescriptor> virtualMachineDescriptors = VirtualMachine.list();
         Optional<VirtualMachineDescriptor> vmDescriptor = virtualMachineDescriptors.stream().filter(virtualMachineDescriptor -> Objects.equals(virtualMachineDescriptor.id(), pid)).findFirst();
-        if (vmDescriptor.isEmpty()) {
+        if (!vmDescriptor.isPresent()) {
             throw new GlobalException(ResultStatus.VM_NOT_EXISTED);
         }
         VirtualMachineDescriptor virtualMachineDescriptor = vmDescriptor.get();

@@ -1,6 +1,5 @@
 package com.sdefaa.just.mock.agent;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.just.mock.agent.config.JustMockAgentConfigLoader;
 import com.sdefaa.just.mock.agent.pojo.AgentConfigProperties;
@@ -12,14 +11,19 @@ import com.sdefaa.just.mock.common.pojo.ApiRegistryDTO;
 import com.sdefaa.just.mock.common.pojo.TargetClass;
 import com.sdefaa.just.mock.common.utils.CommonUtils;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
@@ -69,6 +73,7 @@ public class MockAgentMain {
                     .map(CommonUtils::generateTargetClass)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
+          System.out.println(loadedTargetClasses.toString());
             List<String> environmentVariableList;
             if (argvs.length > 2) {
                 environmentVariableList = new ArrayList<>();
@@ -92,19 +97,21 @@ public class MockAgentMain {
             }
             List<ApiInfo> apiInfoList = loadedTargetClasses.stream()
                     .flatMap(CommonUtils::generateApiInfoFromTargetClass)
-                    .toList();
+                    .collect(Collectors.toList());
             ApiRegistryDTO apiRegistryDTO = new ApiRegistryDTO();
             apiRegistryDTO.setApiInfos(apiInfoList);
             apiRegistryDTO.setPid(argvs[1]);
             apiRegistryDTO.setPort(availablePort);
             //  Upload apiInfoList
+            logger.info(apiRegistryDTO.toString());
             registry(agentConfigProperties.getRegistryUrl(), apiRegistryDTO);
         }
     }
 
     public static void registry(String url, ApiRegistryDTO apiRegistryDTO) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         ObjectMapper objectMapper = new ObjectMapper();
-        byte[] bytes = objectMapper.writeValueAsBytes(apiRegistryDTO);
+      System.out.println(objectMapper.writeValueAsString(apiRegistryDTO));
+      byte[] bytes = objectMapper.writeValueAsBytes(apiRegistryDTO);
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("POST");
@@ -115,9 +122,9 @@ public class MockAgentMain {
             wr.write(bytes);
         }
         int responseCode = con.getResponseCode();
-        Map<String, Object> response = objectMapper.readValue(con.getInputStream(), new TypeReference<>() {
-        });
-        logger.info("register Api, status code:" + responseCode + ",message:" + response.toString());
+      String response = new BufferedReader(new InputStreamReader(con.getInputStream())).lines().collect(Collectors.joining(System.lineSeparator()));
+
+      logger.info("register Api, status code:" + responseCode + ",message:" + response.toString());
     }
 
 }

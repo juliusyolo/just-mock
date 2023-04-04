@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.security.ProtectionDomain;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
@@ -37,10 +38,11 @@ public class MockClassFileTransformer implements ClassFileTransformer {
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         if (className.equals(this.className.replace('.', '/'))) {
+          CtClass ctClass = null;
             try {
                 ClassPool pool = new ClassPool();
                 pool.insertClassPath(new LoaderClassPath(loader));
-                CtClass ctClass = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
+                ctClass = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
                 CtMethod ctMethod = ctClass.getDeclaredMethod(this.methodName);
                 CtClass[] parameterTypes = ctMethod.getParameterTypes();
                 StringBuilder parameters = new StringBuilder();
@@ -84,8 +86,9 @@ public class MockClassFileTransformer implements ClassFileTransformer {
                 }
                 return byteCode;
             } catch (Throwable e) {
-                MockAgentMain.TRANSFORM_HAS_EXCEPTION.compareAndSet(false, true);
-                logger.info("目标类的方法修改异常," + e);
+//                MockAgentMain.TRANSFORM_HAS_EXCEPTION.compareAndSet(false, true);
+              e.printStackTrace();
+                logger.info("目标类的方法修改异常," + Optional.ofNullable(ctClass).map(CtClass::getName).orElse(e.toString())+e);
                 throw new IllegalClassFormatException("目标类的方法修改异常" + e);
             }
         }
