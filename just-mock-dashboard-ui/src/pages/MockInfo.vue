@@ -36,7 +36,9 @@ export default defineComponent({
       slotName: 'apiType'
     }, {
       title: '接口',
-      slotName: 'apiUrl'
+      slotName: 'apiUrl',
+      ellipsis: true,
+      tooltip: true
     }, {
       title: '是否开启Mock',
       slotName: 'mockEnable'
@@ -180,7 +182,7 @@ export default defineComponent({
           </a-tooltip>
         </template>
         <template #apiUrl="{record}">
-          <a-tooltip :content="record.methodAnnotationsDesc">
+          <a-tooltip :content="record.methodAnnotationsDesc" position="left">
             <a-tag color="green">{{ record.apiMethod + ' ' + record.apiUrl }}</a-tag>
           </a-tooltip>
         </template>

@@ -11,11 +11,11 @@ import lombok.Data;
  */
 @Data
 public class ApiInfo {
-    private String apiUrl;
-    private String apiMethod;
-    private String apiType;
-    private ApiClassInfo apiClassInfo;
-    private ApiMethodInfo apiMethodInfo;
+  private String apiUrl;
+  private String apiMethod;
+  private String apiType;
+  private ApiClassInfo apiClassInfo;
+  private ApiMethodInfo apiMethodInfo;
 
 
 }

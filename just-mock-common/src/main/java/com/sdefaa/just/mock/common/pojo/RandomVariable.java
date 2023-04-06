@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RandomVariable {
-    private String name;
-    private String sequence;
+  private String name;
+  private String sequence;
 
 }

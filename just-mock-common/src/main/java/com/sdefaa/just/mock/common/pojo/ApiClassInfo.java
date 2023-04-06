@@ -13,6 +13,6 @@ import java.util.List;
  */
 @Data
 public class ApiClassInfo {
-    private String className;
-    private List<String> annotations;
+  private String className;
+  private List<String> annotations;
 }

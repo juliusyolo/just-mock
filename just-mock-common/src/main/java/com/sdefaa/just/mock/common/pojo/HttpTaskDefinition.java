@@ -11,6 +11,6 @@ import lombok.Data;
  */
 @Data
 public class HttpTaskDefinition {
-    private String type;
-    private HttpTaskDefinitionContent content;
+  private String type;
+  private HttpTaskDefinitionContent content;
 }

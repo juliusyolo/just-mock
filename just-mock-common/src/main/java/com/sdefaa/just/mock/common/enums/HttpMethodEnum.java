@@ -8,6 +8,6 @@ package com.sdefaa.just.mock.common.enums;
  * @since 1.0.0
  */
 public enum HttpMethodEnum {
-    GET,
-    POST
+  GET,
+  POST
 }

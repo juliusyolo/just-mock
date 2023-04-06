@@ -13,6 +13,7 @@
         <module>just-mock-dashboard</module>
         <module>just-mock-test</module>
       <module>just-mock-agent-core</module>
+        <module>test</module>
     </modules>
     <properties>
         <java.version>1.8</java.version>

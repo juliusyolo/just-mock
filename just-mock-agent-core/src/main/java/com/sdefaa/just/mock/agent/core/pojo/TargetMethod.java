@@ -15,9 +15,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TargetMethod {
-    private String methodName;
-    private String mark;
-    private String signature;
-    private List<String> annotations;
+  private Method method;
+  private String methodName;
+  private String mark;
+  private String signature;
+  private List<String> annotations;
 
 }
