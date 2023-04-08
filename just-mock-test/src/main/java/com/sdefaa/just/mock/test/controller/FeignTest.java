@@ -18,9 +18,4 @@ public interface FeignTest {
     @GetMapping("/hello")
     Test1 hello(@RequestBody Test1 test1);
 
-    @GetMapping("/hello1/feign")
-    Test1 hello1(@RequestBody Test1 test1);
-
-    @GetMapping("/hello2/feign")
-    Test1 hello2(@RequestBody Test1 test1);
 }

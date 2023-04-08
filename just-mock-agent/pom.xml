@@ -26,6 +26,10 @@
       <artifactId>just-mock-agent-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-all</artifactId>
     </dependency>
@@ -83,6 +87,10 @@
             <relocation>
               <pattern>io.netty</pattern>
               <shadedPattern>com.sdefaa.netty</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.ow2.asm</pattern>
+              <shadedPattern>com.sdefaa.asm</shadedPattern>
             </relocation>
           </relocations>
         </configuration>
