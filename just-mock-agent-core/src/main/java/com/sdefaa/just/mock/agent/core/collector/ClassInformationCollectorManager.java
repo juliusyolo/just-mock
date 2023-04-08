@@ -25,6 +25,6 @@ public class ClassInformationCollectorManager {
         return collector.collect(clazz);
       }
       return null;
-    }).filter(Objects::nonNull).filter(targetClass -> !targetClass.getTargetMethods().isEmpty());
+    }).filter(Objects::nonNull).filter(targetClass -> !targetClass.getClazz().getName().contains("springfox")).filter(targetClass -> !targetClass.getTargetMethods().isEmpty());
   }
 }

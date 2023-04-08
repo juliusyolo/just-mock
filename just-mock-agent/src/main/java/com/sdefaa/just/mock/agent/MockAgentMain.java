@@ -7,7 +7,9 @@ import com.sdefaa.just.mock.agent.core.pojo.TargetClass;
 import com.sdefaa.just.mock.agent.core.utils.CollectorUtils;
 import com.sdefaa.just.mock.agent.pojo.AgentConfigProperties;
 import com.sdefaa.just.mock.agent.server.EmbeddedHttpServer;
+import com.sdefaa.just.mock.agent.transformer.MockClassFileASMTransformer;
 import com.sdefaa.just.mock.agent.transformer.MockClassFileTransformer;
+import com.sdefaa.just.mock.agent.transformer.TestMockTransformer;
 import com.sdefaa.just.mock.common.constant.CommonConstant;
 import com.sdefaa.just.mock.common.pojo.*;
 import com.sdefaa.just.mock.common.utils.CommonUtils;
@@ -17,8 +19,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -90,12 +94,20 @@ public class MockAgentMain {
         environmentVariableList = null;
       }
       loadedTargetClasses.forEach(targetClass -> {
-        instrumentation.addTransformer(new MockClassFileTransformer(targetClass, environmentVariableList), true);
+        instrumentation.addTransformer(new MockClassFileASMTransformer(targetClass, environmentVariableList), true);
         try {
-          instrumentation.retransformClasses(targetClass.getClazz());
-        } catch (UnmodifiableClassException e) {
-          logger.info("unmodifiable class exception:" + targetClass.getClazz().getName());
-          throw new RuntimeException(e);
+          logger.info(targetClass.getClazz().getName());
+           instrumentation.retransformClasses(targetClass.getClazz());
+//          ClassDefinition definition = new ClassDefinition(targetClass.getClazz(),new TestMockTransformer().transform(targetClass,environmentVariableList));
+//          instrumentation.redefineClasses(definition);
+//
+////          if (targetClass.getClazz().getClassLoader()!=null){
+////            targetClass.getClazz().getClassLoader().loadClass(targetClass.getClazz().getName());
+////          }
+        } catch (Exception e) {
+          logger.info("EXCEPTION:"+targetClass.getClazz().getName());
+          logger.info("unmodifiable class exception:" + e);
+         // throw new RuntimeException(e);
         }
       });
       if (TRANSFORM_HAS_EXCEPTION.get()) {
