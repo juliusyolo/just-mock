@@ -19,9 +19,9 @@ import java.util.Arrays;
 @RestController
 public class ControllerTest {
     public final static ThreadLocal<Object> threadLocal = ThreadLocal.withInitial(() -> "hello");
-  @Autowired
+    @Autowired
     @Qualifier("com.sdefaa.just.mock.test.controller.FeignTest")
-  FeignTest feignTest;
+    FeignTest feignTest;
     @Autowired
     ObjectMapper objectMapper;
 
@@ -36,19 +36,20 @@ public class ControllerTest {
     @GetMapping("/hello2")
     public Integer say2(@RequestParam("age") String age, @RequestParam("name") String name) throws JsonProcessingException {
 //    com.sdefaa.just.mock.test.controller.ControllerTest.threadLocal.get()
+        Object[] var3 = new Object[]{age, name, threadLocal.get()};
         System.out.println("回调:" + age + "," + name);
         return 1;
     }
 
     @PostMapping("/hello3")
-    public void say3(@RequestParam("age") String age, @RequestParam("name") String name) throws JsonProcessingException {
+    public void say3(@RequestParam("age") double age, @RequestParam("name") String name) throws JsonProcessingException {
 //    com.sdefaa.just.mock.test.controller.ControllerTest.threadLocal.get()
         System.out.println("回调:" + age + "," + name);
     }
 
-//    @GetMapping("/hello2/test")
-    @RequestMapping(value = "/hello2/test",method = RequestMethod.GET)
-    public Test say1(@RequestBody Test test) {
+    //    @GetMapping("/hello2/test")
+    @RequestMapping(value = "/hello2/test", method = RequestMethod.GET)
+    public static Test say1(@RequestBody Test test) {
         return test;
     }
 
@@ -80,21 +81,21 @@ public class ControllerTest {
                     '}';
         }
 
-      public static void main(String[] args) {
-        System.out.println(Object.class.getSuperclass());
-        System.out.println(ControllerTest.class.getSuperclass().getName());
-        System.out.println(ControllerTest.class.getInterfaces().length);
-        String regex = "@org\\.springframework\\.web\\.bind\\.annotation\\.(Post|Get)Mapping.*path=\\[(.*?)\\],.*value=\\[(.*?)\\],.*";
-        String regex1 = "@org\\.springframework\\.web\\.bind\\.annotation\\.RequestMapping.*path=\\[(.*?)\\],.*method=\\[(.*?)\\],.*value=\\[(.*?)\\],.*";
+        public static void main(String[] args) {
+            System.out.println(Object.class.getSuperclass());
+            System.out.println(ControllerTest.class.getSuperclass().getName());
+            System.out.println(ControllerTest.class.getInterfaces().length);
+            String regex = "@org\\.springframework\\.web\\.bind\\.annotation\\.(Post|Get)Mapping.*path=\\[(.*?)\\],.*value=\\[(.*?)\\],.*";
+            String regex1 = "@org\\.springframework\\.web\\.bind\\.annotation\\.RequestMapping.*path=\\[(.*?)\\],.*method=\\[(.*?)\\],.*value=\\[(.*?)\\],.*";
 
-        String s1 = "@org.springframework.web.bind.annotation.GetMapping(headers=[], path=[], produces=[], name=, params=[], value=[/hello1/{pid}/hello], consumes=[])";
-        System.out.println(s1.replaceAll(regex1, "$1"));
-        System.out.println(s1.replaceAll(regex1,"$2"));
-        Arrays.stream(ControllerTest.class.getDeclaredMethods()).flatMap(method -> Arrays.stream(method.getAnnotations())).map(Annotation::toString).forEach(s -> {
-          System.out.println(s.replaceAll(regex,"$1 $2$3"));
-          System.out.println(s.replaceAll(regex1,"$2 $1$3"));
-        });
-      }
+            String s1 = "@org.springframework.web.bind.annotation.GetMapping(headers=[], path=[], produces=[], name=, params=[], value=[/hello1/{pid}/hello], consumes=[])";
+            System.out.println(s1.replaceAll(regex1, "$1"));
+            System.out.println(s1.replaceAll(regex1, "$2"));
+            Arrays.stream(ControllerTest.class.getDeclaredMethods()).flatMap(method -> Arrays.stream(method.getAnnotations())).map(Annotation::toString).forEach(s -> {
+                System.out.println(s.replaceAll(regex, "$1 $2$3"));
+                System.out.println(s.replaceAll(regex1, "$2 $1$3"));
+            });
+        }
     }
 
 }

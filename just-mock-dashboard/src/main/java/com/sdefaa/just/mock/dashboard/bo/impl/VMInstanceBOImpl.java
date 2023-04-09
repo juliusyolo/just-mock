@@ -6,7 +6,6 @@ import com.sdefaa.just.mock.dashboard.enums.ResultStatus;
 import com.sdefaa.just.mock.dashboard.exception.GlobalException;
 import com.sdefaa.just.mock.dashboard.pojo.dto.VMInstanceDTO;
 import com.sdefaa.just.mock.dashboard.pojo.model.VMInstanceAttachInfoModel;
-
 import com.sun.tools.attach.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -54,7 +53,10 @@ public class VMInstanceBOImpl implements VMInstanceBO {
         // 过滤后的已连接的虚拟机实例
         List<VMInstanceDTO> filteredAttachedVMInstanceDTOs = allVMInstanceDTOs.stream()
                 .filter(vmInstanceDTO -> attachedVMInstanceDTOs.stream().anyMatch(attachedVMInstanceDTO -> Objects.equals(vmInstanceDTO.getPid(), attachedVMInstanceDTO.getPid())))
-                .peek(vmInstanceDTO -> {vmInstanceDTO.setAttached(true);vmInstanceDTO.setEnvironmentVariables(attachedVMInstanceDTOs.stream().filter(attachedVMInstance->attachedVMInstance.getPid().equals(vmInstanceDTO.getPid())).findFirst().orElse(new VMInstanceDTO()).getEnvironmentVariables());})
+                .peek(vmInstanceDTO -> {
+                    vmInstanceDTO.setAttached(true);
+                    vmInstanceDTO.setEnvironmentVariables(attachedVMInstanceDTOs.stream().filter(attachedVMInstance -> attachedVMInstance.getPid().equals(vmInstanceDTO.getPid())).findFirst().orElse(new VMInstanceDTO()).getEnvironmentVariables());
+                })
                 .collect(Collectors.toList());
         List<VMInstanceDTO> vmInstanceDTOList = new ArrayList<>();
         vmInstanceDTOList.addAll(unattachedVMInstanceDTOs);

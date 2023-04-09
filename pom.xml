@@ -45,9 +45,9 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-              <groupId>org.ow2.asm</groupId>
-              <artifactId>asm</artifactId>
-              <version>9.5</version>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>9.5</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -60,11 +60,11 @@
                 <artifactId>just-mock-common</artifactId>
                 <version>${just.mock.common.version}</version>
             </dependency>
-          <dependency>
-            <groupId>com.sdefaa</groupId>
-            <artifactId>just-mock-agent-core</artifactId>
-            <version>${just.mock.agent.core.version}</version>
-          </dependency>
+            <dependency>
+                <groupId>com.sdefaa</groupId>
+                <artifactId>just-mock-agent-core</artifactId>
+                <version>${just.mock.agent.core.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
@@ -96,9 +96,9 @@
                 <version>2.13.5</version>
             </dependency>
             <dependency>
-              <groupId>org.mybatis.spring.boot</groupId>
-              <artifactId>mybatis-spring-boot-starter</artifactId>
-              <version>2.3.0</version>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>2.3.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

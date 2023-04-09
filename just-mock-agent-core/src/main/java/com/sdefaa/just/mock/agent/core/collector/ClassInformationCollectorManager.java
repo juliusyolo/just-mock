@@ -14,17 +14,17 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 public class ClassInformationCollectorManager {
-  private static final Logger logger = Logger.getLogger(ClassInformationCollectorManager.class.getName());
+    private static final Logger logger = Logger.getLogger(ClassInformationCollectorManager.class.getName());
 
-  public final static List<AbstractClassInformationCollector> CLASS_INFORMATION_COLLECTOR_LIST = Arrays.asList(new CombineAlternativeClassInformationCollectorImpl());
+    public final static List<AbstractClassInformationCollector> CLASS_INFORMATION_COLLECTOR_LIST = Arrays.asList(new CombineAlternativeClassInformationCollectorImpl());
 
-  public final static Stream<TargetClass> collectTargetClassStream(Class<?> clazz) {
-    return CLASS_INFORMATION_COLLECTOR_LIST.stream().map(collector -> {
-      if (collector.match(clazz)) {
-        logger.info("ClassInformationCollectorManager matched clazz:" + clazz.getName());
-        return collector.collect(clazz);
-      }
-      return null;
-    }).filter(Objects::nonNull).filter(targetClass -> !targetClass.getClazz().getName().contains("springfox")).filter(targetClass -> !targetClass.getTargetMethods().isEmpty());
-  }
+    public final static Stream<TargetClass> collectTargetClassStream(Class<?> clazz) {
+        return CLASS_INFORMATION_COLLECTOR_LIST.stream().map(collector -> {
+            if (collector.match(clazz)) {
+                logger.info("ClassInformationCollectorManager matched clazz:" + clazz.getName());
+                return collector.collect(clazz);
+            }
+            return null;
+        }).filter(Objects::nonNull).filter(targetClass -> !targetClass.getTargetMethods().isEmpty());
+    }
 }

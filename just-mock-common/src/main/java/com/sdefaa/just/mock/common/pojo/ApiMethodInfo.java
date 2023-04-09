@@ -13,9 +13,9 @@ import java.util.List;
  */
 @Data
 public class ApiMethodInfo {
-  private String methodName;
-  private List<String> annotations;
-  private ApiMethodArgInfo output;
-  private List<ApiMethodArgInfo> inputs;
+    private String methodName;
+    private List<String> annotations;
+    private ApiMethodArgInfo output;
+    private List<ApiMethodArgInfo> inputs;
 
 }

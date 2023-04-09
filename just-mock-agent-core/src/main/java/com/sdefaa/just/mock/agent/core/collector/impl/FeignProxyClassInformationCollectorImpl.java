@@ -14,19 +14,19 @@ import java.util.List;
  */
 public class FeignProxyClassInformationCollectorImpl extends AbstractClassInformationCollector {
 
-  @Override
-  public boolean match(Class<?> clazz) {
-   return !clazz.isInterface()
-      && CollectorUtils.isClassAnyAnnotated("org.springframework.cloud.openfeign.FeignClient", clazz.getInterfaces());
-  }
+    @Override
+    public boolean match(Class<?> clazz) {
+        return !clazz.isInterface()
+                && CollectorUtils.isClassAnyAnnotated("org.springframework.cloud.openfeign.FeignClient", clazz.getInterfaces());
+    }
 
-  @Override
-  public TargetClass collect(Class<?> clazz) {
-    TargetClass targetClass = new TargetClass(clazz);
-    List<TargetMethod> targetMethods = CollectorUtils.generateMVCMappingAnnotatedMethodListFromInterfaces(clazz);
-    targetClass.setAnnotations(CollectorUtils.generateAnnotationList(clazz.getInterfaces()));
-    targetClass.setTargetMethods(targetMethods);
-    targetClass.setMark(ClassMarkEnum.FEIGN.name());
-    return targetClass;
-  }
+    @Override
+    public TargetClass collect(Class<?> clazz) {
+        TargetClass targetClass = new TargetClass(clazz);
+        List<TargetMethod> targetMethods = CollectorUtils.generateMVCMappingAnnotatedMethodListFromInterfaces(clazz);
+        targetClass.setAnnotations(CollectorUtils.generateAnnotationList(clazz.getInterfaces()));
+        targetClass.setTargetMethods(targetMethods);
+        targetClass.setMark(ClassMarkEnum.FEIGN.name());
+        return targetClass;
+    }
 }

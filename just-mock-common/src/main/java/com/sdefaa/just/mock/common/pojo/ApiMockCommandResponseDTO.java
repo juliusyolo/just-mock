@@ -8,6 +8,6 @@ import lombok.Data;
  */
 @Data
 public class ApiMockCommandResponseDTO {
-  private String code;
-  private String message;
+    private String code;
+    private String message;
 }

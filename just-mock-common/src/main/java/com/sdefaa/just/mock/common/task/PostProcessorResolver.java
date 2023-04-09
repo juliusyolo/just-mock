@@ -16,23 +16,23 @@ import java.util.Objects;
  */
 public class PostProcessorResolver {
 
-  public final static PostProcessorResolver INSTANCE = new PostProcessorResolver();
+    public final static PostProcessorResolver INSTANCE = new PostProcessorResolver();
 
-  public final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    public final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-  private PostProcessorResolver() {
+    private PostProcessorResolver() {
 
-  }
-
-  public AbstractPostProcessor resolve(String taskDefinition, Map<String, Object> model) {
-    try {
-      TaskDefinition taskDef = OBJECT_MAPPER.readValue(taskDefinition, TaskDefinition.class);
-      if (Objects.equals(TaskTypeEnum.HTTP_TASK.name(), taskDef.getType())) {
-        return new HttpTaskPostProcessor(OBJECT_MAPPER.readValue(taskDefinition, HttpTaskDefinition.class), model);
-      }
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
     }
-    return null;
-  }
+
+    public AbstractPostProcessor resolve(String taskDefinition, Map<String, Object> model) {
+        try {
+            TaskDefinition taskDef = OBJECT_MAPPER.readValue(taskDefinition, TaskDefinition.class);
+            if (Objects.equals(TaskTypeEnum.HTTP_TASK.name(), taskDef.getType())) {
+                return new HttpTaskPostProcessor(OBJECT_MAPPER.readValue(taskDefinition, HttpTaskDefinition.class), model);
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 }

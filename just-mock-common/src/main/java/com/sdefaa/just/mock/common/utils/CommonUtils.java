@@ -18,24 +18,24 @@ import java.util.Map;
  */
 public class CommonUtils {
 
-  private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-  public static String generateClassStruct(Class clazz) {
-    if (clazz.isPrimitive() || Character.class.isAssignableFrom(clazz) || Boolean.class.isAssignableFrom(clazz) || Number.class.isAssignableFrom(clazz) || clazz.isEnum() || clazz == String.class) {
-      return clazz.getName();
+    public static String generateClassStruct(Class clazz) {
+        if (clazz.isPrimitive() || Character.class.isAssignableFrom(clazz) || Boolean.class.isAssignableFrom(clazz) || Number.class.isAssignableFrom(clazz) || clazz.isEnum() || clazz == String.class) {
+            return clazz.getName();
+        }
+        Map<String, String> map = new HashMap<>();
+        Arrays.stream(clazz.getDeclaredFields()).forEach(field -> map.put(field.getName(), generateClassStruct(field.getType())));
+        try {
+            return OBJECT_MAPPER.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            return map.toString();
+        }
     }
-    Map<String, String> map = new HashMap<>();
-    Arrays.stream(clazz.getDeclaredFields()).forEach(field -> map.put(field.getName(), generateClassStruct(field.getType())));
-    try {
-      return OBJECT_MAPPER.writeValueAsString(map);
-    } catch (JsonProcessingException e) {
-      return map.toString();
-    }
-  }
 
-  public static int getAvailablePort() throws IOException {
-    try (ServerSocket socket = new ServerSocket(0)) {
-      return socket.getLocalPort();
+    public static int getAvailablePort() throws IOException {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        }
     }
-  }
 }

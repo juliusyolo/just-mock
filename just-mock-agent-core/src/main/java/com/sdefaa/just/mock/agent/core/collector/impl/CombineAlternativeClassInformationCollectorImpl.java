@@ -13,23 +13,23 @@ import java.util.Objects;
  */
 public class CombineAlternativeClassInformationCollectorImpl extends AbstractClassInformationCollector {
 
-  public final static String FILTERED_CLASS = "org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController";
-  public final static List<AbstractClassInformationCollector> CLASS_INFORMATION_COLLECTOR_LIST = Arrays.asList(new ControllerClassInformationCollectorImpl(), new RestControllerClassInformationCollectorImpl(), new FeignProxyClassInformationCollectorImpl());
+    public final static String FILTERED_CLASS = "org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController";
+    public final static List<AbstractClassInformationCollector> CLASS_INFORMATION_COLLECTOR_LIST = Arrays.asList(new ControllerClassInformationCollectorImpl(), new RestControllerClassInformationCollectorImpl(), new FeignProxyClassInformationCollectorImpl());
 
-  @Override
-  public boolean match(Class<?> clazz) {
-    return CLASS_INFORMATION_COLLECTOR_LIST.stream().anyMatch(collector -> collector.match(clazz));
-  }
-
-  @Override
-  public TargetClass collect(Class<?> clazz) {
-    if (Objects.equals(clazz.getName(), FILTERED_CLASS)) {
-      return null;
+    @Override
+    public boolean match(Class<?> clazz) {
+        return CLASS_INFORMATION_COLLECTOR_LIST.stream().anyMatch(collector -> collector.match(clazz));
     }
-    return CLASS_INFORMATION_COLLECTOR_LIST.stream()
-      .filter(collector -> collector.match(clazz))
-      .findFirst()
-      .map(collector -> collector.collect(clazz))
-      .orElse(null);
-  }
+
+    @Override
+    public TargetClass collect(Class<?> clazz) {
+        if (Objects.equals(clazz.getName(), FILTERED_CLASS)) {
+            return null;
+        }
+        return CLASS_INFORMATION_COLLECTOR_LIST.stream()
+                .filter(collector -> collector.match(clazz))
+                .findFirst()
+                .map(collector -> collector.collect(clazz))
+                .orElse(null);
+    }
 }

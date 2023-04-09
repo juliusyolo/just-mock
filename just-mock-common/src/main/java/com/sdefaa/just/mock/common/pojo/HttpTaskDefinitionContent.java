@@ -11,10 +11,10 @@ import lombok.Data;
  */
 @Data
 public class HttpTaskDefinitionContent {
-  private String url;
-  private String payload;
-  private String method;
+    private String url;
+    private String payload;
+    private String method;
 
-  private String payloadType;
+    private String payloadType;
 
 }

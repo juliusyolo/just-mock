@@ -11,11 +11,11 @@ import io.netty.handler.codec.http.HttpServerCodec;
  * @since 1.0.0
  */
 public class EmbeddedServerInitializer extends ChannelInitializer<SocketChannel> {
-  @Override
-  protected void initChannel(SocketChannel socketChannel) throws Exception {
-    ChannelPipeline pipeline = socketChannel.pipeline();
-    pipeline.addLast("httpServerCodec", new HttpServerCodec());
-    pipeline.addLast("httpObjectAggregator", new HttpObjectAggregator(1048576));
-    pipeline.addLast("httpServerHandler", new EmbeddedHttpServerHandler());
-  }
+    @Override
+    protected void initChannel(SocketChannel socketChannel) throws Exception {
+        ChannelPipeline pipeline = socketChannel.pipeline();
+        pipeline.addLast("httpServerCodec", new HttpServerCodec());
+        pipeline.addLast("httpObjectAggregator", new HttpObjectAggregator(1048576));
+        pipeline.addLast("httpServerHandler", new EmbeddedHttpServerHandler());
+    }
 }

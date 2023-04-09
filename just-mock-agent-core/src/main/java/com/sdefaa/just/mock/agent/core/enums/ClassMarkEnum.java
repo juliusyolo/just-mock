@@ -5,7 +5,7 @@ package com.sdefaa.just.mock.agent.core.enums;
  * @since 1.0.0
  */
 public enum ClassMarkEnum {
-  FEIGN,
-  REST_CONTROLLER,
-  CONTROLLER
+    FEIGN,
+    REST_CONTROLLER,
+    CONTROLLER
 }

@@ -8,5 +8,5 @@ package com.sdefaa.just.mock.common.enums;
  * @since 1.0.0
  */
 public enum TaskTypeEnum {
-  HTTP_TASK
+    HTTP_TASK
 }

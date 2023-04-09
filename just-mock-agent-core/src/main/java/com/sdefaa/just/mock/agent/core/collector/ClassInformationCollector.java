@@ -8,8 +8,8 @@ import com.sdefaa.just.mock.agent.core.pojo.TargetClass;
  * @since 1.0.0
  */
 public interface ClassInformationCollector {
-  boolean match(Class<?> clazz);
+    boolean match(Class<?> clazz);
 
-  TargetClass collect(Class<?> clazz);
+    TargetClass collect(Class<?> clazz);
 
 }

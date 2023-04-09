@@ -10,18 +10,18 @@ import java.util.List;
  */
 @Data
 public class ApiMockCommandDTO {
-  private String commandType;
-  private String clazzName;
-  private String methodName;
-  private String templateContent;
-  private String el;
+    private String commandType;
+    private String clazzName;
+    private String methodName;
+    private String templateContent;
+    private String el;
 
-  private List<RandomVariable> randomVariables;
+    private List<RandomVariable> randomVariables;
 
-  private List<String> taskDefinitions;
+    private List<String> taskDefinitions;
 
-  public enum CommandType {
-    PUT,
-    REMOVE
-  }
+    public enum CommandType {
+        PUT,
+        REMOVE
+    }
 }

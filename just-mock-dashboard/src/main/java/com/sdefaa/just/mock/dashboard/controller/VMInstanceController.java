@@ -32,8 +32,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class VMInstanceController {
     private final VMInstanceService vmInstanceService;
-@Autowired
+    @Autowired
     ObjectMapper objectMapper;
+
     public VMInstanceController(VMInstanceService vmInstanceService) {
         this.vmInstanceService = vmInstanceService;
     }

@@ -15,28 +15,28 @@ import java.util.logging.Logger;
  * @since 1.0.0
  */
 public class EmbeddedHttpServer {
-  private static final Logger logger = Logger.getLogger(EmbeddedHttpServer.class.getName());
-  private int port;
-  private NioEventLoopGroup bossGroup = new NioEventLoopGroup();
-  private NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+    private static final Logger logger = Logger.getLogger(EmbeddedHttpServer.class.getName());
+    private int port;
+    private NioEventLoopGroup bossGroup = new NioEventLoopGroup();
+    private NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
-  public EmbeddedHttpServer(int port) {
-    this.port = port;
-  }
+    public EmbeddedHttpServer(int port) {
+        this.port = port;
+    }
 
-  public void start() throws InterruptedException {
-    logger.info("start embedded http server");
-    ServerBootstrap serverBootstrap = new ServerBootstrap();
-    serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-      .childHandler(new EmbeddedServerInitializer());
-    ChannelFuture channelFuture = serverBootstrap.bind(this.port).sync();
-    channelFuture.channel().closeFuture().sync();
-  }
+    public void start() throws InterruptedException {
+        logger.info("start embedded http server");
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
+        serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+                .childHandler(new EmbeddedServerInitializer());
+        ChannelFuture channelFuture = serverBootstrap.bind(this.port).sync();
+        channelFuture.channel().closeFuture().sync();
+    }
 
-  public void stop() {
-    logger.info("stop embedded http server");
-    bossGroup.shutdownGracefully();
-    workerGroup.shutdownGracefully();
-  }
+    public void stop() {
+        logger.info("stop embedded http server");
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+    }
 
 }

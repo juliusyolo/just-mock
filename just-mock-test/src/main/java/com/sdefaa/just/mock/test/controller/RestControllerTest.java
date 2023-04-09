@@ -11,8 +11,8 @@ import com.sdefaa.just.mock.test.pojo.Test1;
  */
 public class RestControllerTest implements FeignTest {
 
-  @Override
-  public Test1 hello(Test1 test1) {
-    return test1;
-  }
+    @Override
+    public Test1 hello(Test1 test1) {
+        return test1;
+    }
 }

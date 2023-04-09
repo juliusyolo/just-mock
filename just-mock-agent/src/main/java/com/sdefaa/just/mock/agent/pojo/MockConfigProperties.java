@@ -11,5 +11,5 @@ import lombok.Data;
  */
 @Data
 public class MockConfigProperties {
-  private AgentConfigProperties agent;
+    private AgentConfigProperties agent;
 }

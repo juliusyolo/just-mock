@@ -11,6 +11,6 @@ import lombok.Data;
  */
 @Data
 public class ApiMethodArgInfo {
-  private String type;
-  private String jsonStruct;
+    private String type;
+    private String jsonStruct;
 }

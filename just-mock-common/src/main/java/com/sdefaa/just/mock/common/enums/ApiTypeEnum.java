@@ -8,12 +8,12 @@ package com.sdefaa.just.mock.common.enums;
  * @since 1.0.0
  */
 public enum ApiTypeEnum {
-  /**
-   * Feign调用API
-   */
-  FEIGN,
-  /**
-   * 普通API
-   */
-  CONTROLLER
+    /**
+     * Feign调用API
+     */
+    FEIGN,
+    /**
+     * 普通API
+     */
+    CONTROLLER
 }
