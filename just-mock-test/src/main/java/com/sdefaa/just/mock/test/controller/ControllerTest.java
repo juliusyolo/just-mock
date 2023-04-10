@@ -50,7 +50,12 @@ public class ControllerTest {
     //    @GetMapping("/hello2/test")
     @RequestMapping(value = "/hello2/test", method = RequestMethod.GET)
     public static Test say1(@RequestBody Test test) {
+
+      try {
         return test;
+      }catch (Exception e){
+        return null;
+      }
     }
 
     public static class Test {

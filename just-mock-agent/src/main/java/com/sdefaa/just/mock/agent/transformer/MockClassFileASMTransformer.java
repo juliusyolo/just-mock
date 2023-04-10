@@ -92,7 +92,9 @@ public class MockClassFileASMTransformer implements ClassFileTransformer {
         private final String methodDescriptor;
         private final List<String> environmentVariableList;
 
-
+      Label startTry;
+      Label endTry;
+      Label handler;
         public MockMethodVisitor(int api, MethodVisitor methodVisitor, String targetClassName, String methodName, boolean isMethodStatic, String methodDescriptor, List<String> environmentVariableList) {
             super(api, methodVisitor);
             this.targetClassName = targetClassName;
@@ -132,13 +134,18 @@ public class MockClassFileASMTransformer implements ClassFileTransformer {
                 visitInsn(Opcodes.AASTORE);
                 index += 1;
             }
-            Label label = new Label();
+             startTry = new Label();
+             endTry = new Label();
+             handler = new Label();
+            Label ifLabel = new Label();
             Type returnType = Type.getReturnType(methodDescriptor);
+            visitTryCatchBlock(startTry, endTry, handler, "java/lang/Exception");
+            visitLabel(startTry);
             visitLdcInsn(this.targetClassName);
             visitLdcInsn(this.methodName);
             visitVarInsn(Opcodes.ALOAD, argumentCount);
             visitMethodInsn(Opcodes.INVOKESTATIC, "com/sdefaa/just/mock/common/strategy/MockManager", "shouldMock", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;)Z", false);
-            visitJumpInsn(Opcodes.IFEQ, label);
+            visitJumpInsn(Opcodes.IFEQ, ifLabel);
             visitLdcInsn(this.targetClassName);
             visitLdcInsn(this.methodName);
             visitLdcInsn(returnType);
@@ -170,7 +177,9 @@ public class MockClassFileASMTransformer implements ClassFileTransformer {
                     visitInsn(Opcodes.ARETURN);
                     break;
             }
-            visitLabel(label);
+            visitLabel(ifLabel);
+            visitLabel(endTry);
+            visitLabel(handler);
         }
     }
 }
