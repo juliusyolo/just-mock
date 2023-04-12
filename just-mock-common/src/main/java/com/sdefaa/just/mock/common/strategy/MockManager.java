@@ -35,6 +35,8 @@ public class MockManager {
 
     public boolean shouldMock(String clazzName, String methodName, Object[] parameters) {
         List<RandomVariable> randomVariables = MOCK_RANDOM_VARIABLE_MAP.get(clazzName + SPLIT + methodName);
+        System.out.println("mock"+clazzName+methodName);
+        System.out.println(this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(randomVariables, parameters));
         return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(randomVariables, parameters);
     }
 
@@ -65,7 +67,7 @@ public class MockManager {
         List<RandomVariable> randomVariables = MOCK_RANDOM_VARIABLE_MAP.get(clazzName + SPLIT + methodName);
         List<String> taskDefinitions = MOCK_TASK_DEFINITION_POST_PROCESSOR_MAP.get(clazzName + SPLIT + methodName);
         System.out.println(clazzName+methodName);
-
+        System.out.println(this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz, taskDefinitions, randomVariables, parameters));
         return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz, taskDefinitions, randomVariables, parameters);
     }
 }

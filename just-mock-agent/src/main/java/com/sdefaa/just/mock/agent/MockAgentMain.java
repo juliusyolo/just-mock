@@ -85,9 +85,9 @@ public class MockAgentMain {
             } else {
                 environmentVariableList = null;
             }
-            List<MockClassFileASMTransformer> mockClassFileTransformers = new ArrayList<>();
+            List<MockClassFileTransformer> mockClassFileTransformers = new ArrayList<>();
             loadedTargetClasses.forEach(targetClass -> {
-              MockClassFileASMTransformer mockClassFileTransformer = new MockClassFileASMTransformer(targetClass, environmentVariableList);
+                MockClassFileTransformer mockClassFileTransformer = new MockClassFileTransformer(targetClass, environmentVariableList);
               mockClassFileTransformers.add(mockClassFileTransformer);
               instrumentation.addTransformer(mockClassFileTransformer, true);
                 try {

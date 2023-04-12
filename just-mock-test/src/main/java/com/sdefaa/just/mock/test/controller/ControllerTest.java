@@ -16,7 +16,7 @@ import java.util.Arrays;
  * <p>
  * @since 1.0.0
  */
-//@RestController
+@RestController
 public class ControllerTest {
     public final static ThreadLocal<Object> threadLocal = ThreadLocal.withInitial(() -> "hello");
     @Autowired

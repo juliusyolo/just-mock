@@ -39,6 +39,7 @@ public abstract class AbstractMockStrategy implements MockStrategy {
 
     @Override
     public Object mock(Class<?> returnClass, List<String> taskDefinitions, List<RandomVariable> randomVariables, Object[] parameters) {
+        System.out.println("1");
         Map<String, Object> modelMap = new HashMap<>();
         if (Objects.nonNull(parameters)) {
             for (int i = 0; i < parameters.length; i++) {
@@ -52,6 +53,7 @@ public abstract class AbstractMockStrategy implements MockStrategy {
                 modelMap.put(randomVariable.getName(), seq[random]);
             }
         }
+        System.out.println("2");
         String str;
         try (StringWriter writer = new StringWriter();) {
             template.process(modelMap, writer);
@@ -60,6 +62,7 @@ public abstract class AbstractMockStrategy implements MockStrategy {
             logger.info("模板引擎处理异常，Mock失效," + e);
             throw new RuntimeException(e);
         }
+        System.out.println("3");
         Object result;
         try {
             if (returnClass == boolean.class || returnClass == Boolean.class) {
@@ -94,6 +97,7 @@ public abstract class AbstractMockStrategy implements MockStrategy {
             logger.info("无法将Mock内容转换成对应简单响应实体，Mock失效," + e);
             throw new RuntimeException(e);
         }
+        System.out.println("4");
         List<AbstractPostProcessor> postProcessors = Optional.ofNullable(taskDefinitions).map(taskDefinitionList -> taskDefinitionList.stream().map(taskDefinition -> PostProcessorResolver.INSTANCE.resolve(taskDefinition, modelMap)).filter(Objects::nonNull).collect(Collectors.toList())).orElse(null);
         Optional.ofNullable(postProcessors).ifPresent(postProcessorList -> postProcessorList.forEach(CompletableFuture::runAsync));
         return result;

@@ -113,7 +113,7 @@ CREATE TABLE `vm_instance_mock_info`
     `class_annotations_desc`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL COMMENT '类注解',
     `method_annotations_desc` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL COMMENT '方法注解',
     `api_method`              varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT 'API 方法',
-    `api_url`                 varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT 'API URL',
+    `api_url`                 varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT 'API URL',
     `api_type`                varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT 'API类型',
     `mock_enable`             tinyint(1) NULL DEFAULT NULL COMMENT '是否开启mock',
     `mock_template_id`        bigint UNSIGNED NULL DEFAULT NULL COMMENT '模板编号',
