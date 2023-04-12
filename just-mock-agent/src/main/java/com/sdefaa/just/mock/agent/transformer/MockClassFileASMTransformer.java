@@ -1,5 +1,6 @@
 package com.sdefaa.just.mock.agent.transformer;
 
+import com.sdefaa.just.mock.agent.MockAgentMain;
 import com.sdefaa.just.mock.agent.config.JustMockAgentConfigLoader;
 import com.sdefaa.just.mock.agent.core.pojo.TargetClass;
 import com.sdefaa.just.mock.agent.core.pojo.TargetMethod;
@@ -61,6 +62,7 @@ public class MockClassFileASMTransformer implements ClassFileTransformer {
                 }
                 return classWriter.toByteArray();
             } catch (Throwable e) {
+                MockAgentMain.TRANSFORM_FILED_CLASS.add(targetClass);
                 e.printStackTrace();
             }
 
@@ -94,7 +96,8 @@ public class MockClassFileASMTransformer implements ClassFileTransformer {
 
       Label startTry;
       Label endTry;
-      Label handler;
+      Label catchStart;
+      Label catchEnd;
         public MockMethodVisitor(int api, MethodVisitor methodVisitor, String targetClassName, String methodName, boolean isMethodStatic, String methodDescriptor, List<String> environmentVariableList) {
             super(api, methodVisitor);
             this.targetClassName = targetClassName;
@@ -107,7 +110,6 @@ public class MockClassFileASMTransformer implements ClassFileTransformer {
 
         @Override
         public void visitCode() {
-            super.visitCode();
             Type[] parameterTypes = Type.getArgumentTypes(methodDescriptor);
             int sizeSum = Arrays.stream(parameterTypes).mapToInt(Type::getSize).sum();
             int argumentCount = isMethodStatic ? sizeSum : sizeSum + 1;
@@ -134,12 +136,13 @@ public class MockClassFileASMTransformer implements ClassFileTransformer {
                 visitInsn(Opcodes.AASTORE);
                 index += 1;
             }
-             startTry = new Label();
-             endTry = new Label();
-             handler = new Label();
+            startTry = new Label();
+            endTry = new Label();
+            catchStart = new Label();
+            catchEnd = new Label();
             Label ifLabel = new Label();
             Type returnType = Type.getReturnType(methodDescriptor);
-            visitTryCatchBlock(startTry, endTry, handler, "java/lang/Exception");
+            visitTryCatchBlock(startTry, endTry, catchStart, "java/lang/Exception");
             visitLabel(startTry);
             visitLdcInsn(this.targetClassName);
             visitLdcInsn(this.methodName);
@@ -155,31 +158,48 @@ public class MockClassFileASMTransformer implements ClassFileTransformer {
             switch (returnTypeSort) {
                 case Type.VOID:
                     visitInsn(Opcodes.RETURN);
+                    visitLabel(endTry);
                     break;
                 case Type.BOOLEAN:
                 case Type.CHAR:
                 case Type.BYTE:
                 case Type.SHORT:
                 case Type.INT:
+                    visitLabel(endTry);
                     visitInsn(Opcodes.IRETURN);
                     break;
                 case Type.FLOAT:
+                    visitLabel(endTry);
                     visitInsn(Opcodes.FRETURN);
                     break;
                 case Type.LONG:
+                    visitLabel(endTry);
                     visitInsn(Opcodes.LRETURN);
                     break;
                 case Type.DOUBLE:
+                    visitLabel(endTry);
                     visitInsn(Opcodes.DRETURN);
                     break;
                 default:
                     visitTypeInsn(Opcodes.CHECKCAST, returnType.getInternalName());
+                    visitLabel(endTry);
                     visitInsn(Opcodes.ARETURN);
                     break;
             }
+            visitFrame(Opcodes.F_NEW, 0, null, 0, null);
             visitLabel(ifLabel);
-            visitLabel(endTry);
-            visitLabel(handler);
+            visitJumpInsn(Opcodes.GOTO,catchEnd);
+            visitLabel(catchStart);
+            visitFrame(Opcodes.F_NEW, 0, null, 1, new Object[] {"java/lang/Exception"});
+            visitVarInsn(Opcodes.ASTORE, offset);
+            visitLabel(catchEnd);
+            visitFrame(Opcodes.F_NEW, 0, null, 0, null);
+            super.visitCode();
         }
+
+      @Override
+      public void visitMaxs(int maxStack, int maxLocals) {
+        super.visitMaxs(maxStack+2, maxLocals+1);
+      }
     }
 }

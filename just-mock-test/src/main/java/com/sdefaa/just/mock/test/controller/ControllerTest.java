@@ -16,7 +16,7 @@ import java.util.Arrays;
  * <p>
  * @since 1.0.0
  */
-@RestController
+//@RestController
 public class ControllerTest {
     public final static ThreadLocal<Object> threadLocal = ThreadLocal.withInitial(() -> "hello");
     @Autowired
@@ -42,20 +42,21 @@ public class ControllerTest {
     }
 
     @PostMapping("/hello3")
-    public void say3(@RequestParam("age") double age, @RequestParam("name") String name) throws JsonProcessingException {
+    public void say3(@RequestParam("age") Double age, @RequestParam("name") String name) throws JsonProcessingException {
 //    com.sdefaa.just.mock.test.controller.ControllerTest.threadLocal.get()
         System.out.println("回调:" + age + "," + name);
     }
 
     //    @GetMapping("/hello2/test")
     @RequestMapping(value = "/hello2/test", method = RequestMethod.GET)
-    public static Test say1(@RequestBody Test test) {
+    public Test say1(@RequestBody Test test) {
 
       try {
-        return test;
-      }catch (Exception e){
         return null;
+      }catch (Exception e){
+
       }
+      return test;
     }
 
     public static class Test {

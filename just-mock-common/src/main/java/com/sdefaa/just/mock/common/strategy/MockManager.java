@@ -64,6 +64,8 @@ public class MockManager {
     public Object doMock(String clazzName, String methodName, Class<?> returnClazz, Object[] parameters) {
         List<RandomVariable> randomVariables = MOCK_RANDOM_VARIABLE_MAP.get(clazzName + SPLIT + methodName);
         List<String> taskDefinitions = MOCK_TASK_DEFINITION_POST_PROCESSOR_MAP.get(clazzName + SPLIT + methodName);
+        System.out.println(clazzName+methodName);
+
         return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz, taskDefinitions, randomVariables, parameters);
     }
 }

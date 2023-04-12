@@ -1,5 +1,6 @@
 package com.sdefaa.just.mock.agent.transformer;
 
+import com.sdefaa.just.mock.agent.MockAgentMain;
 import com.sdefaa.just.mock.agent.config.JustMockAgentConfigLoader;
 import com.sdefaa.just.mock.agent.core.pojo.TargetClass;
 import com.sdefaa.just.mock.agent.core.pojo.TargetMethod;
@@ -34,9 +35,8 @@ public class MockClassFileTransformer implements ClassFileTransformer {
         this.environmentVariableList = environmentVariableList;
     }
 
-
     @Override
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
         String targetClassName = this.targetClass.getClazz().getName();
         if (className.equals(targetClassName.replace('.', '/'))) {
             CtClass ctClass = null;
@@ -46,7 +46,6 @@ public class MockClassFileTransformer implements ClassFileTransformer {
                 ctClass = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
                 for (TargetMethod targetMethod : this.targetClass.getTargetMethods()) {
                     CtMethod ctMethod = ctClass.getDeclaredMethod(targetMethod.getMethodName());
-                    logger.info(ctMethod.getReturnType().getName());
                     boolean isVoidReturnType = Objects.equals(ctMethod.getReturnType().getName(), "void");
                     CtClass[] parameterTypes = ctMethod.getParameterTypes();
                     StringBuilder parameters = new StringBuilder();
@@ -95,10 +94,8 @@ public class MockClassFileTransformer implements ClassFileTransformer {
                 }
                 return byteCode;
             } catch (Throwable e) {
-                logger.info(e.toString());
-                // MockAgentMain.TRANSFORM_HAS_EXCEPTION.compareAndSet(false, true);
-                logger.info("目标类的方法修改异常," + e);
-                throw new IllegalClassFormatException("目标类的方法修改异常" + e);
+                MockAgentMain.TRANSFORM_FILED_CLASS.add(targetClass);
+                logger.info("目标类的方法修改异常,类名:"+targetClassName+",异常:" + e);
             }
         }
         return null;

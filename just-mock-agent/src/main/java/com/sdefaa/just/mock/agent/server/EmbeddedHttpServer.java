@@ -5,6 +5,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 /**
@@ -17,6 +18,7 @@ import java.util.logging.Logger;
 public class EmbeddedHttpServer {
     private static final Logger logger = Logger.getLogger(EmbeddedHttpServer.class.getName());
     private int port;
+    private AtomicBoolean isStopped = new AtomicBoolean(false);
     private NioEventLoopGroup bossGroup = new NioEventLoopGroup();
     private NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -34,9 +36,11 @@ public class EmbeddedHttpServer {
     }
 
     public void stop() {
-        logger.info("stop embedded http server");
-        bossGroup.shutdownGracefully();
-        workerGroup.shutdownGracefully();
+        if (isStopped.compareAndSet(false,true)){
+          logger.info("stop embedded http server");
+          bossGroup.shutdownGracefully();
+          workerGroup.shutdownGracefully();
+        }
     }
 
 }

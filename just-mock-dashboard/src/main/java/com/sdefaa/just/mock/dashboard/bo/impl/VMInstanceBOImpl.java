@@ -73,14 +73,14 @@ public class VMInstanceBOImpl implements VMInstanceBO {
             throw new GlobalException(ResultStatus.VM_NOT_EXISTED);
         }
         VirtualMachineDescriptor virtualMachineDescriptor = vmDescriptor.get();
+        VirtualMachine vm = null;
         try {
-            VirtualMachine vm = VirtualMachine.attach(virtualMachineDescriptor);
+            vm = VirtualMachine.attach(virtualMachineDescriptor);
             if (Objects.nonNull(environmentVariables)) {
                 vm.loadAgent(mockAgentPath, mockConfigPath.concat(" ").concat(pid).concat(" ").concat(environmentVariables));
             } else {
                 vm.loadAgent(mockAgentPath, mockConfigPath.concat(" ").concat(pid));
             }
-            vm.detach();
         } catch (AttachNotSupportedException e) {
             throw new GlobalException(ResultStatus.ATTACH_NOT_SUPPORTED_EXCEPTION, e);
         } catch (AgentLoadException e) {
@@ -89,6 +89,14 @@ public class VMInstanceBOImpl implements VMInstanceBO {
             throw new GlobalException(ResultStatus.AGENT_INITIALIZATION_EXCEPTION, e);
         } catch (IOException e) {
             throw new GlobalException(ResultStatus.IO_EXCEPTION, e);
+        }finally {
+          if (Objects.nonNull(vm)){
+            try {
+              vm.detach();
+            } catch (IOException e) {
+              throw new GlobalException(ResultStatus.IO_EXCEPTION, e);
+            }
+          }
         }
         VMInstanceDTO vmInstanceDTO = new VMInstanceDTO();
         vmInstanceDTO.setName(virtualMachineDescriptor.displayName());

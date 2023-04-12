@@ -4,13 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdefaa.just.mock.agent.config.JustMockAgentConfigLoader;
 import com.sdefaa.just.mock.agent.core.collector.ClassInformationCollectorManager;
 import com.sdefaa.just.mock.agent.core.pojo.TargetClass;
-import com.sdefaa.just.mock.agent.core.utils.CollectorUtils;
 import com.sdefaa.just.mock.agent.pojo.AgentConfigProperties;
 import com.sdefaa.just.mock.agent.server.EmbeddedHttpServer;
 import com.sdefaa.just.mock.agent.transformer.MockClassFileASMTransformer;
+import com.sdefaa.just.mock.agent.transformer.MockClassFileTransformer;
 import com.sdefaa.just.mock.common.constant.CommonConstant;
 import com.sdefaa.just.mock.common.pojo.*;
 import com.sdefaa.just.mock.common.utils.CommonUtils;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,7 +25,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,7 +44,7 @@ public class MockAgentMain {
     private static final Logger logger = Logger.getLogger(MockAgentMain.class.getName());
     private static final AtomicBoolean LOADED = new AtomicBoolean(false);
 
-    public static final AtomicBoolean TRANSFORM_HAS_EXCEPTION = new AtomicBoolean(false);
+    public static final List<TargetClass> TRANSFORM_FILED_CLASS = new CopyOnWriteArrayList<>();
 
     private static final String WHITE_SPACE = " ";
 
@@ -52,32 +55,27 @@ public class MockAgentMain {
         if (LOADED.compareAndSet(false, true)) {
             String[] argvs = args.split(WHITE_SPACE);
             int availablePort = CommonUtils.getAvailablePort();
+            logger.info(availablePort+"");
             // 启动内嵌HttpServer，用于心跳检测和注册Mock拦截
             EmbeddedHttpServer server = new EmbeddedHttpServer(availablePort);
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            CompletableFuture.runAsync(() -> {
                 try {
                     server.start();
                 } catch (InterruptedException e) {
-                    logger.info("interrupted");
                     server.stop();
                 }
             });
             // 添加虚拟机shutdownHook
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                future.cancel(true);
                 server.stop();
             }));
             AgentConfigProperties agentConfigProperties = JustMockAgentConfigLoader.INSTANCE.load(argvs[0]).agentConfigProperties();
             Class[] allLoadedClasses = instrumentation.getAllLoadedClasses();
-            Arrays.stream(allLoadedClasses).filter(aClass -> aClass.getName().contains("RiskDispatchController")).findFirst().ifPresent(aClass -> {
-                logger.info(aClass.getName());
-                CollectorUtils.generateAnnotationList(aClass).forEach(logger::info);
-                logger.info(aClass.getSuperclass().getName());
-                CollectorUtils.generateAnnotationList(aClass.getSuperclass()).forEach(logger::info);
-                CollectorUtils.generateAnnotationList(aClass.getInterfaces()).forEach(logger::info);
-            });
             List<TargetClass> loadedTargetClasses = Arrays.stream(allLoadedClasses).flatMap(ClassInformationCollectorManager::collectTargetClassStream).collect(Collectors.toList());
-            logger.info("Loaded Target Classes:" + loadedTargetClasses);
+            Boolean debug = agentConfigProperties.getDebug();
+            if (debug){
+              logger.info("Loaded Target Classes:" + loadedTargetClasses);
+            }
             List<String> environmentVariableList;
             if (argvs.length > 2) {
                 environmentVariableList = new ArrayList<>();
@@ -87,20 +85,23 @@ public class MockAgentMain {
             } else {
                 environmentVariableList = null;
             }
+            List<MockClassFileASMTransformer> mockClassFileTransformers = new ArrayList<>();
             loadedTargetClasses.forEach(targetClass -> {
-                instrumentation.addTransformer(new MockClassFileASMTransformer(targetClass, environmentVariableList), true);
+              MockClassFileASMTransformer mockClassFileTransformer = new MockClassFileASMTransformer(targetClass, environmentVariableList);
+              mockClassFileTransformers.add(mockClassFileTransformer);
+              instrumentation.addTransformer(mockClassFileTransformer, true);
                 try {
-                    logger.info(targetClass.getClazz().getName());
+                    if (debug) {
+                      logger.info("ReTransform Class:" + targetClass.getClazz().getName());
+                    }
                     instrumentation.retransformClasses(targetClass.getClazz());
                 } catch (Exception e) {
-                    logger.info("unmodifiable class exception:" + e);
-                    throw new RuntimeException(e);
+                    logger.info("ReTransform class occur exception," + ",className:"+ targetClass.getClazz().getName()+",exception:" +e);
+                    TRANSFORM_FILED_CLASS.add(targetClass);
                 }
             });
-            if (TRANSFORM_HAS_EXCEPTION.get()) {
-                throw new RuntimeException("目标类转换存在异常");
-            }
             List<ApiInfo> apiInfoList = loadedTargetClasses.stream()
+                    .filter(targetClass -> !TRANSFORM_FILED_CLASS.contains(targetClass))
                     .flatMap(MockAgentMain::generateApiInfoFromTargetClass)
                     .collect(Collectors.toList());
             ApiRegistryDTO apiRegistryDTO = new ApiRegistryDTO();
@@ -108,14 +109,13 @@ public class MockAgentMain {
             apiRegistryDTO.setPid(argvs[1]);
             apiRegistryDTO.setPort(availablePort);
             //  Upload apiInfoList
-            logger.info(apiRegistryDTO.toString());
             registry(agentConfigProperties.getRegistryUrl(), apiRegistryDTO);
         }
     }
 
     public static void registry(String url, ApiRegistryDTO apiRegistryDTO) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(objectMapper.writeValueAsString(apiRegistryDTO));
+        logger.info("registry api infos:" + objectMapper.writeValueAsString(apiRegistryDTO));
         byte[] bytes = objectMapper.writeValueAsBytes(apiRegistryDTO);
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
