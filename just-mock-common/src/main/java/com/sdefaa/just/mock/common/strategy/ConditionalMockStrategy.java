@@ -45,6 +45,7 @@ public class ConditionalMockStrategy extends AbstractMockStrategy {
             ValueExpression valueExpression = factory.createValueExpression(elContext, el, Boolean.class);
             return (boolean) valueExpression.getValue(elContext);
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 

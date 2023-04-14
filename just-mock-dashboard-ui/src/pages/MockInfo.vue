@@ -33,7 +33,8 @@ export default defineComponent({
     let intervalId: any = null;
     const columns = [{
       title: '接口类型',
-      slotName: 'apiType'
+      slotName: 'apiType',
+      width: 150
     }, {
       title: '接口',
       slotName: 'apiUrl',
@@ -41,11 +42,13 @@ export default defineComponent({
       tooltip: true
     }, {
       title: '是否开启Mock',
-      slotName: 'mockEnable'
+      slotName: 'mockEnable',
+      width:150
     },
       {
         title: '操作',
         slotName: 'optional',
+        width: 280
       }];
     const queryRegisteredApiList = () => {
       loading.value = true

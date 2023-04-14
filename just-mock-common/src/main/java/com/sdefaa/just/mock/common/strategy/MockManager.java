@@ -35,8 +35,6 @@ public class MockManager {
 
     public boolean shouldMock(String clazzName, String methodName, Object[] parameters) {
         List<RandomVariable> randomVariables = MOCK_RANDOM_VARIABLE_MAP.get(clazzName + SPLIT + methodName);
-        System.out.println("mock"+clazzName+methodName);
-        System.out.println(this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(randomVariables, parameters));
         return this.MOCK_STRATEGY_MAP.containsKey(clazzName + SPLIT + methodName) && this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).canMock(randomVariables, parameters);
     }
 
@@ -51,6 +49,8 @@ public class MockManager {
             abstractMockStrategy = new DefaultMockStrategy(template);
         }
         this.MOCK_STRATEGY_MAP.put(clazzName + SPLIT + methodName, abstractMockStrategy);
+        this.MOCK_RANDOM_VARIABLE_MAP.remove(clazzName + SPLIT + methodName);
+        this.MOCK_TASK_DEFINITION_POST_PROCESSOR_MAP.remove(clazzName + SPLIT + methodName);
         Optional.ofNullable(taskDefinitions).ifPresent(t -> this.MOCK_TASK_DEFINITION_POST_PROCESSOR_MAP.put(clazzName + SPLIT + methodName, t));
         Optional.ofNullable(randomVariables).ifPresent(r -> this.MOCK_RANDOM_VARIABLE_MAP.put(clazzName + SPLIT + methodName, r));
     }
@@ -66,8 +66,6 @@ public class MockManager {
     public Object doMock(String clazzName, String methodName, Class<?> returnClazz, Object[] parameters) {
         List<RandomVariable> randomVariables = MOCK_RANDOM_VARIABLE_MAP.get(clazzName + SPLIT + methodName);
         List<String> taskDefinitions = MOCK_TASK_DEFINITION_POST_PROCESSOR_MAP.get(clazzName + SPLIT + methodName);
-        System.out.println(clazzName+methodName);
-        System.out.println(this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz, taskDefinitions, randomVariables, parameters));
         return this.MOCK_STRATEGY_MAP.get(clazzName + SPLIT + methodName).mock(returnClazz, taskDefinitions, randomVariables, parameters);
     }
 }

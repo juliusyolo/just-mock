@@ -49,25 +49,18 @@ public class MockClassFileTransformer implements ClassFileTransformer {
                     boolean isVoidReturnType = Objects.equals(ctMethod.getReturnType().getName(), "void");
                     CtClass[] parameterTypes = ctMethod.getParameterTypes();
                     StringBuilder parameters = new StringBuilder();
-                    if (parameterTypes.length > 0) {
-                        parameters.append(",new Object[]{");
-                        if (Objects.isNull(environmentVariableList) || environmentVariableList.isEmpty()) {
-                            for (int i = 1; i < parameterTypes.length; i++) {
-                                parameters.append("(Object)$" + i + ",");
-                            }
-                            parameters.append("(Object)$" + parameterTypes.length);
-                        } else {
-                            for (int i = 1; i < parameterTypes.length + 1; i++) {
-                                parameters.append("(Object)$" + i + ",");
-                            }
-                            for (int i = 0; i < environmentVariableList.size() - 1; i++) {
-                                parameters.append("(Object)" + environmentVariableList.get(i) + ",");
-                            }
-                            parameters.append("(Object)" + environmentVariableList.get(environmentVariableList.size() - 1));
-                        }
-                        parameters.append("}");
-                    } else {
+                    String parameterSequence = generateParameterSequence(parameterTypes);
+                    String environmentVariableSequence = generateEnvironmentVariableSequence(environmentVariableList);
+                    if (Objects.isNull(parameterSequence) || Objects.isNull(environmentVariableSequence)){
+                      if (Objects.isNull(parameterSequence) && Objects.isNull(environmentVariableSequence)){
                         parameters.append(",null");
+                      }else if (Objects.isNull(parameterSequence)){
+                        parameters.append(",new Object[]{").append(environmentVariableSequence).append("}");
+                      }else {
+                        parameters.append(",new Object[]{").append(parameterSequence).append("}");
+                      }
+                    }else {
+                      parameters.append(",new Object[]{").append(parameterSequence).append(",").append(environmentVariableSequence).append("}");
                     }
                     StringBuilder sb = new StringBuilder();
                     sb.append("try{");
@@ -75,9 +68,9 @@ public class MockClassFileTransformer implements ClassFileTransformer {
                     sb.append(parameters);
                     sb.append(")){");
                     if (isVoidReturnType) {
-                        sb.append("com.sdefaa.just.mock.common.strategy.MockManager.INSTANCE.doMock(\"" + targetClassName + "\",\"" + targetMethod.getMethodName() + "\",$type");
+                        sb.append("com.sdefaa.just.mock.common.strategy.MockManager.INSTANCE.doMock(\"" + targetClassName + "\",\"" + targetMethod.getMethodName() + "\",java.lang.Class.forName(\""+generateReturnTypeName(ctMethod.getReturnType())+"\")");
                     } else {
-                        sb.append("return (" + ctMethod.getReturnType().getName() + ")com.sdefaa.just.mock.common.strategy.MockManager.INSTANCE.doMock(\"" + targetClassName + "\",\"" + targetMethod.getMethodName() + "\",$type");
+                        sb.append("return (" + ctMethod.getReturnType().getName() + ")com.sdefaa.just.mock.common.strategy.MockManager.INSTANCE.doMock(\"" + targetClassName + "\",\"" + targetMethod.getMethodName() + "\",java.lang.Class.forName(\""+generateReturnTypeName(ctMethod.getReturnType())+"\")");
                     }
                     sb.append(parameters);
                     sb.append(");");
@@ -89,8 +82,7 @@ public class MockClassFileTransformer implements ClassFileTransformer {
                 ctClass.detach();
                 Boolean debug = JustMockAgentConfigLoader.INSTANCE.agentConfigProperties().getDebug();
                 if (debug) {
-                    Path byteCodePath = Paths.get(targetClassName + ".class");
-                    Files.write(byteCodePath, byteCode);
+                  CtClass.debugDump = "./dump";
                 }
                 return byteCode;
             } catch (Throwable e) {
@@ -101,4 +93,63 @@ public class MockClassFileTransformer implements ClassFileTransformer {
         return null;
     }
 
+    public String generateParameterSequence(CtClass[] parameterTypes){
+      StringBuilder sequences = new StringBuilder();
+      if (parameterTypes.length > 0) {
+        for (int i = 0; i < parameterTypes.length; i++) {
+          if (parameterTypes[i].isPrimitive()){
+            sequences.append(wrapPrimitiveType(parameterTypes[i],i+1));
+          }else {
+            sequences.append("(Object)$" + (i+1) + ",");
+          }
+        }
+        return sequences.substring(0, sequences.length()-1);
+      }
+      return null;
+    }
+
+    public String wrapPrimitiveType(CtClass ctClass,int index){
+      String className = ctClass.getName();
+      String result;
+      switch (className){
+        case "int": result = "(Object)Integer.valueOf($"+index+"),";break;
+        case "short": result = "(Object)Short.valueOf($"+index+"),";break;
+        case "long": result = "(Object)Long.valueOf($"+index+"),";break;
+        case "double": result = "(Object)Double.valueOf($"+index+"),";break;
+        case "float": result = "(Object)Float.valueOf($"+index+"),";break;
+        case "byte": result = "(Object)Byte.valueOf($"+index+"),";break;
+        case "char": result = "(Object)Character.valueOf($"+index+"),";break;
+        default: result = "(Object)Boolean.valueOf($"+index+"),";
+      }
+      return result;
+    }
+
+    public String generateEnvironmentVariableSequence(List<String> environmentVariableList){
+      StringBuilder sequences = new StringBuilder();
+      if (Objects.nonNull(environmentVariableList) && !environmentVariableList.isEmpty()) {
+        for (int i = 0; i < environmentVariableList.size(); i++) {
+          sequences.append("(Object)" + environmentVariableList.get(i) + ",");
+        }
+        return sequences.substring(0, sequences.length() - 1);
+      }
+      return null;
+    }
+
+    public String generateReturnTypeName(CtClass ctClass){
+      String className = ctClass.getName();
+      String result;
+      switch (className){
+        case "int": result = "java.lang.Integer";break;
+        case "short": result = "java.lang.Short";break;
+        case "long": result = "java.lang.Long";break;
+        case "double": result = "java.lang.Double";break;
+        case "float": result = "java.lang.Float";break;
+        case "byte": result = "java.lang.Byte";break;
+        case "char": result = "java.lang.Character";break;
+        case "boolean": result = "java.lang.Boolean";break;
+        case "void": result = "java.lang.Void";break;
+        default: result = className;
+      }
+      return result;
+    }
 }

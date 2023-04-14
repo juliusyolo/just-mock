@@ -27,6 +27,7 @@
         <spring-boot.version>2.7.5</spring-boot.version>
         <spring-cloud.version>2021.0.6</spring-cloud.version>
         <lombok.version>1.18.26</lombok.version>
+        <javassist.version>3.29.2-GA</javassist.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -73,7 +74,7 @@
             <dependency>
                 <groupId>org.javassist</groupId>
                 <artifactId>javassist</artifactId>
-                <version>3.21.0-GA</version>
+                <version>${javassist.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.javafaker</groupId>

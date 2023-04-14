@@ -77,19 +77,31 @@
                             <shadedPattern>com.sdefaa.jackson</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>org.javassist</pattern>
+                            <pattern>javassist</pattern>
                             <shadedPattern>com.sdefaa.javassist</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>org.freemarker</pattern>
+                            <pattern>freemarker</pattern>
                             <shadedPattern>com.sdefaa.freemarker</shadedPattern>
+                        </relocation>
+                        <relocation>
+                          <pattern>org.yaml.snakeyaml</pattern>
+                          <shadedPattern>com.sdefaa.snakeyaml</shadedPattern>
+                        </relocation>
+                        <relocation>
+                          <pattern>javax.el</pattern>
+                          <shadedPattern>com.sdefaa.javax.el</shadedPattern>
+                        </relocation>
+                        <relocation>
+                          <pattern>com.sun.el</pattern>
+                          <shadedPattern>com.sdefaa.sun.el</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>io.netty</pattern>
                             <shadedPattern>com.sdefaa.netty</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>org.ow2.asm</pattern>
+                            <pattern>org.objectweb.asm</pattern>
                             <shadedPattern>com.sdefaa.asm</shadedPattern>
                         </relocation>
                     </relocations>

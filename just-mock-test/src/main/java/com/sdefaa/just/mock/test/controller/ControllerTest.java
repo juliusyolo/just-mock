@@ -42,7 +42,7 @@ public class ControllerTest {
     }
 
     @PostMapping("/hello3")
-    public void say3(@RequestParam("age") Double age, @RequestParam("name") String name) throws JsonProcessingException {
+    public void say3(@RequestParam("age") double age, @RequestParam("age") int age1, @RequestParam("age") long age2,@RequestParam("age") short age6, @RequestParam("age") byte age3, @RequestParam("name") String name) throws JsonProcessingException {
 //    com.sdefaa.just.mock.test.controller.ControllerTest.threadLocal.get()
         System.out.println("回调:" + age + "," + name);
     }

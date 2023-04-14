@@ -151,17 +151,22 @@ export default defineComponent({
     const columns = [{
       title: '模板标签',
       slotName: 'tag',
+      ellipsis: true,
+      tooltip: true
     }, {
       title: '是否el条件mock',
       slotName: 'conditionalMock',
+      width:150
     }, {
       title: '模板内容',
       dataIndex: 'templateContent',
       ellipsis: true,
-      tooltip: true
+      tooltip: true,
+      width: 300
     }, {
       title: '操作',
       slotName: 'optional',
+      width: 200
     }];
     const randomVariablesChange = (records: RandomVariableArray) => {
       mockTemplateInfoModel.value = {
